@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.pdes.rcp.core.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="RCP Perspective"
+            class="org.pdes.rcp.core.Perspective"
+            id="pDES.perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.pdes.rcp.view.editor.ProjectEditor"
+            default="false"
+            icon="icons/editor.png"
+            id="pDES.ProjectEditor"
+            name="Project">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.pdes.rcp.view.parts.SelectedModelViewPart"
+            icon="icons/detail.png"
+            id="pDES.SelectedModelViewPart"
+            name="Detail"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>

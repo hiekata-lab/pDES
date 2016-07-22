@@ -137,13 +137,13 @@ public class ProjectEditor extends DiagramEditor {
 		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, Boolean.FALSE);
 		drawer.add(entry);
 		
-		entry = new CreationToolEntry("Sub-workflow", "Make sub-workflow", new SimpleFactory(
-				SubWorkflowNode.class), Activator.imageDescriptorFromPlugin(
-						Activator.PLUGIN_ID, FigureConstants.WORKFLOW_IMAGE_PATH), Activator
-						.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
-								FigureConstants.WORKFLOW_IMAGE_PATH)); 
-		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, Boolean.FALSE);
-		drawer.add(entry);
+//		entry = new CreationToolEntry("Sub-workflow", "Make sub-workflow", new SimpleFactory(
+//				SubWorkflowNode.class), Activator.imageDescriptorFromPlugin(
+//						Activator.PLUGIN_ID, FigureConstants.WORKFLOW_IMAGE_PATH), Activator
+//						.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+//								FigureConstants.WORKFLOW_IMAGE_PATH)); 
+//		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, Boolean.FALSE);
+//		drawer.add(entry);
 		
 		entry = new CreationToolEntry("Component", "Make component", new SimpleFactory(
 				ComponentNode.class), Activator.imageDescriptorFromPlugin(

@@ -35,6 +35,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.pdes.rcp.actions.NewProjectFileAction;
+import org.pdes.rcp.actions.OneRunPDES_BasicSimulatorAction;
+import org.pdes.rcp.actions.OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction;
 import org.pdes.rcp.actions.OpenProjectFileAction;
 import org.pdes.rcp.actions.SaveAsFileAction;
 import org.pdes.rcp.actions.SaveFileAction;
@@ -49,7 +51,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private SaveFileAction save = new SaveFileAction();
 	private SaveAsFileAction saveAs = new SaveAsFileAction();
 	private OpenProjectFileAction open = new OpenProjectFileAction();
-	//private MultiWorkflowMonteCarloSimulationAction mwSim = new MultiWorkflowMonteCarloSimulationAction();
+	private OneRunPDES_BasicSimulatorAction basicSim = new OneRunPDES_BasicSimulatorAction();
+	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
 	
 	/**
 	 * This is the constructor.
@@ -85,7 +88,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		MenuManager simulationMenu = new MenuManager("Simulation","Simulation");
 		menuBar.add(simulationMenu);
-		//simulationMenu.add(mwSim);
+		MenuManager runMenu = new MenuManager("Run at once");
+		simulationMenu.add(runMenu);
+		runMenu.add(basicSim);
+		runMenu.add(retSim);
 	}
 	
 }

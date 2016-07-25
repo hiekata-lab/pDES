@@ -1,0 +1,199 @@
+/*
+ * Copyright (c) 2016, Design Engineering Laboratory, The University of Tokyo.
+ * All rights reserved. 
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the project nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+package org.pdes.simulator.model;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.pdes.rcp.model.ComponentNode;
+
+/**
+ * Component model for discrete event simulation.<br>
+ * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ */
+public class Component {
+	
+	// Constraint variables on simulation
+	private final String id; // ID
+	private final String nodeId; // ComponentNode ID
+	private final String name;
+	private final double errorTolerance;
+	private final List<Component> dependingComponentList = new ArrayList<>();
+	private final List<Component> dependedComponentList = new ArrayList<>();
+	
+	// Changeable variable on simulation
+	private double error;
+	
+	//Other
+	private final Random random = new Random();
+	
+	/**
+	 * This is the constructor.
+	 * @param componentNode
+	 */
+	public Component(ComponentNode componentNode) {
+		this.id = UUID.randomUUID().toString();
+		this.nodeId = componentNode.getId();
+		this.name = componentNode.getName();
+		this.errorTolerance = componentNode.getErrorTolerance();
+	}
+	
+	/**
+	 * Initialize
+	 */
+	public void initialize() {
+		error = 0;
+	}
+	
+	/**
+	 * Add the attribute of depending component to this.
+	 * @param component
+	 */
+	public void addDependingComponent(Component component) {
+		dependingComponentList.add(component);
+	}
+	
+	/**
+	 * Add the attribute of depended component to this,
+	 * @param component
+	 */
+	public void addDependedComponent(Component component) {
+		dependedComponentList.add(component);
+	}
+	
+	/**
+	 * Update error value randomly.
+	 * @param noErrorProbability
+	 */
+	public void updateErrorValue(double noErrorProbability) {
+		if (random.nextDouble() >= noErrorProbability) error++;
+	}
+	
+	/**
+	 * Get total error value including depending components.
+	 */
+	public double getTotalErrorValue() {
+		if (dependingComponentList.size() == 0) return error;
+		return error + dependingComponentList.stream().mapToDouble(c -> c.getTotalErrorValue()).sum();
+	}
+	
+	/**
+	 * Check if the value of error is over tolerance.
+	 * @return
+	 */
+	public boolean checkIfErrorIsOverTolerance() {
+		if (getTotalErrorValue() > errorTolerance) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Reset error value.
+	 */
+	public void resetErrorValue() {
+		error = 0;
+		dependingComponentList.forEach(c -> c.resetErrorValue());
+	}
+
+	/**
+	 * Get the id.
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Get the node id.
+	 * @return the nodeId
+	 */
+	public String getNodeId() {
+		return nodeId;
+	}
+
+	/**
+	 * Get the name.
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Get error tolerance.
+	 * @return the errorTolerance
+	 */
+	public double getErrorTolerance() {
+		return errorTolerance;
+	}
+
+	/**
+	 * Get the list of depending components.
+	 * @return the dependingComponentList
+	 */
+	public List<Component> getDependingComponentList() {
+		return dependingComponentList;
+	}
+
+	/**
+	 * Get the list of depended components.
+	 * @return the dependedComponentList
+	 */
+	public List<Component> getDependedComponentList() {
+		return dependedComponentList;
+	}
+
+	/**
+	 * Get error value.
+	 * @return the error
+	 */
+	public double getError() {
+		return error;
+	}
+
+	/**
+	 * Set error value.
+	 * @param error the error to set
+	 */
+	public void setError(double error) {
+		this.error = error;
+	}
+	
+	/**
+	 * Transfer to text data.
+	 */
+	public String toString() {
+		String dependingComponentNames = String.join(",", dependingComponentList.stream().map(c -> c.getName()).collect(Collectors.toList()));
+		return String.format("[%s] E=%f ETotal=%f dp=%s", name, error, getTotalErrorValue(), dependingComponentNames);
+	}
+}

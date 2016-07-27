@@ -28,10 +28,20 @@
  */
 package org.pdes.simulator.base;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.pdes.simulator.model.Facility;
 import org.pdes.simulator.model.Organization;
 import org.pdes.simulator.model.Product;
@@ -41,7 +51,7 @@ import org.pdes.simulator.model.Worker;
 import org.pdes.simulator.model.Workflow;
 
 /**
- * This is the abstract simulator for PDES application.<br>
+ * This is the abstract simulator for pDES application.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
 public abstract class PDES_AbstractSimulator {
@@ -157,6 +167,7 @@ public abstract class PDES_AbstractSimulator {
 	
 	/**
 	 * Allocate ready tasks to free workers and facilities if necessary.
+	 * @param time 
 	 * @param readyTaskList
 	 * @param freeWorkerList
 	 * @param freeFacilityList
@@ -186,14 +197,15 @@ public abstract class PDES_AbstractSimulator {
 	
 	/**
 	 * Perform and update all workflow in this time.
+	 * @param time 
 	 * @param componentErrorRework 
 	 */
-	public void performAndUpdateAllWorkflow(boolean componentErrorRework){
+	public void performAndUpdateAllWorkflow(int time, boolean componentErrorRework){
 		workflowList.forEach(w -> {
-			w.checkWorking();//READY -> WORKING
-			w.perform(componentErrorRework);//update information of WORKING task in each workflow
-			w.checkFinished();// WORKING -> WORKING_ADDITIONALLY or FINISHED
-			w.checkReady();// NONE -> READY
+			w.checkWorking(time);//READY -> WORKING
+			w.perform(time, componentErrorRework);//update information of WORKING task in each workflow
+			w.checkFinished(time);// WORKING -> WORKING_ADDITIONALLY or FINISHED
+			w.checkReady(time);// NONE -> READY
 			w.updatePERTData();//Update PERT information
 		});
 	}
@@ -213,5 +225,107 @@ public abstract class PDES_AbstractSimulator {
 				.filter(w -> w.hasTask(task.getId()))
 				.map(w -> w.getId()).findFirst();
 		return runningWorkflow.isPresent() || numOfRunningWorkflow < concurrencyWorkflowLimit;
+	}
+	
+	/**
+	 * Save the simulation result to the given directory.
+	 * @param outputDir
+	 */
+	public void saveResultFilesInDirectory(String outputDir, String no){
+		String fileName = this.getResultFileName(no);//the list of file name
+		this.saveResultFileByCsv(outputDir, fileName+".csv");//1. Gantt chart data by csv format.
+	}
+	
+	/**
+	 * Get the file name considering 
+	 * @param type
+	 * @param extension
+	 */
+	private String getResultFileName(String no){
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String fileName = String.join("_", sdf.format(date));
+		if(no.length()>0) fileName += "_"+no;
+		return fileName;
+	}
+	
+	/**
+	 * Save result file by csv format.
+	 * @param outputDirName
+	 * @param resultFileName
+	 */
+	private void saveResultFileByCsv(String outputDirName, String resultFileName){
+		File resultFile = new File(outputDirName, resultFileName);
+		String separator = ",";
+		try {
+			// BOM
+			FileOutputStream os = new FileOutputStream(resultFile);
+			os.write(0xef);
+			os.write(0xbb);
+			os.write(0xbf);
+			
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
+			
+			// header
+			pw.println(FilenameUtils.getBaseName(resultFile.toString()));
+			
+			// workflow
+			pw.println();
+			pw.println("Gantt chart of each Task");
+			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
+			this.workflowList.forEach(w -> {
+				String workflowName = "Workflow ("+w.getDueDate()+")";
+				w.getTaskList().forEach(t ->{
+					pw.println(String.join(separator ,
+							new String[]{workflowName, t.getName(), t.getAllocatedTeam().getName(), String.valueOf(t.getReadyTime()), String.valueOf(t.getStartTime()), String.valueOf(t.getFinishTime()), String.valueOf(t.getAdditionalStartTime()), String.valueOf(t.getAdditionalFinishTime())}));
+				});
+			});
+			
+			// product
+			pw.println();
+			pw.println("Gantt chart of each Component");
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Ready Time", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
+			
+			// Organization
+			pw.println();
+			pw.println("Gantt chart of each Resource");
+			pw.println(String.join(separator , new String[]{"Team", "Type", "Name", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time"}));
+			this.organization.getTeamList().forEach(t -> {
+				String teamName = t.getName();
+				
+				//Workers
+				t.getWorkerList().forEach(w -> {;
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(teamName);
+					baseInfo.add("Worker");
+					baseInfo.add(w.getName());
+					IntStream.range(0, w.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
+						baseInfo.add(w.getWorkedTaskList().get(i).getName());
+					});
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));;
+				});
+				
+				//Facilities
+				t.getFacilityList().forEach(w -> {
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(teamName);
+					baseInfo.add("Facility");
+					baseInfo.add(w.getName());
+					IntStream.range(0, w.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
+						baseInfo.add(w.getWorkedTaskList().get(i).getName());
+					});
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));;
+				});
+			});
+			
+			pw.close();
+			os.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

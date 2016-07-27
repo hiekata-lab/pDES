@@ -61,7 +61,7 @@ public class Resource {
 	protected double totalCost = 0;
 	protected final List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
 	protected final List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
-	protected final List<Task> assignedTaskList = new ArrayList<Task>(); // list of assigned task
+	protected final List<Task> workedTaskList = new ArrayList<Task>(); // list of worked task
 	
 	/**
 	 * This is the constructor.
@@ -86,7 +86,7 @@ public class Resource {
 		totalCost = 0;
 		startTimeList.clear();
 		finishTimeList.clear();
-		assignedTaskList.clear();
+		workedTaskList.clear();
 	}
 	
 	/**
@@ -167,8 +167,8 @@ public class Resource {
 	 * Add assigned task.
 	 * @param task
 	 */
-	public void addAssignedTask(Task task) {
-		assignedTaskList.add(task);
+	public void addWorkedTask(Task task) {
+		workedTaskList.add(task);
 	}
 	
 	/**
@@ -286,11 +286,11 @@ public class Resource {
 	}
 
 	/**
-	 * Get the list of assigned task.
-	 * @return the assingedTaskList
+	 * Get the list of worked task.
+	 * @return the workedTaskList
 	 */
-	public List<Task> getAssingedTaskList() {
-		return assignedTaskList;
+	public List<Task> getWorkedTaskList() {
+		return workedTaskList;
 	}
 	
 	/**

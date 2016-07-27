@@ -131,7 +131,7 @@ public class SubWorkflow {
 	 * @return
 	 */
 	public Component getTopComponent() {
-		return componentList.stream().filter(component -> component.getDependedComponentList().size() == 0).findFirst().get();
+		return componentList.stream().filter(component -> component.getDirectlyDependedComponentList().size() == 0).findFirst().get();
 	}
 
 	/**

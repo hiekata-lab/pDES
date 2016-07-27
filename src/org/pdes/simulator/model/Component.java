@@ -49,6 +49,7 @@ public class Component {
 	private final double errorTolerance;
 	private final List<Component> dependingComponentList = new ArrayList<>();
 	private final List<Component> dependedComponentList = new ArrayList<>();
+	private final List<Task> targetedTaskList = new ArrayList<>();
 	
 	// Changeable variable on simulation
 	private double error;
@@ -88,6 +89,14 @@ public class Component {
 	 */
 	public void addDependedComponent(Component component) {
 		dependedComponentList.add(component);
+	}
+	
+	/**
+	 * Add targeted Task of this component.
+	 * @param task
+	 */
+	public void addTargetedTask(Task task) {
+		targetedTaskList.add(task);
 	}
 	
 	/**
@@ -158,19 +167,27 @@ public class Component {
 	}
 
 	/**
-	 * Get the list of depending components.
+	 * Get the list of directly depending components.
 	 * @return the dependingComponentList
 	 */
-	public List<Component> getDependingComponentList() {
+	public List<Component> getDirectlyDependingComponentList() {
 		return dependingComponentList;
 	}
 
 	/**
-	 * Get the list of depended components.
+	 * Get the list of directly depended components.
 	 * @return the dependedComponentList
 	 */
-	public List<Component> getDependedComponentList() {
+	public List<Component> getDirectlyDependedComponentList() {
 		return dependedComponentList;
+	}
+	
+	/**
+	 * Get the list of targeted task.
+	 * @return the targetedTaskList
+	 */
+	public List<Task> getTargetedTaskList() {
+		return targetedTaskList;
 	}
 
 	/**

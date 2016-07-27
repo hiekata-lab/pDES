@@ -43,15 +43,15 @@ import org.pdes.rcp.model.TaskNode;
 public class Task {
 	
 	private enum TaskState {
-		/** Cannot start task */
+		/** Cannot start task (stateInt=0)*/
 		NONE,
-		/** Can start task but not start*/
+		/** Can start task but not start (stateInt=1)*/
 		READY,
-		/** Doing this task*/
+		/** Doing this task (stateInt=2)*/
 		WORKING,
-		/** Doing Additional or Exceptional work of this task*/
+		/** Doing Additional or Exceptional work of this task (stateInt=3)*/
 		WORKING_ADDITIONALLY,
-		/** Finished this task */
+		/** Finished this task (stateInt=4)*/
 		FINISHED,
 	}
 	
@@ -76,6 +76,8 @@ public class Task {
 	private double remainingWorkAmount; // remaining work amount
 	private double actualWorkAmount; // actual work amount
 	private TaskState state = TaskState.NONE; // state of this task
+	private int stateInt = 0;
+	private int readyTime = 0;
 	private int startTime = 0;
 	private int finishTime = 0;
 	private int additionalStartTime = 0;//start time of additional work
@@ -108,6 +110,8 @@ public class Task {
 		remainingWorkAmount = defaultWorkAmount;
 		actualWorkAmount = defaultWorkAmount;
 		state = TaskState.NONE;
+		stateInt = 0;
+		readyTime = 0;
 		startTime = 0;
 		finishTime = 0;
 		additionalStartTime = 0;
@@ -145,8 +149,12 @@ public class Task {
 	 * Check whether this task has to be READY or not.<br>
 	 * If all input tasks are FINISHED and the state of this task is NONE, change the state of this task to READY.
 	 */
-	public void checkReady() {
-		if (isNone() && inputTaskList.stream().allMatch(t -> t.isFinished())) state = TaskState.READY;
+	public void checkReady(int time) {
+		if (isNone() && inputTaskList.stream().allMatch(t -> t.isFinished())){
+			state = TaskState.READY;
+			stateInt = 1;
+			readyTime = time;
+		}
 	}
 	
 	/**
@@ -158,14 +166,15 @@ public class Task {
 	public void checkWorking(int time) {
 		if (isReady() && allocatedWorker != null) {
 			state = TaskState.WORKING;
+			stateInt = 2;
 			startTime = time;
 			allocatedWorker.setStateWorking();
 			allocatedWorker.addStartTime(time);
-			allocatedWorker.addAssignedTask(this);
+			allocatedWorker.addWorkedTask(this);
 			if (needFacility) {
 				allocatedFacility.setStateWorking();
 				allocatedFacility.addStartTime(time);
-				allocatedFacility.addAssignedTask(this);
+				allocatedFacility.addWorkedTask(this);
 			}
 		}
 	}
@@ -186,6 +195,7 @@ public class Task {
 				if (additionalTaskFlag) {
 					//Additional work
 					state = TaskState.WORKING_ADDITIONALLY;
+					stateInt = 3;
 					remainingWorkAmount = additionalWorkAmount;
 					actualWorkAmount += additionalWorkAmount;
 					additionalStartTime = time + 1;
@@ -193,6 +203,7 @@ public class Task {
 				} else {
 					//Finish normally.
 					state = TaskState.FINISHED;
+					stateInt = 4;
 					allocatedWorker.setStateFree();
 					allocatedWorker.addFinishTime(time);
 					if (needFacility) {
@@ -204,6 +215,7 @@ public class Task {
 				additionalFinishTime = time;
 				remainingWorkAmount = 0;
 				state = TaskState.FINISHED;
+				stateInt = 4;
 				allocatedWorker.setStateFree();
 				allocatedWorker.addFinishTime(time);
 				if (needFacility) {
@@ -476,6 +488,24 @@ public class Task {
 	 */
 	public double getActualWorkAmount() {
 		return actualWorkAmount;
+	}
+	
+	
+
+	/**
+	 * Get the state(int) of this task.
+	 * @return the stateInt
+	 */
+	public int getStateInt() {
+		return stateInt;
+	}
+
+	/**
+	 * Get the ready time
+	 * @return the readyTime
+	 */
+	public int getReadyTime() {
+		return readyTime;
 	}
 
 	/**

@@ -57,9 +57,11 @@ import org.pdes.rcp.view.editor.ProjectEditor;
  * Simulation should do on other UI thread, so concurrent callable class should be developed in upper class.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public abstract class AbstractOneRunSimulationAction extends Action {
+public abstract class AbstractSimulationAction extends Action {
 	
 	protected final MessageConsoleStream msgStream = Activator.getDefault().getMsgStream();
+	
+	protected boolean aggregateMode = false;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#run()
@@ -102,18 +104,19 @@ public abstract class AbstractOneRunSimulationAction extends Action {
 		}
 		
 		//4. Run simulation
-		Future<String> result = this.doSimulation((ProjectDiagram)pe.getDiagram(), workflowCount);
+		Future<String> result = this.doSimulation((ProjectDiagram)pe.getDiagram(), workflowCount, outputDirName);
 		
 		//5. Save the result of simulation
-		this.saveResult(outputDirName, result);
+		if(aggregateMode) this.saveResult(outputDirName, result);
 	}
 	
 	
 	/**
 	 * Run simulation.
 	 * @param workflowCount 
+	 * @param outputDirectoryPath 
 	 */
-	protected abstract Future<String> doSimulation(ProjectDiagram diagram, int workflowCount);
+	protected abstract Future<String> doSimulation(ProjectDiagram diagram, int workflowCount, String outputDirectoryPath);
 	
 	/**
 	 * Save result of simulation.
@@ -126,7 +129,7 @@ public abstract class AbstractOneRunSimulationAction extends Action {
 		String resultFileName = String.join("_", sdf.format(date)) + ".csv";
 		File resultFile = new File(outputDirName, resultFileName);
 		try {
-			// BOMをつける
+			// BOM
 			FileOutputStream os = new FileOutputStream(resultFile);
 			os.write(0xef);
 			os.write(0xbb);

@@ -82,7 +82,7 @@ public class PDES_BasicSimulator extends PDES_AbstractSimulator {
 			this.allocateReadyTasksToFreeResources(readyTaskList, freeWorkerList, freeFacilityList);
 			
 			//4. Perform WORKING tasks and update the status of each task.
-			this.performAndUpdateAllWorkflow(considerReworkOfErrorTorelance);
+			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
 			time++;
 		}
 	}

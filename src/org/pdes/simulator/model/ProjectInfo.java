@@ -146,6 +146,7 @@ public class ProjectInfo {
 					.findFirst()
 					.get();
 			destinationTask.addTargetComponent(originComponent);
+			originComponent.addTargetedTask(destinationTask);
 		});
 	}
 	
@@ -216,5 +217,16 @@ public class ProjectInfo {
 		return workflowList.stream()
 				.mapToDouble(w -> w.getTotalActualWorkAmount())
 				.sum();
+	}
+	
+	/**
+	 * Get the duration considering all workflows.
+	 * @return
+	 */
+	public int getDuration(){
+		return workflowList.stream()
+				.mapToInt(w -> w.getDuration())
+				.max()
+				.orElse(0);
 	}
 }

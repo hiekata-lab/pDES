@@ -43,7 +43,7 @@ public class Workflow {
 	private String id;
 	private final int dueDate; // Due or Submission date. (for utilizing the priority of each workflow in this application)
 	private final List<Task> taskList;
-	private int time = 0;
+	private int duration = 0;
 	
 	private double criticalPathLength = 0;
 	
@@ -72,10 +72,10 @@ public class Workflow {
 	 */
 	public void initialize() {
 		taskList.forEach(t -> t.initialize());
-		time = 0;
+		duration = 0;
 		criticalPathLength = 0;
 		updatePERTData();
-		checkReady();
+		checkReady(0);
 	}
 	
 	/**
@@ -263,21 +263,21 @@ public class Workflow {
 	/**
 	 * Change the state of each task to READY if necessary.
 	 */
-	public void checkReady() {
-		taskList.forEach(t -> t.checkReady());
+	public void checkReady(int time) {
+		taskList.forEach(t -> t.checkReady(time));
 	}
 	
 	/**
 	 * Change the state of each task to WORKING if necessary.
 	 */
-	public void checkWorking() {
+	public void checkWorking(int time) {
 		taskList.forEach(t -> t.checkWorking(time));
 	}
 	
 	/**
 	 * Change the state of each task to FINISH if necessary.
 	 */
-	public void checkFinished() {
+	public void checkFinished(int time) {
 		taskList.forEach(t -> t.checkFinished(time));
 	}
 	
@@ -286,9 +286,8 @@ public class Workflow {
 	 * @param componentErrorRework 
 	 * @param time
 	 */
-	public void perform(boolean componentErrorRework) {
+	public void perform(int time, boolean componentErrorRework) {
 		taskList.forEach(t -> t.perform(time, componentErrorRework));
-		time++;
 	}
 	
 	/**
@@ -339,17 +338,17 @@ public class Workflow {
 	}
 
 	/**
-	 * Get the time.
-	 * @return the time
+	 * Get the duration.
+	 * @return the duration
 	 */
-	public int getTime() {
-		return time;
+	public int getDuration() {
+		return duration;
 	}
 	
 	/**
 	 * Transfer to text data.
 	 */
 	public String toString() {
-		return "t=" + time + "\n" + String.join("\n", taskList.stream().map(t -> t.toString()).collect(Collectors.toList()));
+		return "duration=" + duration + "\n" + String.join("\n", taskList.stream().map(t -> t.toString()).collect(Collectors.toList()));
 	}
 }

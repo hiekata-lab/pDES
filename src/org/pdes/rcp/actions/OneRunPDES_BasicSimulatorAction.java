@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.pdes.rcp.actions.base.AbstractOneRunSimulationAction;
+import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
 import org.pdes.simulator.PDES_BasicSimulator;
 import org.pdes.simulator.model.ProjectInfo;
@@ -42,7 +42,7 @@ import org.pdes.simulator.model.ProjectInfo;
  * This is the Action class for running PDES_BasicSimulator at once.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class OneRunPDES_BasicSimulatorAction extends AbstractOneRunSimulationAction {
+public class OneRunPDES_BasicSimulatorAction extends AbstractSimulationAction {
 	
 	private final String text = "Basic DES";
 	
@@ -55,10 +55,10 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractOneRunSimulationAct
 	 * @see org.pdes.rcp.actions.base.AbstractOneRunSimulationAction#doSimulation()
 	 */
 	@Override
-	protected Future<String> doSimulation(ProjectDiagram diagram, int workflowCount) {
+	protected Future<String> doSimulation(ProjectDiagram diagram, int workflowCount, String outputDirectoryPath) {
 		long start = System.currentTimeMillis();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		Future<String> result = service.submit(new BasicSimulationTask(0, diagram, workflowCount));
+		Future<String> result = service.submit(new BasicSimulationTask(0, diagram, workflowCount, outputDirectoryPath));
 		service.shutdown();
 		long end = System.currentTimeMillis();
 		msgStream.println("Processing time: " + ((end - start) / 1000) + " [sec]");
@@ -74,6 +74,7 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractOneRunSimulationAct
 		private final int no;
 		private final ProjectDiagram diagram;
 		private final int numOfWorkflow;
+		private final String outputDirectoryPath;
 		
 		/**
 		 * This is the constructor.
@@ -81,10 +82,11 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractOneRunSimulationAct
 		 * @param diagram
 		 * @param numOfWorkflow
 		 */
-		public BasicSimulationTask(int no, ProjectDiagram diagram, int numOfWorkflow) {
+		public BasicSimulationTask(int no, ProjectDiagram diagram, int numOfWorkflow, String outputDirectoryPath) {
 			this.no = no;
 			this.diagram = diagram;
 			this.numOfWorkflow = numOfWorkflow;
+			this.outputDirectoryPath = outputDirectoryPath;
 		}
 
 		/* (non-Javadoc)
@@ -94,7 +96,8 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractOneRunSimulationAct
 		public String call() throws Exception {
 			ProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
 			PDES_BasicSimulator sim = new PDES_BasicSimulator(project);
-			sim.execute();			
+			sim.execute();
+			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%d,%f,%f", no, sim.getTime(), project.getTotalCost(), project.getTotalActualWorkAmount());
 		}
 	}

@@ -116,12 +116,13 @@ public class CreateLinkCommand extends Command {
 			if(this.hasSomeLinkBetweenNodeElement()) return false;//IF a link has existed in the same place THEN wrong.
 			if(!(source instanceof ComponentNode)) return false; // source have to be Component
 			if(!(target instanceof ComponentNode || target instanceof SubWorkflowNode)) return false; // target have to be Component or SubWorkflow
+			if(target.getIncomingLinkList().stream().filter(link -> link instanceof ComponentHierarchyLink).count()>0) return false;//Child component can have only one parent component.
 			return true;
 		}else if(link instanceof AllocationLink){
 			if(this.hasSomeLinkBetweenNodeElement()) return false;//IF a link has existed in the same place THEN wrong.
 			if(!(source instanceof TeamNode)) return false;
 			if(!(target instanceof TaskNode)) return false;
-			if(target.getIncomingLinkList().stream().filter(link -> link instanceof AllocationLink).count()>1) return false;//Only one team can be assigned to one Task. TODO Check this.
+			if(target.getIncomingLinkList().stream().filter(link -> link instanceof AllocationLink).count()>0) return false;//Only one team can be assigned to one Task.
 			return true;
 		}else if(link instanceof TargetComponentLink){
 			if(this.hasSomeLinkBetweenNodeElement()) return false;//IF a link has existed in the same place THEN wrong.

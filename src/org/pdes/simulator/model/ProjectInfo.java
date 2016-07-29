@@ -65,7 +65,7 @@ public class ProjectInfo {
 			this.addTargetComponentLinkInformation(componentList, taskList);
 			this.addAllocationLinkInformation(organization, taskList);
 			Workflow workflow = new Workflow(i,taskList);
-			Product product = new Product(componentList);
+			Product product = new Product(i,componentList);
 			this.workflowList.add(workflow);
 			this.productList.add(product);
 		});

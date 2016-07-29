@@ -96,7 +96,6 @@ public class ProjectEditor extends DiagramEditor {
 	 */
 	@Override
 	protected void configureGraphicalViewer() {
-		// TODO Auto-generated method stub
 		super.configureGraphicalViewer();
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new ProjectEditorEditPartFactory());

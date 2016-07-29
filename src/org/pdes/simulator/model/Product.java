@@ -29,6 +29,7 @@
 package org.pdes.simulator.model;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -38,13 +39,17 @@ import java.util.stream.Collectors;
  *
  */
 public class Product {
+	private String id;
+	private int dueDate;
 	private List<Component> componentList;
 	
 	/**
 	 * This is the constructor.
 	 * @param componentList
 	 */
-	public Product(List<Component> componentList) {
+	public Product(int dueDate, List<Component> componentList) {
+		this.id = UUID.randomUUID().toString();
+		this.dueDate = dueDate;;
 		this.setComponentList(componentList);
 	}
 	
@@ -55,6 +60,21 @@ public class Product {
 		componentList.forEach(c -> c.initialize());
 	}
 	
+	/**
+	 * Get the id.
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @return the dueDate
+	 */
+	public int getDueDate() {
+		return dueDate;
+	}
+
 	/**
 	 * Get the component which has same id.
 	 * @param id

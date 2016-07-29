@@ -284,8 +284,14 @@ public abstract class PDES_AbstractSimulator {
 			// product
 			pw.println();
 			pw.println("Gantt chart of each Component");
-			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Ready Time", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
-			
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
+			this.productList.forEach(p -> {
+				String productName = "Product ("+p.getDueDate()+")";
+				p.getComponentList().forEach(c -> {
+					pw.println(String.join(separator ,
+							new String[]{productName, c.getName(), String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getFinishTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getAdditionalFinishTime())}));
+				});
+			});
 			// Organization
 			pw.println();
 			pw.println("Gantt chart of each Resource");

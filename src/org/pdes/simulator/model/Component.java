@@ -189,7 +189,81 @@ public class Component {
 	public List<Task> getTargetedTaskList() {
 		return targetedTaskList;
 	}
-
+	
+	/**
+	 * Get the list of all depending components.
+	 * @return
+	 */
+	public List<Component> getAllDependingComponentList(){
+		List<Component> allDependingComponentList = new ArrayList<Component>();
+		this.getAllDependingComponentListForRecursion(this, allDependingComponentList);
+		return allDependingComponentList;
+	}
+	
+	/**
+	 * Get the list of all depending components.
+	 * @param c
+	 * @param allDependingComponentList
+	 */
+	private void getAllDependingComponentListForRecursion(Component c, List<Component> allDependingComponentList){
+		allDependingComponentList.add(c);
+		c.getDirectlyDependingComponentList().forEach(cc ->{
+			 this.getAllDependingComponentListForRecursion(cc, allDependingComponentList);
+		});
+	}
+	
+	/**
+	 * Get the start time from all depending components and tasks.
+	 * @return
+	 */
+	public int getStartTime(){
+		return this.getAllDependingComponentList().stream()
+				.flatMap(c -> c.getTargetedTaskList().stream())
+				.mapToInt(t -> t.getStartTime())
+				.filter(s -> s >= 0)
+				.min()
+				.orElse(-1);
+	}
+	
+	/**
+	 * Get the finish time from all depending components and tasks.
+	 * @return
+	 */
+	public int getFinishTime(){
+		return this.getAllDependingComponentList().stream()
+				.flatMap(c -> c.getTargetedTaskList().stream())
+				.mapToInt(t -> t.getFinishTime())
+				.filter(f -> f >= 0)
+				.max()
+				.orElse(-1);
+	}
+	
+	/**
+	 * Get the additional start time from all depending components and tasks.
+	 * @return
+	 */
+	public int getAdditionalStartTime(){
+		return this.getAllDependingComponentList().stream()
+				.flatMap(c -> c.getTargetedTaskList().stream())
+				.mapToInt(t -> t.getAdditionalStartTime())
+				.filter(s -> s >= 0)
+				.min()
+				.orElse(-1);
+	}
+	
+	/**
+	 * Get the additional finish time from all depending components and tasks.
+	 * @return
+	 */
+	public int getAdditionalFinishTime(){
+		return this.getAllDependingComponentList().stream()
+				.flatMap(c -> c.getTargetedTaskList().stream())
+				.mapToInt(t -> t.getAdditionalFinishTime())
+				.filter(f -> f >= 0)
+				.max()
+				.orElse(-1);
+	}
+	
 	/**
 	 * Get error value.
 	 * @return the error

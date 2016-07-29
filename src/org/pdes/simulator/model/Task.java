@@ -77,11 +77,11 @@ public class Task {
 	private double actualWorkAmount; // actual work amount
 	private TaskState state = TaskState.NONE; // state of this task
 	private int stateInt = 0;
-	private int readyTime = 0;
-	private int startTime = 0;
-	private int finishTime = 0;
-	private int additionalStartTime = 0;//start time of additional work
-	private int additionalFinishTime = 0; //finish time of additional work
+	private int readyTime = -1;
+	private int startTime = -1;
+	private int finishTime = -1;
+	private int additionalStartTime = -1;//start time of additional work
+	private int additionalFinishTime = -1; //finish time of additional work
 	private boolean additionalTaskFlag = false;
 	private Worker allocatedWorker = null;
 	private Facility allocatedFacility = null;
@@ -111,11 +111,11 @@ public class Task {
 		actualWorkAmount = defaultWorkAmount;
 		state = TaskState.NONE;
 		stateInt = 0;
-		readyTime = 0;
-		startTime = 0;
-		finishTime = 0;
-		additionalStartTime = 0;
-		additionalFinishTime = 0;
+		readyTime = -1;
+		startTime = -1;
+		finishTime = -1;
+		additionalStartTime = -1;
+		additionalFinishTime = -1;
 		additionalTaskFlag = false;
 		allocatedWorker = null;
 		allocatedFacility = null;
@@ -192,24 +192,34 @@ public class Task {
 				finishTime = time;
 				remainingWorkAmount = 0;
 				
+				//Finish normally.
+				state = TaskState.FINISHED;
+				stateInt = 4;
+				allocatedWorker.setStateFree();
+				allocatedWorker.addFinishTime(time);
+				if (needFacility) {
+					allocatedFacility.setStateFree();
+					allocatedFacility.addFinishTime(time);
+				}
+				
 				if (additionalTaskFlag) {
 					//Additional work
+					//TODO check and update the logic of adding additional work.
 					state = TaskState.WORKING_ADDITIONALLY;
 					stateInt = 3;
 					remainingWorkAmount = additionalWorkAmount;
 					actualWorkAmount += additionalWorkAmount;
 					additionalStartTime = time + 1;
-					additionalTaskFlag = false;
-				} else {
-					//Finish normally.
-					state = TaskState.FINISHED;
-					stateInt = 4;
-					allocatedWorker.setStateFree();
-					allocatedWorker.addFinishTime(time);
+					
+					//Just assign worker and facility again.
+					allocatedWorker.addStartTime(time+1);
+					allocatedWorker.addWorkedTask(this);
 					if (needFacility) {
-						allocatedFacility.setStateFree();
-						allocatedFacility.addFinishTime(time);
+						allocatedFacility.addStartTime(time+1);
+						allocatedFacility.addWorkedTask(this);
 					}
+					
+					additionalTaskFlag = false;
 				}
 			} else if (isWorkingAdditionally()) {
 				additionalFinishTime = time;

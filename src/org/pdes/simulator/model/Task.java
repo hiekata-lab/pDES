@@ -81,7 +81,6 @@ public class Task {
 	private int startTime = -1;
 	private int finishTime = -1;
 	private int additionalStartTime = -1;//start time of additional work
-	private int additionalFinishTime = -1; //finish time of additional work
 	private boolean additionalTaskFlag = false;
 	private Worker allocatedWorker = null;
 	private Facility allocatedFacility = null;
@@ -115,7 +114,6 @@ public class Task {
 		startTime = -1;
 		finishTime = -1;
 		additionalStartTime = -1;
-		additionalFinishTime = -1;
 		additionalTaskFlag = false;
 		allocatedWorker = null;
 		allocatedFacility = null;
@@ -221,8 +219,9 @@ public class Task {
 					
 					additionalTaskFlag = false;
 				}
+				
 			} else if (isWorkingAdditionally()) {
-				additionalFinishTime = time;
+				finishTime = time;
 				remainingWorkAmount = 0;
 				state = TaskState.FINISHED;
 				stateInt = 4;
@@ -538,14 +537,6 @@ public class Task {
 	 */
 	public int getAdditionalStartTime() {
 		return additionalStartTime;
-	}
-
-	/**
-	 * Get the additional finish time.
-	 * @return the additionalFinishTime
-	 */
-	public int getAdditionalFinishTime() {
-		return additionalFinishTime;
 	}
 
 	/**

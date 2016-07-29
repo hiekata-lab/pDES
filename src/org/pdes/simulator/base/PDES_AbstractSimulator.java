@@ -55,6 +55,7 @@ import org.pdes.simulator.model.Workflow;
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
 public abstract class PDES_AbstractSimulator {
+	protected final ProjectInfo project;
 	protected final List<Workflow> workflowList;
 	protected final Organization organization;
 	protected final List<Product> productList;
@@ -70,6 +71,7 @@ public abstract class PDES_AbstractSimulator {
 	 * @param simultaneousWorkflowLimit
 	 */
 	public PDES_AbstractSimulator(ProjectInfo project){
+		this.project = project;
 		this.workflowList = project.getWorkflowList();
 		this.organization = project.getOrganization();
 		this.productList = project.getProductList();
@@ -242,11 +244,7 @@ public abstract class PDES_AbstractSimulator {
 	 * @param extension
 	 */
 	private String getResultFileName(String no){
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String fileName = String.join("_", sdf.format(date));
-		if(no.length()>0) fileName += "_"+no;
-		return fileName;
+		return no;
 	}
 	
 	/**
@@ -267,29 +265,29 @@ public abstract class PDES_AbstractSimulator {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
 			// header
-			pw.println(FilenameUtils.getBaseName(resultFile.toString()));
+			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
 			
 			// workflow
 			pw.println();
 			pw.println("Gantt chart of each Task");
-			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Additinoal Start Time", "Finish Time"}));
 			this.workflowList.forEach(w -> {
 				String workflowName = "Workflow ("+w.getDueDate()+")";
 				w.getTaskList().forEach(t ->{
 					pw.println(String.join(separator ,
-							new String[]{workflowName, t.getName(), t.getAllocatedTeam().getName(), String.valueOf(t.getReadyTime()), String.valueOf(t.getStartTime()), String.valueOf(t.getFinishTime()), String.valueOf(t.getAdditionalStartTime()), String.valueOf(t.getAdditionalFinishTime())}));
+							new String[]{workflowName, t.getName(), t.getAllocatedTeam().getName(), String.valueOf(t.getReadyTime()), String.valueOf(t.getStartTime()), String.valueOf(t.getAdditionalStartTime()), String.valueOf(t.getFinishTime())}));
 				});
 			});
 			
 			// product
 			pw.println();
 			pw.println("Gantt chart of each Component");
-			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Start Time", "Finish Time", "Additinoal Start Time", "Additional Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Start Time", "Additinoal Start Time", "Finish Time"}));
 			this.productList.forEach(p -> {
 				String productName = "Product ("+p.getDueDate()+")";
 				p.getComponentList().forEach(c -> {
 					pw.println(String.join(separator ,
-							new String[]{productName, c.getName(), String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getFinishTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getAdditionalFinishTime())}));
+							new String[]{productName, c.getName(), String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getFinishTime())}));
 				});
 			});
 			// Organization

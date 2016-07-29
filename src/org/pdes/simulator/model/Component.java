@@ -252,19 +252,6 @@ public class Component {
 	}
 	
 	/**
-	 * Get the additional finish time from all depending components and tasks.
-	 * @return
-	 */
-	public int getAdditionalFinishTime(){
-		return this.getAllDependingComponentList().stream()
-				.flatMap(c -> c.getTargetedTaskList().stream())
-				.mapToInt(t -> t.getAdditionalFinishTime())
-				.filter(f -> f >= 0)
-				.max()
-				.orElse(-1);
-	}
-	
-	/**
 	 * Get error value.
 	 * @return the error
 	 */

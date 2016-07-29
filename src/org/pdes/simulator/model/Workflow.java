@@ -43,7 +43,6 @@ public class Workflow {
 	private String id;
 	private final int dueDate; // Due or Submission date. (for utilizing the priority of each workflow in this application)
 	private final List<Task> taskList;
-	private int duration = 0;
 	
 	private double criticalPathLength = 0;
 	
@@ -72,7 +71,6 @@ public class Workflow {
 	 */
 	public void initialize() {
 		taskList.forEach(t -> t.initialize());
-		duration = 0;
 		criticalPathLength = 0;
 		updatePERTData();
 		checkReady(0);
@@ -342,13 +340,16 @@ public class Workflow {
 	 * @return the duration
 	 */
 	public int getDuration() {
-		return duration;
+		return this.taskList.stream()
+				.mapToInt(t -> t.getFinishTime())
+				.max()
+				.orElse(0);
 	}
 	
 	/**
 	 * Transfer to text data.
 	 */
 	public String toString() {
-		return "duration=" + duration + "\n" + String.join("\n", taskList.stream().map(t -> t.toString()).collect(Collectors.toList()));
+		return "duration=" + this.getDuration() + "\n" + String.join("\n", taskList.stream().map(t -> t.toString()).collect(Collectors.toList()));
 	}
 }

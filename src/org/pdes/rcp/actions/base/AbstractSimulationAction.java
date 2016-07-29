@@ -80,6 +80,7 @@ public abstract class AbstractSimulationAction extends Action {
 		//2. Set directory for save result.
 		DirectoryDialog directoryDialog = new DirectoryDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		directoryDialog.setText("Select a directory to save results.");
+		directoryDialog.setFilterPath(new File(pe.getFilePath()).getParent());
 		String outputDirName = directoryDialog.open();
 		if (outputDirName == null) {
 			return;

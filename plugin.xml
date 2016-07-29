@@ -39,5 +39,17 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="pDES.application"
+            name="pDES">
+         <property
+               name="appName"
+               value="pDES">
+         </property>
+      </product>
+   </extension>
 
 </plugin>

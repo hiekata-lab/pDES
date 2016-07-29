@@ -28,6 +28,8 @@
  */
 package org.pdes.rcp.actions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,14 +57,15 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractSimulationAction {
 	 * @see org.pdes.rcp.actions.base.AbstractOneRunSimulationAction#doSimulation()
 	 */
 	@Override
-	protected Future<String> doSimulation(ProjectDiagram diagram, int workflowCount, String outputDirectoryPath) {
+	protected List<Future<String>> doSimulation(ProjectDiagram diagram, int workflowCount) {
 		long start = System.currentTimeMillis();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		Future<String> result = service.submit(new BasicSimulationTask(0, diagram, workflowCount, outputDirectoryPath));
+		List<Future<String>> resultList = new ArrayList<Future<String>>();
+		resultList.add(service.submit(new BasicSimulationTask(0, diagram, workflowCount, outputDir)));
 		service.shutdown();
 		long end = System.currentTimeMillis();
-		msgStream.println("Processing time: " + ((end - start) / 1000) + " [sec]");
-		return result;
+		msgStream.println("Processing time: " + ((end - start)) + " [millisec]");
+		return resultList;
 	}
 	
 	/**
@@ -98,7 +101,7 @@ public class OneRunPDES_BasicSimulatorAction extends AbstractSimulationAction {
 			PDES_BasicSimulator sim = new PDES_BasicSimulator(project);
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
-			return String.format("%d,%d,%f,%f", no, sim.getTime(), project.getTotalCost(), project.getTotalActualWorkAmount());
+			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());
 		}
 	}
 

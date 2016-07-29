@@ -34,14 +34,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.pdes.simulator.model.Facility;
 import org.pdes.simulator.model.Organization;
 import org.pdes.simulator.model.Product;
@@ -282,12 +279,12 @@ public abstract class PDES_AbstractSimulator {
 			// product
 			pw.println();
 			pw.println("Gantt chart of each Component");
-			pw.println(String.join(separator , new String[]{"Product", "Component", "Error", "Start Time", "Additinoal Start Time", "Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error/Error Torerance", "Start Time", "Additinoal Start Time", "Finish Time"}));
 			this.productList.forEach(p -> {
 				String productName = "Product ("+p.getDueDate()+")";
 				p.getComponentList().forEach(c -> {
 					pw.println(String.join(separator ,
-							new String[]{productName, c.getName(), String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getFinishTime())}));
+							new String[]{productName, c.getName(), String.valueOf(c.getError())+"/"+String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getFinishTime())}));
 				});
 			});
 			// Organization

@@ -36,7 +36,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.apache.commons.io.FilenameUtils;
@@ -62,6 +62,7 @@ public abstract class AbstractSimulationAction extends Action {
 	protected final MessageConsoleStream msgStream = Activator.getDefault().getMsgStream();
 	
 	protected boolean aggregateMode = false;
+	protected String outputDir;
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#run()
@@ -77,19 +78,10 @@ public abstract class AbstractSimulationAction extends Action {
 			return;
 		}
 		
-		//2. Set directory for save result.
-		DirectoryDialog directoryDialog = new DirectoryDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		directoryDialog.setText("Select a directory to save results.");
-		directoryDialog.setFilterPath(new File(pe.getFilePath()).getParent());
-		String outputDirName = directoryDialog.open();
-		if (outputDirName == null) {
-			return;
-		}
-		
-		//3. Set the number of workflow and product
+		//2. Set the number of workflow and product
 		int workflowCount = 0;
 		InputSimpleTextDialog workflowCountTextDialog = new InputSimpleTextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		workflowCountTextDialog.setTitleAndMessage("The number of workflows running", "Enter the number of workflows running.");
+		workflowCountTextDialog.setTitleAndMessage("The number of products (or workflows)", "Enter the number of products creating or workflows running.");
 		if (workflowCountTextDialog.open() == Window.OK) {
 			String text = workflowCountTextDialog.getTextString();
 			try {
@@ -104,11 +96,29 @@ public abstract class AbstractSimulationAction extends Action {
 			return;
 		}
 		
+		//3. Set directory for save result.
+		DirectoryDialog directoryDialog = new DirectoryDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		directoryDialog.setText("Select a directory to save results.");
+		directoryDialog.setFilterPath(new File(pe.getFilePath()).getParent());
+		this.outputDir = directoryDialog.open();
+		if (outputDir == null) {
+			return;
+		}
+		String dateString = this.getDateString();
+		File saveDir = new File(outputDir, dateString);
+		if(!saveDir.mkdir()){
+			msgStream.println("Not creating the folder for saving resutls.");
+			return;
+		}
+		this.outputDir = saveDir.getPath();
+		
 		//4. Run simulation
-		Future<String> result = this.doSimulation((ProjectDiagram)pe.getDiagram(), workflowCount, outputDirName);
+		List<Future<String>> result = this.doSimulation((ProjectDiagram)pe.getDiagram(), workflowCount);
 		
 		//5. Save the result of simulation
-		if(aggregateMode) this.saveResult(outputDirName, result);
+		if(aggregateMode) this.saveResult("aggregate.csv", result);
+		
+		msgStream.println("A result was saved to " + outputDir);
 	}
 	
 	
@@ -117,18 +127,15 @@ public abstract class AbstractSimulationAction extends Action {
 	 * @param workflowCount 
 	 * @param outputDirectoryPath 
 	 */
-	protected abstract Future<String> doSimulation(ProjectDiagram diagram, int workflowCount, String outputDirectoryPath);
+	protected abstract List<Future<String>> doSimulation(ProjectDiagram diagram, int workflowCount);
 	
 	/**
 	 * Save result of simulation.
 	 * @param outputDirName
 	 * @param result
 	 */
-	public void saveResult(String outputDirName, Future<String> result){
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String resultFileName = String.join("_", sdf.format(date)) + ".csv";
-		File resultFile = new File(outputDirName, resultFileName);
+	public void saveResult(String resultFileName, List<Future<String>> resultList){
+		File resultFile = new File(outputDir, resultFileName);
 		try {
 			// BOM
 			FileOutputStream os = new FileOutputStream(resultFile);
@@ -140,17 +147,17 @@ public abstract class AbstractSimulationAction extends Action {
 			
 			// header
 			pw.println(FilenameUtils.getBaseName(resultFile.toString()));
-			pw.println(String.join(",", "No", "Time", "Cost", "Work amount"));
+			pw.println(String.join(",", "No", "Cost", "Duration", "Total Work amount"));
 			
 			try {
-				pw.println(result.get());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				msgStream.println("Error was occurred.");
-				pw.close();
-				os.close();
-				return;
-			} catch (ExecutionException e) {
+				resultList.forEach(result -> {
+					try {
+						pw.println(result.get());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+			} catch (Exception e) {
 				e.printStackTrace();
 				msgStream.println("Error was occurred.");
 				pw.close();
@@ -159,10 +166,43 @@ public abstract class AbstractSimulationAction extends Action {
 			}
 			pw.close();
 			os.close();
-			
-			msgStream.println("A result was saved to " + resultFile.toString());
 		} catch (IOException e) {
 			msgStream.println(e.getMessage());
 		}
+	}
+	
+	/**
+	 * Get the text of Date for file name.
+	 * @return
+	 */
+	public String getDateString(){
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String resultFileName = String.join("_", sdf.format(date));
+		return resultFileName;
+	}
+	
+	/**
+	 * Set the number of Simulation.
+	 * @return
+	 */
+	public int setNumOfSimulation(){
+		int numOfSimulation = 0;
+		InputSimpleTextDialog workflowCountTextDialog = new InputSimpleTextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+		workflowCountTextDialog.setTitleAndMessage("The number of simulation running", "Enter the number of simulation running.");
+		if (workflowCountTextDialog.open() == Window.OK) {
+			String text = workflowCountTextDialog.getTextString();
+			try {
+				numOfSimulation = Integer.valueOf(text);
+			} catch (NumberFormatException e) {
+				msgStream.println(String.format("\"%s\" is not integer value. Exit.", text));
+				return -1;
+			}
+		}
+		if (numOfSimulation <= 0) {
+			msgStream.println("Enter a positive integer value. Exit.");
+			return -1;
+		}
+		return numOfSimulation;
 	}
 }

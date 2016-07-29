@@ -12,16 +12,14 @@ Application examples of pDES are as followings:
 This software is developed by Eclipse Rich Client Platform (RCP3) and Graphical Editing Framework(GEF3). Simulator is implemented based on previous researches.
 
 ## Demo
-Update soon...
+![Interface](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/pDES/pictures/topInterface.png "topPage")
 
 ## Requirement
-- Java (1.8.0 or later)
+- Java (1.8 or later)
 
-## Usage
-Update soon...
-
-## Install
-Update soon...
+## Download
+Please download pDES from this [URL](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/pDES/download)
+	- *Please download and install the latest Java from this [URL](http://www.oracle.com/technetwork/java/javase/downloads/index.html) if necessary.*
 
 
 ## for Developer
@@ -33,7 +31,7 @@ Update soon...
 		- Eclipse Rich Client Platform (RCP3)
 		- Eclipse Graphical Editing Framework (GEF3)
 
-1. Fork it ([http://github.com/taiga4112/pDES/fork](http://github.com/taiga4112/pDES/fork).
+1. Fork it ([http://github.com/taiga4112/pDES/fork](http://github.com/taiga4112/pDES/fork)).
 
 2. Clone pDES project.
 	```bash
@@ -42,10 +40,10 @@ Update soon...
 	```
 
 3. Add your explorer of eclipse workspace.
-- Import.. -> Existing Projects into Workspace -> Select pDES project
+	- Import.. -> Existing Projects into Workspace -> Select pDES project
 
 4. Run
-- Right click on pDES project on Explorer -> Run as -> Eclipse Application
+	- Right click on pDES project on Explorer -> Run as -> Eclipse Application
 
 ## Contribution
 1. Fork it ( http://github.com/taiga4112/pDES/fork )

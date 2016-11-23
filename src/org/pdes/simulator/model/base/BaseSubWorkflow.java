@@ -34,6 +34,9 @@ import java.util.stream.Collectors;
 import org.pdes.rcp.model.ProjectDiagram;
 import org.pdes.rcp.model.SubWorkflowNode;
 
+import org.pdes.simulator.model.Component;
+import org.pdes.simulator.model.Task;
+
 /**
  * SubWorkflow model for discrete event simulation.
  * TODO However, this model cannot be used in our simulation now.
@@ -65,8 +68,8 @@ public class BaseSubWorkflow {
 	 * Set the information of TaskLink, ComponentLink and TargetComponentLink to Task and Component.
 	 */
 	private void buildSimulationModel() {
-		taskList = diagram.getTaskNodeList().stream().map(node -> new BaseTask(node)).collect(Collectors.toList());
-		componentList = diagram.getComponentNodeList().stream().map(node -> new BaseComponent(node)).collect(Collectors.toList());
+		taskList = diagram.getTaskNodeList().stream().map(node -> new Task(node)).collect(Collectors.toList());
+		componentList = diagram.getComponentNodeList().stream().map(node -> new Component(node)).collect(Collectors.toList());
 		
 		//Set the information of TaskLink to Task
 		diagram.getTaskLinkList().forEach(link -> {

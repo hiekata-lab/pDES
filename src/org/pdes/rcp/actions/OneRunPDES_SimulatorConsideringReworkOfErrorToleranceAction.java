@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
 import org.pdes.simulator.PDES_BasicSimulator;
+import org.pdes.simulator.model.ProjectInfo;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 
 /**
@@ -97,7 +98,7 @@ public class OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction extends
 		 */
 		@Override
 		public String call() throws Exception {
-			BaseProjectInfo project = new BaseProjectInfo(diagram, numOfWorkflow);
+			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
 			PDES_BasicSimulator sim = new PDES_BasicSimulator(project);
 			sim.setConsiderReworkOfErrorTorelance(true);
 			sim.execute();

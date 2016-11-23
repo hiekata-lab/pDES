@@ -34,6 +34,9 @@ import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.TeamNode;
 
+import org.pdes.simulator.model.Facility;
+import org.pdes.simulator.model.Worker;
+
 /**
  * Team model for discrete event simulator.<br>
  * Team model has the list of workers and facilities.<br>
@@ -57,8 +60,8 @@ public class BaseTeam {
 		this.id = UUID.randomUUID().toString();
 		this.nodeId = teamNode.getId();
 		this.name = teamNode.getName();
-		this.workerList = teamNode.getWorkerList().stream().map(w -> new BaseWorker(w, this)).collect(Collectors.toList());
-		this.facilityList = teamNode.getFacilityList().stream().map(f -> new BaseFacility(f, this)).collect(Collectors.toList());
+		this.workerList = teamNode.getWorkerList().stream().map(w -> new Worker(w, this)).collect(Collectors.toList());
+		this.facilityList = teamNode.getFacilityList().stream().map(f -> new Facility(f, this)).collect(Collectors.toList());
 	}
 	
 	/**

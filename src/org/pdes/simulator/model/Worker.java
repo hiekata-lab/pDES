@@ -29,20 +29,22 @@
 package org.pdes.simulator.model;
 
 import org.pdes.rcp.model.WorkerElement;
+import org.pdes.simulator.model.base.BaseTeam;
+import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * Worker model for discrete event simulator.
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-public class Worker extends Resource {
-	
+public class Worker extends BaseWorker {
+
 	/**
-	 * This is the constructor.
 	 * @param workerElement
 	 * @param team
 	 */
-	public Worker(WorkerElement workerElement, Team team) {
+	public Worker(WorkerElement workerElement, BaseTeam team) {
 		super(workerElement, team);
+		// TODO Auto-generated constructor stub
 	}
+
 }

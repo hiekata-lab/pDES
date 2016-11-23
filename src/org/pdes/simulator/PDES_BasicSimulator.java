@@ -31,10 +31,10 @@ package org.pdes.simulator;
 import java.util.List;
 
 import org.pdes.simulator.base.PDES_AbstractSimulator;
-import org.pdes.simulator.model.Facility;
-import org.pdes.simulator.model.ProjectInfo;
-import org.pdes.simulator.model.Task;
-import org.pdes.simulator.model.Worker;
+import org.pdes.simulator.model.base.BaseFacility;
+import org.pdes.simulator.model.base.BaseProjectInfo;
+import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseWorker;
 
 /**
  * This is the basic discrete event simulator of this application.<br>
@@ -53,7 +53,7 @@ public class PDES_BasicSimulator extends PDES_AbstractSimulator {
 	 * @param productList
 	 * @param simultaneousWorkflowLimit
 	 */
-	public PDES_BasicSimulator(ProjectInfo project) {
+	public PDES_BasicSimulator(BaseProjectInfo project) {
 		super(project);
 	}
 
@@ -69,9 +69,9 @@ public class PDES_BasicSimulator extends PDES_AbstractSimulator {
 			if(checkAllTasksAreFinished()) return;
 			
 			//1. Get ready task and free resources
-			List<Task> readyTaskList = this.getReadyTaskList();
-			List<Worker> freeWorkerList = organization.getFreeWorkerList();
-			List<Facility> freeFacilityList = organization.getFreeFacilityList();
+			List<BaseTask> readyTaskList = this.getReadyTaskList();
+			List<BaseWorker> freeWorkerList = organization.getFreeWorkerList();
+			List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
 			
 			//2. Sort ready task and free resources
 			this.sortTasks(readyTaskList);

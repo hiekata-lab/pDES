@@ -28,153 +28,21 @@
  */
 package org.pdes.simulator.model;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.pdes.rcp.model.TeamNode;
+import org.pdes.simulator.model.base.BaseTeam;
 
 /**
- * Team model for discrete event simulator.<br>
- * Team model has the list of workers and facilities.<br>
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-public class Team {
-	private final String id; // ID
-	private final String nodeId; // TeamNode ID
-	private final String name;
-	private final List<Worker> workerList;
-	private final List<Facility> facilityList;
-	private Team superiorTeam;
-	
+public class Team extends BaseTeam {
+
 	/**
-	 * This is the constructor.
 	 * @param teamNode
 	 */
 	public Team(TeamNode teamNode) {
-		
-		this.id = UUID.randomUUID().toString();
-		this.nodeId = teamNode.getId();
-		this.name = teamNode.getName();
-		this.workerList = teamNode.getWorkerList().stream().map(w -> new Worker(w, this)).collect(Collectors.toList());
-		this.facilityList = teamNode.getFacilityList().stream().map(f -> new Facility(f, this)).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Initialize
-	 */
-	public void initialize() {
-		workerList.forEach(w -> w.initialize());
-		facilityList.forEach(f -> f.initialize());
-	}
-	
-	/**
-	 * Get the list of free workers.
-	 * @return
-	 */
-	public List<Worker> getFreeWorkerList() {
-		return workerList.stream().filter(w -> w.isFree()).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get the list of working workers.
-	 * @return
-	 */
-	public List<Worker> getWorkingWorkerList() {
-		return workerList.stream().filter(w -> w.isWorking()).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get the list of free facilities.
-	 * @return
-	 */
-	public List<Facility> getFreeFacilityList() {
-		return facilityList.stream().filter(w -> w.isFree()).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get the list of working facilities.
-	 * @return
-	 */
-	public List<Facility> getWorkingFacilityList() {
-		return facilityList.stream().filter(w -> w.isWorking()).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get the total cost of this team.
-	 * @return
-	 */
-	public double getTotalCost() {
-		double workerTotalCost = workerList.stream().mapToDouble(w -> w.getTotalCost()).sum();
-		double facilityTotalCost = facilityList.stream().mapToDouble(f -> f.getTotalCost()).sum();
-		return workerTotalCost + facilityTotalCost;
+		super(teamNode);
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * Get the id.
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * Get the node id.
-	 * @return the nodeId
-	 */
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	/**
-	 * Get the name.
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Get the list of workers.
-	 * @return the workerList
-	 */
-	public List<Worker> getWorkerList() {
-		return workerList;
-	}
-
-	/**
-	 * Get the list of facilities.
-	 * @return the facilityList
-	 */
-	public List<Facility> getFacilityList() {
-		return facilityList;
-	}
-
-	/**
-	 * Get the superior Team.
-	 * @return the superiorTeam
-	 */
-	public Team getSuperiorTeam() {
-		return superiorTeam;
-	}
-
-	/**
-	 * Set the superior Team.
-	 * @param superiorTeam the superiorTeam to set
-	 */
-	public void setSuperiorTeam(Team superiorTeam) {
-		this.superiorTeam = superiorTeam;
-	}
-	
-	/**
-	 * Transfer to text data.
-	 */
-	public String toString() {
-		String str = "[" + name + "]\n";
-		str += String.join("\n", workerList.stream().map(w -> w.toString()).collect(Collectors.toList()));
-		str += "\n";
-		str += String.join("\n", facilityList.stream().map(f -> f.toString()).collect(Collectors.toList()));
-		return str;
-	}
 }

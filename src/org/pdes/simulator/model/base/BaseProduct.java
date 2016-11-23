@@ -26,34 +26,87 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package org.pdes.simulator.model;
+package org.pdes.simulator.model.base;
 
 import java.util.List;
-
-import org.pdes.simulator.model.base.BaseTask;
-import org.pdes.simulator.model.base.BaseWorkflow;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * Product model for discrete event simulation.<br>
+ * This model has the list of Components.<br>
+ * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  *
  */
-public class Workflow extends BaseWorkflow {
-
+public class BaseProduct {
+	private String id;
+	private int dueDate;
+	private List<BaseComponent> componentList;
+	
 	/**
-	 * @param taskList
+	 * This is the constructor.
+	 * @param componentList
 	 */
-	public Workflow(List<BaseTask> taskList) {
-		super(taskList);
-		// TODO Auto-generated constructor stub
+	public BaseProduct(int dueDate, List<BaseComponent> componentList) {
+		this.id = UUID.randomUUID().toString();
+		this.dueDate = dueDate;;
+		this.setComponentList(componentList);
+	}
+	
+	/**
+	 * Initialize
+	 */
+	public void initialize() {
+		componentList.forEach(c -> c.initialize());
+	}
+	
+	/**
+	 * Get the id.
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
 	}
 
 	/**
-	 * @param dueDate
-	 * @param taskList
+	 * @return the dueDate
 	 */
-	public Workflow(int dueDate, List<BaseTask> taskList) {
-		super(dueDate, taskList);
-		// TODO Auto-generated constructor stub
+	public int getDueDate() {
+		return dueDate;
 	}
 
+	/**
+	 * Get the component which has same id.
+	 * @param id
+	 * @return
+	 */
+	public BaseComponent getComponent(String id) {
+		for (BaseComponent c : componentList) {
+			if (c.getId().equals(id)) return c;
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the list of components.
+	 * @return the componentList
+	 */
+	public List<BaseComponent> getComponentList() {
+		return componentList;
+	}
+	
+	/**
+	 * Set the list of components.
+	 * @param componentList the componentList to set
+	 */
+	public void setComponentList(List<BaseComponent> componentList) {
+		this.componentList = componentList;
+	}
+	
+	/**
+	 * Transfer to text data.
+	 */
+	public String toString() {
+		return String.join("\n", componentList.stream().map(c -> c.toString()).collect(Collectors.toList()));
+	}
 }

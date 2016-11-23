@@ -28,205 +28,22 @@
  */
 package org.pdes.simulator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.pdes.rcp.model.ProjectDiagram;
+import org.pdes.simulator.model.base.BaseProjectInfo;
 
 /**
- * This is the class for collecting Project information.<br>
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ *
  */
-public class ProjectInfo {
-	
-	private ProjectDiagram diagram;
-	
-	public Organization organization;
-	public List<Workflow> workflowList;
-	public List<Product> productList;
-	public int concurrencyWorkflowLimit;
-	
+public class ProjectInfo extends BaseProjectInfo {
+
 	/**
-	 * This is the constructor.
-	 * If you put the diagram information, you can create the model for simulation automatically.
 	 * @param diagram
+	 * @param workflowCount
 	 */
-	public ProjectInfo(ProjectDiagram diagram, int workflowCount){
-		this.diagram = diagram;
-		this.organization = this.getOrganizationFromProjectDiagram();
-		
-		this.workflowList = new ArrayList<Workflow>();
-		this.productList = new ArrayList<Product>();
-		IntStream.range(0,workflowCount).forEach(i ->{
-			List<Task> taskList = this.getTaskListConsideringOnlyTaskDependency();
-			List<Component> componentList = this.getComponentListConsideringOnlyComponentDependency();
-			this.addTargetComponentLinkInformation(componentList, taskList);
-			this.addAllocationLinkInformation(organization, taskList);
-			Workflow workflow = new Workflow(i,taskList);
-			Product product = new Product(i,componentList);
-			this.workflowList.add(workflow);
-			this.productList.add(product);
-		});
-		this.concurrencyWorkflowLimit = this.diagram.getConcurrencyLimitOfWorkflow();
-	}
-	
-	/**
-	 * Get Organization from ProjectDiagram.
-	 * @return
-	 */
-	private Organization getOrganizationFromProjectDiagram(){
-		List<Team> teamList = diagram.getTeamNodeList().stream()
-				.map(node -> new Team(node))
-				.collect(Collectors.toList());
-		return new Organization(teamList);
-	}
-	
-	
-	/**
-	 * Get the list of Task considering only task dependency.
-	 * @return
-	 */
-	private List<Task> getTaskListConsideringOnlyTaskDependency(){
-		List<Task> taskList = this.diagram.getTaskNodeList().stream()
-				.map(node -> new Task(node))
-				.collect(Collectors.toList());
-		this.diagram.getTaskLinkList().forEach(link -> {
-			Task destinationTask = taskList.stream()
-					.filter(task -> task.getNodeId().equals(link.getDestinationNode().getId()))
-					.findFirst()
-					.get();
-			Task originTask = taskList.stream()
-					.filter(task -> task.getNodeId().equals(link.getOriginNode().getId()))
-					.findFirst()
-					.get();
-			destinationTask.addInputTask(originTask);
-			originTask.addOutputTask(destinationTask);
-		});
-		return taskList;
-	}
-	
-	/**
-	 * Get the list of Component considering only component dependency.
-	 * @return
-	 */
-	private List<Component> getComponentListConsideringOnlyComponentDependency(){
-		List<Component> componentList = this.diagram.getComponentNodeList().stream()
-				.map(node -> new Component(node))
-				.collect(Collectors.toList());
-		this.diagram.getComponentLinkList().forEach(link -> {
-			Component destinationComponent = componentList.stream()
-					.filter(component -> component.getNodeId().equals(link.getDestinationNode().getId()))
-					.findFirst()
-					.get();
-			Component originComponent = componentList.stream()
-					.filter(component -> component.getNodeId().equals(link.getOriginNode().getId()))
-					.findFirst()
-					.get();
-			destinationComponent.addDependedComponent(originComponent);
-			originComponent.addDependingComponent(destinationComponent);
-		});
-		return componentList;
-	}
-	
-	/**
-	 * Add TargetComponentLink information to Component and Task.
-	 * @param taskList
-	 * @param componentList
-	 */
-	private void addTargetComponentLinkInformation(List<Component> componentList, List<Task> taskList){
-		this.diagram.getTargetComponentLinkList().forEach(link -> {
-			Task destinationTask = taskList.stream()
-					.filter(task -> task.getNodeId().equals(link.getDestinationNode().getId()))
-					.findFirst()
-					.get();
-			Component originComponent = componentList.stream()
-					.filter(component -> component.getNodeId().equals(link.getOriginNode().getId()))
-					.findFirst()
-					.get();
-			destinationTask.addTargetComponent(originComponent);
-			originComponent.addTargetedTask(destinationTask);
-		});
-	}
-	
-	/**
-	 * Add TargetComponentLink information to Team and Task.
-	 * @param organization
-	 * @param taskList
-	 */
-	private void addAllocationLinkInformation(Organization organization, List<Task> taskList){
-		this.diagram.getAllocationLinkList().forEach(link -> {
-			Task destinationTask = taskList.stream()
-					.filter(task -> task.getNodeId().equals(link.getDestinationNode().getId()))
-					.findFirst()
-					.get();
-			Team originTeam = organization.getTeamList().stream()
-					.filter(team -> team.getNodeId().equals(link.getOriginNode().getId()))
-					.findFirst()
-					.get();
-			destinationTask.setAllocatedTeam(originTeam);
-		});
+	public ProjectInfo(ProjectDiagram diagram, int workflowCount) {
+		super(diagram, workflowCount);
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * Get the Organization.
-	 * @return the organization
-	 */
-	public Organization getOrganization() {
-		return organization;
-	}
-
-	/**
-	 * Get the list of Workflow.
-	 * @return the workflowList
-	 */
-	public List<Workflow> getWorkflowList() {
-		return workflowList;
-	}
-
-	/**
-	 * Get the list of Product
-	 * @return the productList
-	 */
-	public List<Product> getProductList() {
-		return productList;
-	}
-
-	/**
-	 * Get the limit of concurrency workflow.
-	 * @return the concurrencyWorkflowLimit
-	 */
-	public int getConcurrencyWorkflowLimit() {
-		return concurrencyWorkflowLimit;
-	}
-	
-	/**
-	 * Get the total cost of this Project after simulation.
-	 * @return
-	 */
-	public double getTotalCost(){
-		return organization.getTotalCost();
-	}
-	
-	/**
-	 * Get the total actual work amount of this project after simulation.
-	 * @return
-	 */
-	public double getTotalActualWorkAmount(){
-		return workflowList.stream()
-				.mapToDouble(w -> w.getTotalActualWorkAmount())
-				.sum();
-	}
-	
-	/**
-	 * Get the duration considering all workflows.
-	 * @return
-	 */
-	public int getDuration(){
-		return workflowList.stream()
-				.mapToInt(w -> w.getDuration())
-				.max()
-				.orElse(0);
-	}
 }

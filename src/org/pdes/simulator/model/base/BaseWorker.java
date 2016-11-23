@@ -26,34 +26,23 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package org.pdes.simulator.model;
+package org.pdes.simulator.model.base;
 
-import java.util.List;
-
-import org.pdes.simulator.model.base.BaseTask;
-import org.pdes.simulator.model.base.BaseWorkflow;
+import org.pdes.rcp.model.WorkerElement;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * Worker model for discrete event simulator.
+ * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  *
  */
-public class Workflow extends BaseWorkflow {
-
+public class BaseWorker extends BaseResource {
+	
 	/**
-	 * @param taskList
+	 * This is the constructor.
+	 * @param workerElement
+	 * @param team
 	 */
-	public Workflow(List<BaseTask> taskList) {
-		super(taskList);
-		// TODO Auto-generated constructor stub
+	public BaseWorker(WorkerElement workerElement, BaseTeam team) {
+		super(workerElement, team);
 	}
-
-	/**
-	 * @param dueDate
-	 * @param taskList
-	 */
-	public Workflow(int dueDate, List<BaseTask> taskList) {
-		super(dueDate, taskList);
-		// TODO Auto-generated constructor stub
-	}
-
 }

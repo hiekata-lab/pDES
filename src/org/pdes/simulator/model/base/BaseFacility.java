@@ -26,34 +26,23 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package org.pdes.simulator.model;
+package org.pdes.simulator.model.base;
 
-import java.util.List;
-
-import org.pdes.simulator.model.base.BaseTask;
-import org.pdes.simulator.model.base.BaseWorkflow;
+import org.pdes.rcp.model.FacilityElement;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * Facility model for discrete event simulation.<br>
+ * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  *
  */
-public class Workflow extends BaseWorkflow {
-
+public class BaseFacility extends BaseResource {
+	
 	/**
-	 * @param taskList
+	 * This is the constructor.
+	 * @param facilityElement
+	 * @param team
 	 */
-	public Workflow(List<BaseTask> taskList) {
-		super(taskList);
-		// TODO Auto-generated constructor stub
+	public BaseFacility(FacilityElement facilityElement, BaseTeam team) {
+		super(facilityElement, team);
 	}
-
-	/**
-	 * @param dueDate
-	 * @param taskList
-	 */
-	public Workflow(int dueDate, List<BaseTask> taskList) {
-		super(dueDate, taskList);
-		// TODO Auto-generated constructor stub
-	}
-
 }

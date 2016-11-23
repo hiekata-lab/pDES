@@ -39,23 +39,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import org.pdes.simulator.model.Facility;
-import org.pdes.simulator.model.Organization;
-import org.pdes.simulator.model.Product;
-import org.pdes.simulator.model.ProjectInfo;
-import org.pdes.simulator.model.Task;
-import org.pdes.simulator.model.Worker;
-import org.pdes.simulator.model.Workflow;
+import org.pdes.simulator.model.base.BaseFacility;
+import org.pdes.simulator.model.base.BaseOrganization;
+import org.pdes.simulator.model.base.BaseProduct;
+import org.pdes.simulator.model.base.BaseProjectInfo;
+import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseWorker;
+import org.pdes.simulator.model.base.BaseWorkflow;
 
 /**
  * This is the abstract simulator for pDES application.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
 public abstract class PDES_AbstractSimulator {
-	protected final ProjectInfo project;
-	protected final List<Workflow> workflowList;
-	protected final Organization organization;
-	protected final List<Product> productList;
+	protected final BaseProjectInfo project;
+	protected final List<BaseWorkflow> workflowList;
+	protected final BaseOrganization organization;
+	protected final List<BaseProduct> productList;
 	protected final int concurrencyWorkflowLimit;
 	
 	protected int time = 0;
@@ -67,7 +67,7 @@ public abstract class PDES_AbstractSimulator {
 	 * @param productList
 	 * @param simultaneousWorkflowLimit
 	 */
-	public PDES_AbstractSimulator(ProjectInfo project){
+	public PDES_AbstractSimulator(BaseProjectInfo project){
 		this.project = project;
 		this.workflowList = project.getWorkflowList();
 		this.organization = project.getOrganization();
@@ -110,7 +110,7 @@ public abstract class PDES_AbstractSimulator {
 	 * Get the list of READY tasks.
 	 * @return
 	 */
-	public List<Task> getReadyTaskList(){
+	public List<BaseTask> getReadyTaskList(){
 		return workflowList.stream()
 				.map(w -> w.getReadyTaskList())
 				.collect(
@@ -126,7 +126,7 @@ public abstract class PDES_AbstractSimulator {
 	 * 2. TSLACK (a task which Slack time(LS-ES) is lower has high priority)
 	 * @param resourceList
 	 */
-	public void sortTasks(List<Task> taskList){
+	public void sortTasks(List<BaseTask> taskList){
 		taskList.sort((t1, t2) -> {
 			int dd1 = t1.getDueDate();
 			int dd2 = t2.getDueDate();
@@ -143,7 +143,7 @@ public abstract class PDES_AbstractSimulator {
 	 * 1. SSP (a resource which amount of skill point is lower has high priority)
 	 * @param resourceList
 	 */
-	public void sortWorkers(List<Worker> resourceList){
+	public void sortWorkers(List<BaseWorker> resourceList){
 		resourceList.sort((w1, w2) -> {
 			double sp1 = w1.getTotalWorkAmountSkillPoint();
 			double sp2 = w2.getTotalWorkAmountSkillPoint();
@@ -156,7 +156,7 @@ public abstract class PDES_AbstractSimulator {
 	 * 1. SSP (a resource which amount of skill point is lower has high priority)
 	 * @param resourceList
 	 */
-	public void sortFacilities(List<Facility> resourceList){
+	public void sortFacilities(List<BaseFacility> resourceList){
 		resourceList.sort((w1, w2) -> {
 			double sp1 = w1.getTotalWorkAmountSkillPoint();
 			double sp2 = w2.getTotalWorkAmountSkillPoint();
@@ -171,14 +171,14 @@ public abstract class PDES_AbstractSimulator {
 	 * @param freeWorkerList
 	 * @param freeFacilityList
 	 */
-	public void allocateReadyTasksToFreeResources(List<Task> readyTaskList, List<Worker> freeWorkerList, List<Facility> freeFacilityList){
+	public void allocateReadyTasksToFreeResources(List<BaseTask> readyTaskList, List<BaseWorker> freeWorkerList, List<BaseFacility> freeFacilityList){
 		this.sortTasks(readyTaskList);
 		readyTaskList.stream().forEachOrdered(task -> {
 			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
-				Optional<Worker> availableWorker = freeWorkerList.stream().filter(w -> w.hasSkill(task)).findFirst();
+				Optional<BaseWorker> availableWorker = freeWorkerList.stream().filter(w -> w.hasSkill(task)).findFirst();
 				availableWorker.ifPresent(worker ->{
 					if (task.isNeedFacility()) {
-						Optional<Facility> availableFacility = freeFacilityList.stream().filter(w -> w.hasSkill(task)).findFirst();
+						Optional<BaseFacility> availableFacility = freeFacilityList.stream().filter(w -> w.hasSkill(task)).findFirst();
 						availableFacility.ifPresent(facility -> {
 							task.setAllocatedWorker(worker);
 							task.setAllocatedFacility(facility);
@@ -214,7 +214,7 @@ public abstract class PDES_AbstractSimulator {
 	 * @param task
 	 * @return
 	 */
-	public boolean checkSatisfyingWorkflowLimitForStartingTask(Task task){
+	public boolean checkSatisfyingWorkflowLimitForStartingTask(BaseTask task){
 		long numOfRunningWorkflow = workflowList.stream()
 				.filter(w -> w.isRunning())
 				.map(w -> w.getId())

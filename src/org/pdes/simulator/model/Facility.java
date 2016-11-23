@@ -29,20 +29,22 @@
 package org.pdes.simulator.model;
 
 import org.pdes.rcp.model.FacilityElement;
+import org.pdes.simulator.model.base.BaseFacility;
+import org.pdes.simulator.model.base.BaseTeam;
 
 /**
- * Facility model for discrete event simulation.<br>
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-public class Facility extends Resource {
-	
+public class Facility extends BaseFacility {
+
 	/**
-	 * This is the constructor.
 	 * @param facilityElement
 	 * @param team
 	 */
-	public Facility(FacilityElement facilityElement, Team team) {
+	public Facility(FacilityElement facilityElement, BaseTeam team) {
 		super(facilityElement, team);
+		// TODO Auto-generated constructor stub
 	}
+
 }

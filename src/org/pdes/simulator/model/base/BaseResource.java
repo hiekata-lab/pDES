@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package org.pdes.simulator.model;
+package org.pdes.simulator.model.base;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import org.pdes.rcp.model.base.ResourceElement;
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  *
  */
-public class Resource {
+public class BaseResource {
 	
 	protected enum ResourceState {
 		FREE,
@@ -54,21 +54,21 @@ public class Resource {
 	protected final double costPerTime;
 	protected Map<String, Double> workAmountSkillMap; // skill map of work amount <taskname, skill point>
 	protected Map<String, Double> qualitySkillMap; // skill map of quality <taskname, skill point>
-	protected Team team;
+	protected BaseTeam team;
 	
 	// Changeable variable on simulation
 	protected ResourceState state;
 	protected double totalCost = 0;
 	protected final List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
 	protected final List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
-	protected final List<Task> workedTaskList = new ArrayList<Task>(); // list of worked task
+	protected final List<BaseTask> workedTaskList = new ArrayList<BaseTask>(); // list of worked task
 	
 	/**
 	 * This is the constructor.
 	 * @param resourceElement
 	 * @param team
 	 */
-	public Resource(ResourceElement resourceElement, Team team) {
+	public BaseResource(ResourceElement resourceElement, BaseTeam team) {
 		this.id = UUID.randomUUID().toString();
 		this.nodeId = resourceElement.getId();
 		this.name = resourceElement.getName();
@@ -131,7 +131,7 @@ public class Resource {
 	 * @param task
 	 * @return
 	 */
-	public boolean hasSkill(Task task) {
+	public boolean hasSkill(BaseTask task) {
 		return (task.getAllocatedTeam().equals(team) && workAmountSkillMap.containsKey(task.getName()) && workAmountSkillMap.get(task.getName()) > 0.0);
 	}
 	
@@ -140,7 +140,7 @@ public class Resource {
 	 * @param task
 	 * @return
 	 */
-	public double getWorkAmountSkillPoint(Task task){
+	public double getWorkAmountSkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
 		return workAmountSkillMap.get(task.getName());
 	}
@@ -150,7 +150,7 @@ public class Resource {
 	 * @param task
 	 * @return
 	 */
-	public double getQualitySkillPoint(Task task){
+	public double getQualitySkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
 		return qualitySkillMap.get(task.getName());
 	}
@@ -167,7 +167,7 @@ public class Resource {
 	 * Add assigned task.
 	 * @param task
 	 */
-	public void addWorkedTask(Task task) {
+	public void addWorkedTask(BaseTask task) {
 		workedTaskList.add(task);
 	}
 	
@@ -249,7 +249,7 @@ public class Resource {
 	 * Get the team which has this Resource.
 	 * @return the team
 	 */
-	public Team getTeam() {
+	public BaseTeam getTeam() {
 		return team;
 	}
 
@@ -257,7 +257,7 @@ public class Resource {
 	 * Set the team which has this Resource.
 	 * @param team the team to set
 	 */
-	public void setTeam(Team team) {
+	public void setTeam(BaseTeam team) {
 		this.team = team;
 	}
 
@@ -289,7 +289,7 @@ public class Resource {
 	 * Get the list of worked task.
 	 * @return the workedTaskList
 	 */
-	public List<Task> getWorkedTaskList() {
+	public List<BaseTask> getWorkedTaskList() {
 		return workedTaskList;
 	}
 	

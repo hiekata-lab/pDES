@@ -28,150 +28,23 @@
  */
 package org.pdes.simulator.model;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.pdes.rcp.model.ProjectDiagram;
 import org.pdes.rcp.model.SubWorkflowNode;
+import org.pdes.simulator.model.base.BaseSubWorkflow;
 
 /**
- * SubWorkflow model for discrete event simulation.
- * TODO However, this model cannot be used in our simulation now.
- * @author Hiroya Matsubara <matsubara@is.k.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-@SuppressWarnings({"unchecked","deprecation"})
-public class SubWorkflow {
-	private final String nodeId; // SubWorkflowNodeID
-	private final String name;
-	private final ProjectDiagram diagram;
-	
-	private List<Task> taskList;
-	private List<Component> componentList;
-	
+public class SubWorkflow extends BaseSubWorkflow {
+
 	/**
-	 * This is the constructor.
 	 * @param node
 	 * @param diagram
 	 */
 	public SubWorkflow(SubWorkflowNode node, ProjectDiagram diagram) {
-		this.nodeId = node.getId();
-		this.name = node.getName();
-		this.diagram = diagram;
-		buildSimulationModel();
-	}
-	
-	/**
-	 * Set the information of TaskLink, ComponentLink and TargetComponentLink to Task and Component.
-	 */
-	private void buildSimulationModel() {
-		taskList = diagram.getTaskNodeList().stream().map(node -> new Task(node)).collect(Collectors.toList());
-		componentList = diagram.getComponentNodeList().stream().map(node -> new Component(node)).collect(Collectors.toList());
-		
-		//Set the information of TaskLink to Task
-		diagram.getTaskLinkList().forEach(link -> {
-			Task destTask = findTaskByNodeId(link.getDestinationNode().getId());
-			Task origTask = findTaskByNodeId(link.getOriginNode().getId());
-			destTask.addInputTask(origTask);
-			origTask.addOutputTask(destTask);
-		});
-		
-		//Set the information of ComponentLink to Component
-		diagram.getComponentLinkList().forEach(link -> {
-			Component destComponent = findComponentByNodeId(link.getDestinationNode().getId());
-			Component origComponent = findComponentByNodeId(link.getOriginNode().getId());
-			destComponent.addDependedComponent(origComponent);
-			origComponent.addDependingComponent(destComponent);
-		});
-		
-		//Set the information of TargetComponentLink to Task
-		diagram.getTargetComponentLinkList().forEach(link -> {
-			Task task = findTaskByNodeId(link.getDestinationNode().getId());
-			Component component = findComponentByNodeId(link.getOriginNode().getId());
-			task.addTargetComponent(component);
-		});
-	}
-	
-	/**
-	 * Get Task which has the same id as nodeId
-	 * @param nodeId
-	 * @return
-	 */
-	private Task findTaskByNodeId(String nodeId) {
-		return taskList.stream().filter(task -> task.getNodeId().equals(nodeId)).findFirst().get();
-	}
-	
-	/**
-	 * Get Component which has the same id as nodeId
-	 * @param nodeId
-	 * @return
-	 */
-	private Component findComponentByNodeId(String nodeId) {
-		return componentList.stream().filter(component -> component.getNodeId().equals(nodeId)).findFirst().get();
-	}
-	
-	/**
-	 * Get head task list. These tasks do not have depended task.
-	 * @return
-	 */
-	public List<Task> getHeadTaskList() {
-		return taskList.stream().filter(task -> task.getInputTaskList().size() == 0).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get tail task list. These tasks do not have depending task.
-	 * @return
-	 */
-	public List<Task> getTailTaskList() {
-		return taskList.stream().filter(task -> task.getOutputTaskList().size() == 0).collect(Collectors.toList());
-	}
-	
-	/**
-	 * Get top component in the list of component.
-	 * @return
-	 */
-	public Component getTopComponent() {
-		return componentList.stream().filter(component -> component.getDirectlyDependedComponentList().size() == 0).findFirst().get();
-	}
-
-	/**
-	 * Get the node id.
-	 * @return the nodeId
-	 */
-	public String getNodeId() {
-		return nodeId;
-	}
-
-	/**
-	 * Get the name.
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Get the diagram.
-	 * @return the diagram
-	 */
-	public ProjectDiagram getDiagram() {
-		return diagram;
-	}
-
-	/**
-	 * Get the list of tasks.
-	 * @return the taskList
-	 */
-	public List<Task> getTaskList() {
-		return taskList;
-	}
-
-	/**
-	 * Get the list of components.
-	 * @return the componentList
-	 */
-	public List<Component> getComponentList() {
-		return componentList;
+		super(node, diagram);
+		// TODO Auto-generated constructor stub
 	}
 
 }

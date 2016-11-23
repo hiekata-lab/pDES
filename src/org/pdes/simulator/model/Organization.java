@@ -28,151 +28,23 @@
  */
 package org.pdes.simulator.model;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.pdes.simulator.model.base.BaseOrganization;
+import org.pdes.simulator.model.base.BaseTeam;
 
 /**
- * Organization model for discrete event simulation.<br>
- * This model has the list of Teams.<br>
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-public class Organization {
-	private final List<Team> teamList;
-	
-	/**
-	 * This is the constructor.
-	 * @param teamList
-	 */
-	public Organization(List<Team> teamList) {
-		this.teamList = teamList;
-	}
-	
-	/**
-	 * Initialize
-	 */
-	public void initialize() {
-		teamList.forEach(t -> t.initialize());
-	}
-	
-	/**
-	 * Get the team which has same id.
-	 * @param id
-	 * @return
-	 */
-	public Team getTeam(String id){
-		for(Team team : this.teamList){
-			if(team.getId().equals(id)) return team;
-		}
-		return null;
-	}
-	
-	/**
-	 * Get the list of free workers.
-	 * @return
-	 */
-	public List<Worker> getFreeWorkerList() {
-		return teamList.stream()
-				.map(t -> t.getFreeWorkerList())
-				.collect(
-					() -> new ArrayList<Worker>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get the list of working workers.
-	 * @return
-	 */
-	public List<Worker> getWorkingWorkerList() {
-		return teamList.stream()
-				.map(t -> t.getWorkingWorkerList())
-				.collect(
-					() -> new ArrayList<Worker>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get the list of all workers.
-	 * @return
-	 */
-	public List<Worker> getWorkerList() {
-		return teamList.stream()
-				.map(t -> t.getWorkerList())
-				.collect(
-					() -> new ArrayList<Worker>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get the list of free facilities.
-	 * @return
-	 */
-	public List<Facility> getFreeFacilityList() {
-		return teamList.stream()
-				.map(t -> t.getFreeFacilityList())
-				.collect(
-					() -> new ArrayList<Facility>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get the list of working facilities.
-	 * @return
-	 */
-	public List<Facility> getWorkingFacilityList() {
-		return teamList.stream()
-				.map(t -> t.getWorkingFacilityList())
-				.collect(
-					() -> new ArrayList<Facility>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get the list of all facilities.
-	 * @return
-	 */
-	public List<Facility> getFacilityList() {
-		return teamList.stream()
-				.map(t -> t.getFacilityList())
-				.collect(
-					() -> new ArrayList<Facility>(),
-					(l, t) -> l.addAll(t),
-					(l1, l2) -> l1.addAll(l2)
-				);
-	}
-	
-	/**
-	 * Get total cost of this organization.
-	 * @return
-	 */
-	public double getTotalCost() {
-		return teamList.stream().mapToDouble(t -> t.getTotalCost()).sum();
-	}
+public class Organization extends BaseOrganization {
 
 	/**
-	 * Get the list of team.
-	 * @return the teamList
+	 * @param teamList
 	 */
-	public List<Team> getTeamList() {
-		return teamList;
+	public Organization(List<BaseTeam> teamList) {
+		super(teamList);
+		// TODO Auto-generated constructor stub
 	}
-	
-	/**
-	 * Transfer to text data.
-	 */
-	public String toString() {
-		return String.join("\n", teamList.stream().map(t -> t.toString()).collect(Collectors.toList()));
-	}
+
 }

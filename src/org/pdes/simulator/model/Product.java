@@ -29,84 +29,23 @@
 package org.pdes.simulator.model;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
+import org.pdes.simulator.model.base.BaseComponent;
+import org.pdes.simulator.model.base.BaseProduct;
 
 /**
- * Product model for discrete event simulation.<br>
- * This model has the list of Components.<br>
- * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
  *
  */
-public class Product {
-	private String id;
-	private int dueDate;
-	private List<Component> componentList;
-	
+public class Product extends BaseProduct {
+
 	/**
-	 * This is the constructor.
+	 * @param dueDate
 	 * @param componentList
 	 */
-	public Product(int dueDate, List<Component> componentList) {
-		this.id = UUID.randomUUID().toString();
-		this.dueDate = dueDate;;
-		this.setComponentList(componentList);
-	}
-	
-	/**
-	 * Initialize
-	 */
-	public void initialize() {
-		componentList.forEach(c -> c.initialize());
-	}
-	
-	/**
-	 * Get the id.
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
+	public Product(int dueDate, List<BaseComponent> componentList) {
+		super(dueDate, componentList);
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @return the dueDate
-	 */
-	public int getDueDate() {
-		return dueDate;
-	}
-
-	/**
-	 * Get the component which has same id.
-	 * @param id
-	 * @return
-	 */
-	public Component getComponent(String id) {
-		for (Component c : componentList) {
-			if (c.getId().equals(id)) return c;
-		}
-		return null;
-	}
-	
-	/**
-	 * Get the list of components.
-	 * @return the componentList
-	 */
-	public List<Component> getComponentList() {
-		return componentList;
-	}
-	
-	/**
-	 * Set the list of components.
-	 * @param componentList the componentList to set
-	 */
-	public void setComponentList(List<Component> componentList) {
-		this.componentList = componentList;
-	}
-	
-	/**
-	 * Transfer to text data.
-	 */
-	public String toString() {
-		return String.join("\n", componentList.stream().map(c -> c.toString()).collect(Collectors.toList()));
-	}
 }

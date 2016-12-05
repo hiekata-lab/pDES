@@ -55,6 +55,56 @@ public class BaseTask {
 		FINISHED,
 	}
 	
+	public enum TaskType {
+		/** default task (typeInt=0)*/
+		DEFAULT("Default", 0),
+		/** planning task (typeInt=1)*/
+		PLANNING("Planning", 1),
+		/** design task (typeInt=2)*/
+		DESIGN("Design", 2),
+		/** implementation task (typeInt=3)*/
+		IMPLEMENTATION("Implementation", 3),
+		/** unit test task (typeInt=4)*/
+		UNIT_TEST("Unit test", 4),
+		/** integration test task (typeInt=5)*/
+		INTEGRATION_TEST("Integration test", 5),
+		/** review task (typeInt=6)*/
+		REVIEW("Review", 6),
+		;
+		
+		private final String name;
+	    private final int id;
+
+	    private TaskType(final String name, final int id) {
+	       this.name = name;
+	       this.id = id;
+	    }
+	    public String toString() {
+	        return this.name;
+	    }
+	    public int getInt() {
+	        return this.id;
+	    }
+	}
+	
+	public static TaskType getTaskTypebyId(final int id) {
+        for (TaskType type : TaskType.values()) {
+            if (type.getInt() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+	public static TaskType getTaskTypebyName(final String name) {
+        for (TaskType type : TaskType.values()) {
+            if (type.toString().equals(name)) {
+                return type;
+            }
+        }
+        return null;
+    }
+	
 	// Constraint variables on simulation
 	private final String id; // ID
 	private final String nodeId; // TaskNode ID
@@ -77,6 +127,8 @@ public class BaseTask {
 	private double actualWorkAmount; // actual work amount
 	private TaskState state = TaskState.NONE; // state of this task
 	private int stateInt = 0;
+	private TaskType type = TaskType.DEFAULT;
+	private int typeInt = 0;
 	private List<Integer> readyTimeList = new ArrayList<Integer>(); // list of ready time of one task
 	private List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
 	private List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
@@ -593,5 +645,33 @@ public class BaseTask {
 		String facility = (allocatedFacility != null) ? allocatedFacility.getName() : "";
 		String inputTaskNames = String.join(",", inputTaskList.stream().map(t -> t.getName()).collect(Collectors.toList())); // DEBUG
 		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, remainingWorkAmount, allocatedTeam.getName(), worker, facility, inputTaskNames);
+	}
+
+	/**
+	 * @return the type
+	 */
+	public TaskType getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(TaskType type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the typeInt
+	 */
+	public int getTypeInt() {
+		return typeInt;
+	}
+
+	/**
+	 * @param typeInt the typeInt to set
+	 */
+	public void setTypeInt(int typeInt) {
+		this.typeInt = typeInt;
 	}
 }

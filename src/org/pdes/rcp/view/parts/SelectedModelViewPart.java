@@ -47,6 +47,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -66,6 +67,8 @@ import org.pdes.rcp.model.base.AbstractModel;
 import org.pdes.rcp.model.base.Link;
 import org.pdes.rcp.dialog.InputSimpleTextDialog;
 import org.pdes.rcp.dialog.SelectSimpleDataDialog;
+import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseTask.TaskType;
 
 /**
  * This is the ViewPart class for editing the attributes of clicked model in ProjectDiagram.<br>
@@ -111,9 +114,10 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//2. Define SWT of clicking TaskNode
 	//If you add some attributes in TaskNode, add "setVisibleOfTaskSWT" method.
-	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel;
+	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel, taskTypeLabel;
 	private Text taskNameText, taskWorkAmountText, taskAdditionalWorkAmountText;
 	private Button taskNeedFacilityCheckBox;
+	private Combo taskTypeSelectBox;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -127,12 +131,15 @@ public class SelectedModelViewPart extends ViewPart {
 		taskAdditionalWorkAmountLabel.setVisible(visible);
 		taskAdditionalWorkAmountText.setVisible(visible);
 		taskNeedFacilityCheckBox.setVisible(visible);
+		taskTypeLabel.setVisible(visible);
+		taskTypeSelectBox.setVisible(visible);
 		
 		if(visible){
 			taskNameText.setText(((TaskNode) selectedModel).getName());
 			taskWorkAmountText.setText(String.valueOf(((TaskNode) selectedModel).getWorkAmount()));
 			taskAdditionalWorkAmountText.setText(String.valueOf(((TaskNode)selectedModel).getAdditionalWorkAmount()));
 			taskNeedFacilityCheckBox.setSelection(((TaskNode)selectedModel).isNeedFacility());
+			taskTypeSelectBox.select(((TaskNode)selectedModel).getTypeInt());
 		}
 	}
 	
@@ -637,12 +644,43 @@ public class SelectedModelViewPart extends ViewPart {
 		taskNameTextFD.left= new FormAttachment(taskNameLabel,10);
 		taskNameTextFD.right = new FormAttachment(95);
 		taskNameText.setLayoutData(taskNameTextFD);
+
+		taskTypeLabel = new Label(parent, SWT.NULL);
+		taskTypeLabel.setText("Task Type : ");
+		taskTypeLabel.setFont(new Font(null, "", 10, 0));
+		FormData taskTypeLabelFD = new FormData();
+		taskTypeLabelFD.top= new FormAttachment(taskNameLabel,10);
+		taskTypeLabelFD.left= new FormAttachment(0,10);
+		taskTypeLabel.setLayoutData(taskTypeLabelFD);
+		
+		FormData taskTypeSelectBoxFD = new FormData();
+		taskTypeSelectBoxFD.top = new FormAttachment(taskNameLabel, 10);
+		taskTypeSelectBoxFD.left = new FormAttachment(taskTypeLabel, 10);
+		taskTypeSelectBox = new Combo(parent, SWT.DROP_DOWN|SWT.READ_ONLY);
+		for (TaskType t : TaskType.values()) {
+			taskTypeSelectBox.add(t.toString());
+		}
+		taskTypeSelectBox.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e){
+				
+			}
+			public void widgetSelected(SelectionEvent e){
+				String typeString = taskTypeSelectBox.getText();
+				TaskType type = BaseTask.getTaskTypebyName(typeString);
+				if (type != null) {
+					((TaskNode)selectedModel).setTypeInt(type.getInt());
+				}
+				Combo bCombo = (Combo)e.widget;
+				System.out.println(bCombo.getText());
+			}
+		});
+		taskTypeSelectBox.setLayoutData(taskTypeSelectBoxFD);
 		
 		taskWorkAmountLabel = new Label(parent, SWT.NULL);
 		taskWorkAmountLabel.setText("Work Amount : ");
 		taskWorkAmountLabel.setFont(new Font(null, "", 10, 0));
 		FormData taskWorkAmountLabelFD = new FormData();
-		taskWorkAmountLabelFD.top= new FormAttachment(taskNameLabel,10);
+		taskWorkAmountLabelFD.top= new FormAttachment(taskTypeLabel,10);
 		taskWorkAmountLabelFD.left= new FormAttachment(0,10);
 		taskWorkAmountLabel.setLayoutData(taskWorkAmountLabelFD);
 		
@@ -673,7 +711,7 @@ public class SelectedModelViewPart extends ViewPart {
 			}
 		});
 		FormData taskWorkAmountTextFD = new FormData();
-		taskWorkAmountTextFD.top= new FormAttachment(taskNameLabel,10);
+		taskWorkAmountTextFD.top= new FormAttachment(taskTypeLabel,10);
 		taskWorkAmountTextFD.left= new FormAttachment(taskWorkAmountLabel,10);
 		taskWorkAmountTextFD.width = 50;
 		taskWorkAmountText.setLayoutData(taskWorkAmountTextFD);

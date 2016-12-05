@@ -29,6 +29,8 @@
 package org.pdes.simulator.model.base;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -219,10 +221,43 @@ public class BaseComponent {
 	public int getStartTime(){
 		return this.getAllDependingComponentList().stream()
 				.flatMap(c -> c.getTargetedTaskList().stream())
-				.mapToInt(t -> t.getStartTime())
+				.mapToInt(t -> t.getStartTimeList().stream()
+						.filter(s -> s >=0)
+						.min(Comparator.naturalOrder())
+						.orElse(-1))
 				.filter(s -> s >= 0)
 				.min()
 				.orElse(-1);
+	}
+	
+	/**
+	 * Get the start time list from all depending components and tasks.
+	 * @return
+	 */
+	public List<Integer> getStartTimeList(){
+		List<Integer> startTimeList = new ArrayList<Integer>();
+		this.getAllDependingComponentList().forEach(c -> {
+			c.getTargetedTaskList().forEach(t -> {
+				startTimeList.addAll(t.getStartTimeList());
+			});
+		});
+		Collections.sort(startTimeList);
+		return startTimeList;
+	}
+	
+	/**
+	 * Get the finish time list from all depending components and tasks.
+	 * @return
+	 */
+	public List<Integer> getFinishTimeList(){
+		List<Integer> finishTimeList = new ArrayList<Integer>();
+		this.getAllDependingComponentList().forEach(c -> {
+			c.getTargetedTaskList().forEach(t -> {
+				finishTimeList.addAll(t.getFinishTimeList());
+			});
+		});
+		Collections.sort(finishTimeList);
+		return finishTimeList;
 	}
 	
 	/**
@@ -232,22 +267,12 @@ public class BaseComponent {
 	public int getFinishTime(){
 		return this.getAllDependingComponentList().stream()
 				.flatMap(c -> c.getTargetedTaskList().stream())
-				.mapToInt(t -> t.getFinishTime())
+				.mapToInt(t -> t.getFinishTimeList().stream()
+						.filter(f -> f >=0)
+						.max(Comparator.naturalOrder())
+						.orElse(-1))
 				.filter(f -> f >= 0)
 				.max()
-				.orElse(-1);
-	}
-	
-	/**
-	 * Get the additional start time from all depending components and tasks.
-	 * @return
-	 */
-	public int getAdditionalStartTime(){
-		return this.getAllDependingComponentList().stream()
-				.flatMap(c -> c.getTargetedTaskList().stream())
-				.mapToInt(t -> t.getAdditionalStartTime())
-				.filter(s -> s >= 0)
-				.min()
 				.orElse(-1);
 	}
 	

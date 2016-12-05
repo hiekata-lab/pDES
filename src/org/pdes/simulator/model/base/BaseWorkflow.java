@@ -29,6 +29,7 @@
 package org.pdes.simulator.model.base;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -341,7 +342,9 @@ public class BaseWorkflow {
 	 */
 	public int getDuration() {
 		return this.taskList.stream()
-				.mapToInt(t -> t.getFinishTime())
+				.mapToInt(t -> t.getFinishTimeList().stream()
+						.max(Comparator.naturalOrder())
+						.orElse(0))
 				.max()
 				.orElse(0);
 	}

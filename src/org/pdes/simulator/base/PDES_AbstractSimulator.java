@@ -267,24 +267,39 @@ public abstract class PDES_AbstractSimulator {
 			// workflow
 			pw.println();
 			pw.println("Gantt chart of each Task");
-			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Additinoal Start Time", "Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
 			this.workflowList.forEach(w -> {
 				String workflowName = "Workflow ("+w.getDueDate()+")";
 				w.getTaskList().forEach(t ->{
-					pw.println(String.join(separator ,
-							new String[]{workflowName, t.getName(), t.getAllocatedTeam().getName(), String.valueOf(t.getReadyTime()), String.valueOf(t.getStartTime()), String.valueOf(t.getAdditionalStartTime()), String.valueOf(t.getFinishTime())}));
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(workflowName);
+					baseInfo.add(t.getName());
+					baseInfo.add(t.getAllocatedTeam().getName());
+					IntStream.range(0, t.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(t.getReadyTimeList().get(i)));
+						baseInfo.add(String.valueOf(t.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(t.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator ,baseInfo.stream().toArray(String[]::new)));
 				});
 			});
 			
 			// product
 			pw.println();
 			pw.println("Gantt chart of each Component");
-			pw.println(String.join(separator , new String[]{"Product", "Component", "Error/Error Torerance", "Start Time", "Additinoal Start Time", "Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error/Error Torerance", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
 			this.productList.forEach(p -> {
 				String productName = "Product ("+p.getDueDate()+")";
 				p.getComponentList().forEach(c -> {
-					pw.println(String.join(separator ,
-							new String[]{productName, c.getName(), String.valueOf(c.getError())+"/"+String.valueOf(c.getErrorTolerance()), String.valueOf(c.getStartTime()), String.valueOf(c.getAdditionalStartTime()), String.valueOf(c.getFinishTime())}));
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(productName);
+					baseInfo.add(c.getName());
+					baseInfo.add(String.valueOf(c.getError())+"/"+String.valueOf(c.getErrorTolerance()));
+					IntStream.range(0, c.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(c.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(c.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator ,baseInfo.stream().toArray(String[]::new)));
 				});
 			});
 			// Organization

@@ -77,10 +77,9 @@ public class BaseTask {
 	private double actualWorkAmount; // actual work amount
 	private TaskState state = TaskState.NONE; // state of this task
 	private int stateInt = 0;
-	private int readyTime = -1;
-	private int startTime = -1;
-	private int finishTime = -1;
-	private int additionalStartTime = -1;//start time of additional work
+	private List<Integer> readyTimeList = new ArrayList<Integer>(); // list of ready time of one task
+	private List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
+	private List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
 	private boolean additionalTaskFlag = false;
 	private BaseWorker allocatedWorker = null;
 	private BaseFacility allocatedFacility = null;
@@ -110,10 +109,6 @@ public class BaseTask {
 		actualWorkAmount = defaultWorkAmount;
 		state = TaskState.NONE;
 		stateInt = 0;
-		readyTime = -1;
-		startTime = -1;
-		finishTime = -1;
-		additionalStartTime = -1;
 		additionalTaskFlag = false;
 		allocatedWorker = null;
 		allocatedFacility = null;
@@ -151,7 +146,7 @@ public class BaseTask {
 		if (isNone() && inputTaskList.stream().allMatch(t -> t.isFinished())){
 			state = TaskState.READY;
 			stateInt = 1;
-			readyTime = time;
+			addReadyTime(time);
 		}
 	}
 	
@@ -165,7 +160,7 @@ public class BaseTask {
 		if (isReady() && allocatedWorker != null) {
 			state = TaskState.WORKING;
 			stateInt = 2;
-			startTime = time;
+			addStartTime(time);
 			allocatedWorker.setStateWorking();
 			allocatedWorker.addStartTime(time);
 			allocatedWorker.addWorkedTask(this);
@@ -187,7 +182,7 @@ public class BaseTask {
 	public void checkFinished(int time) {
 		if (remainingWorkAmount <= 0) {
 			if (isWorking()) {
-				finishTime = time;
+				addFinishTime(time);
 				remainingWorkAmount = 0;
 				
 				//Finish normally.
@@ -207,7 +202,8 @@ public class BaseTask {
 					stateInt = 3;
 					remainingWorkAmount = additionalWorkAmount;
 					actualWorkAmount += additionalWorkAmount;
-					additionalStartTime = time + 1;
+					addReadyTime(time + 1);
+					addStartTime(time + 1);
 					
 					//Just assign worker and facility again.
 					allocatedWorker.addStartTime(time+1);
@@ -221,7 +217,7 @@ public class BaseTask {
 				}
 				
 			} else if (isWorkingAdditionally()) {
-				finishTime = time;
+				addFinishTime(time);
 				remainingWorkAmount = 0;
 				state = TaskState.FINISHED;
 				stateInt = 4;
@@ -508,37 +504,55 @@ public class BaseTask {
 	public int getStateInt() {
 		return stateInt;
 	}
-
+	
 	/**
-	 * Get the ready time
-	 * @return the readyTime
+	 * Get the ready time list
+	 * @return the readyTimeList
 	 */
-	public int getReadyTime() {
-		return readyTime;
+	public List<Integer> getReadyTimeList() {
+		return readyTimeList;
 	}
-
+	
 	/**
-	 * Get the start time.
-	 * @return the startTime
+	 * Get the start time list.
+	 * @return the startTimeList
 	 */
-	public int getStartTime() {
-		return startTime;
+	public List<Integer> getStartTimeList() {
+		return startTimeList;
 	}
+	
 	/**
 	 * Get the finish time.
-	 * @return the finishTime
+	 * @return the finishTimeList
 	 */
-	public int getFinishTime() {
-		return finishTime;
+	public List<Integer> getFinishTimeList() {
+		return finishTimeList;
 	}
+	
 	/**
-	 * Get the additional start time.
-	 * @return the additionalStartTime
+	 * Add ready time.
+	 * @param time
 	 */
-	public int getAdditionalStartTime() {
-		return additionalStartTime;
+	public void addReadyTime(int time) {
+		readyTimeList.add(time);
 	}
-
+	
+	/**
+	 * Add start time.
+	 * @param time
+	 */
+	public void addStartTime(int time) {
+		startTimeList.add(time);
+	}
+	
+	/**
+	 * Add finish time.
+	 * @param time
+	 */
+	public void addFinishTime(int time) {
+		finishTimeList.add(time);
+	}
+	
 	/**
 	 * Get the allocated worker.
 	 * @return the allocatedWorker

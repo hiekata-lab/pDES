@@ -100,7 +100,7 @@ public class OneRunPDES_SimulatorConsideringHybridProcessAction extends Abstract
 		public String call() throws Exception {
 			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
 			PDES_HybridSimulator sim = new PDES_HybridSimulator(project);
-			sim.setConsiderReworkOfErrorTorelance(true);
+			sim.setConsiderHybridProcessModel(true);
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());

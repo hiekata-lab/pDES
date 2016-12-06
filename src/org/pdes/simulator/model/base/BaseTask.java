@@ -540,6 +540,13 @@ public class BaseTask {
 	}
 
 	/**
+	 * @param remainingWorkAmount the remainingWorkAmount to set
+	 */
+	public void setRemainingWorkAmount(double remainingWorkAmount) {
+		this.remainingWorkAmount = remainingWorkAmount;
+	}
+
+	/**
 	 * Get the actual work amount.
 	 * @return the actualWorkAmount
 	 */

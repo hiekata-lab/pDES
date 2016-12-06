@@ -307,6 +307,15 @@ public class BaseComponent {
 	public void setError(double error) {
 		this.error = error;
 	}
+
+	/**
+	 * Set error value.
+	 * @param error the error to set
+	 */
+	public boolean isFinished() {
+		return this.getTargetedTaskList().stream()
+										.allMatch(t -> t.isFinished());
+	}
 	
 	/**
 	 * Transfer to text data.

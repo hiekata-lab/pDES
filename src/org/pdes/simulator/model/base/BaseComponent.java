@@ -108,6 +108,22 @@ public class BaseComponent {
 	public void updateErrorValue(double noErrorProbability) {
 		if (random.nextDouble() >= noErrorProbability) error++;
 	}
+
+	/**
+	 * Add error.
+	 * @param generatedError
+	 */
+	public void addError(double generatedError) {
+		error += generatedError;
+	}
+
+	/**
+	 * Remove error.
+	 * @param detectedError
+	 */
+	public void removeError(double detectedError) {
+		error -= detectedError;
+	}
 	
 	/**
 	 * Get total error value including depending components.

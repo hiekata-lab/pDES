@@ -318,12 +318,20 @@ public class BaseComponent {
 	}
 
 	/**
-	 * Set error value.
-	 * @param error the error to set
+	 * Check finished.
+	 * @return if finished or not 
 	 */
 	public boolean isFinished() {
 		return this.getTargetedTaskList().stream()
 										.allMatch(t -> t.isFinished());
+	}
+
+	/**
+	 * Review Component.
+	 * @param if rework or not
+	 */
+	public boolean review() {
+		return false;
 	}
 	
 	/**

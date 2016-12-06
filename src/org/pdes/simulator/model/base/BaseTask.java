@@ -613,6 +613,20 @@ public class BaseTask {
 	}
 	
 	/**
+	 * @return the additionalTaskFlag
+	 */
+	public boolean isAdditionalTaskFlag() {
+		return additionalTaskFlag;
+	}
+
+	/**
+	 * @param additionalTaskFlag the additionalTaskFlag to set
+	 */
+	public void setAdditionalTaskFlag(boolean additionalTaskFlag) {
+		this.additionalTaskFlag = additionalTaskFlag;
+	}
+
+	/**
 	 * Get the allocated worker.
 	 * @return the allocatedWorker
 	 */

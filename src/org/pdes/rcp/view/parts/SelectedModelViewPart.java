@@ -399,15 +399,17 @@ public class SelectedModelViewPart extends ViewPart {
 									}else if(column==1 && doubleCheck(text.getText())){ // cost
 										if(Double.valueOf(text.getText()) < 0.00) return;
 										worker.setCost(Double.valueOf(text.getText()));
-									}else{ // skill ( <work amount skill value>/<quality skill value> )
+									}else{ // skill ( <work amount skill value>/<error rate value>/<error detect rate value> )
 										String[] skillTexts = text.getText().split("/");
-										if (skillTexts.length != 2) return;
+										if (skillTexts.length != 3) return;
 										String workAmountSkillText = skillTexts[0];
-										String qualitySkillText = skillTexts[1];
-										if (!(doubleCheck(workAmountSkillText) && doubleCheck(qualitySkillText))) return;
-										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(qualitySkillText) < 0.00)) return;
+										String errorRateText = skillTexts[1];
+										String errorDetectRateText = skillTexts[2];
+										if (!(doubleCheck(workAmountSkillText) && doubleCheck(errorRateText))) return;
+										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(errorRateText) < 0.00) || (Double.valueOf(errorDetectRateText) < 0.00)) return;
 										worker.addSkillInWorkAmountSkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(workAmountSkillText));
-										worker.addSkillInQualitySkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(qualitySkillText));
+										worker.addSkillInErrorRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorRateText));
+										worker.addSkillInErrorDetectRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorDetectRateText));
 									}
 									redrawAllTableForTeam();
 									text.dispose();
@@ -474,7 +476,7 @@ public class SelectedModelViewPart extends ViewPart {
 		
 		
 		facilityTableLabel = new Label(parent, SWT.NULL);
-		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day]/error probability");
+		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day/day]/error rate[/day]/error detect rate[/day]");
 		facilityTableLabel.setFont(new Font(null, "", 10, 0));
 		FormData facilityTableLabelFD = new FormData();
 		facilityTableLabelFD.top= new FormAttachment(workerTable,20);
@@ -530,15 +532,17 @@ public class SelectedModelViewPart extends ViewPart {
 									}else if(column==1 && doubleCheck(text.getText())){ // cost
 										if(Double.valueOf(text.getText()) < 0.00) return;
 										facility.setCost(Double.valueOf(text.getText()));
-									}else{ // skill ( <work amount skill value>/<quality skill value> )
+									}else{ // skill ( <work amount skill value>/<quality skill value>/<quality skill value> )
 										String[] skillTexts = text.getText().split("/");
-										if (skillTexts.length != 2) return;
+										if (skillTexts.length != 3) return;
 										String workAmountSkillText = skillTexts[0];
-										String qualitySkillText = skillTexts[1];
-										if (!(doubleCheck(workAmountSkillText) && doubleCheck(qualitySkillText))) return;
-										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(qualitySkillText) < 0.00)) return;
+										String errorRateText = skillTexts[1];
+										String errorDetectRateText = skillTexts[2];
+										if (!(doubleCheck(workAmountSkillText) && doubleCheck(errorRateText))) return;
+										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(errorRateText) < 0.00) || (Double.valueOf(errorDetectRateText) < 0.00)) return;
 										facility.addSkillInWorkAmountSkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(workAmountSkillText));
-										facility.addSkillInQualitySkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(qualitySkillText));
+										facility.addSkillInErrorRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorRateText));
+										facility.addSkillInErrorDetectRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorDetectRateText));
 									}
 									redrawAllTableForTeam();
 									text.dispose();
@@ -1074,20 +1078,28 @@ public class SelectedModelViewPart extends ViewPart {
 			item.setText(0, member.getName());
 			item.setText(1, String.valueOf(member.getCost()));
 			for(int j=0;j<teamSkillNameList.size();j++){
-				String text = "/";
+				String text = "";
+				String separator = "/";
 				
 				// skill of work amount
 				if(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)) != null){
-					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j))) + text;
+					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = "0.0" + text;
+					text = "0.0";
 				}
 				
-				// skill of quality
-				if(member.getQualitySkillMap().get(teamSkillNameList.get(j)) != null){
-					text = text + String.valueOf(member.getQualitySkillMap().get(teamSkillNameList.get(j)));
+				// skill of error generate
+				if(member.getErrorRateMap().get(teamSkillNameList.get(j)) != null){
+					text = text + separator + String.valueOf(member.getErrorRateMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = text + "0.0";
+					text = text + separator + "0.0";
+				}
+				
+				// skill of error detect
+				if(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)) != null){
+					text = text + separator + String.valueOf(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)));
+				}else{
+					text = text + separator + "0.0";
 				}
 				item.setText(j+2, text);
 			}
@@ -1130,20 +1142,28 @@ public class SelectedModelViewPart extends ViewPart {
 			item.setText(0, member.getName());
 			item.setText(1, String.valueOf(member.getCost()));
 			for(int j=0;j<teamSkillNameList.size();j++){
-				String text = "/";
+				String text = "";
+				String separator = "/";
 				
 				// skill of work amount
 				if(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)) != null){
-					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j))) + text;
+					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = "0.0" + text;
+					text = "0.0";
 				}
 				
-				// skill of quality
-				if(member.getQualitySkillMap().get(teamSkillNameList.get(j)) != null){
-					text = text + String.valueOf(member.getQualitySkillMap().get(teamSkillNameList.get(j)));
+				// skill of error generate
+				if(member.getErrorRateMap().get(teamSkillNameList.get(j)) != null){
+					text = text + separator + String.valueOf(member.getErrorRateMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = text + "0.0";
+					text = text + separator + "0.0";
+				}
+				
+				// skill of error detect
+				if(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)) != null){
+					text = text + separator + String.valueOf(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)));
+				}else{
+					text = text + separator + "0.0";
 				}
 				item.setText(j+2, text);
 			}

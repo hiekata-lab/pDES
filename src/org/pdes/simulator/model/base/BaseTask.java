@@ -294,11 +294,11 @@ public class BaseTask {
 	public void perform(int time, boolean componentErrorRework) {
 		if (isWorking() || isWorkingAdditionally()) {
 			double workAmount = allocatedWorker.getWorkAmountSkillPoint(this);
-			double noErrorProbability = 1.0 - allocatedWorker.getQualitySkillPoint(this); // Probability of success this task
+			double noErrorProbability = 1.0 - allocatedWorker.getErrorRate(this); // Probability of success this task
 			allocatedWorker.work();
 			if (needFacility) {
 				workAmount *= allocatedFacility.getWorkAmountSkillPoint(this);
-				noErrorProbability *= 1.0 - allocatedFacility.getQualitySkillPoint(this);
+				noErrorProbability *= 1.0 - allocatedFacility.getErrorRate(this);
 				allocatedFacility.work();
 			}
 			remainingWorkAmount -= workAmount;

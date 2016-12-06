@@ -147,8 +147,8 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//3. Define SWT of clicking ComponentNode
 	//If you add some attributes in ComponentNode, add "setVisibleOfComponentSWT" method.
-	private Label componentNameLabel, componentErrorToleranceLabel;
-	private Text componentNameText, componentErrorToleranceText;
+	private Label componentNameLabel, componentErrorToleranceLabel, componentRequirementChangeProbabilityLabel;
+	private Text componentNameText, componentErrorToleranceText, componentRequirementChangeProbabilityText;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -159,10 +159,14 @@ public class SelectedModelViewPart extends ViewPart {
 		componentNameText.setVisible(visible);
 		componentErrorToleranceLabel.setVisible(visible);
 		componentErrorToleranceText.setVisible(visible);
+		componentRequirementChangeProbabilityLabel.setVisible(visible);
+		componentRequirementChangeProbabilityText.setVisible(visible);
+		
 		
 		if(visible){
 			componentNameText.setText(((ComponentNode) selectedModel).getName());
 			componentErrorToleranceText.setText(String.valueOf(((ComponentNode) selectedModel).getErrorTolerance()));
+			componentRequirementChangeProbabilityText.setText(String.valueOf(((ComponentNode) selectedModel).getRequirementChangeProbability()));
 		}
 	}
 	
@@ -879,6 +883,47 @@ public class SelectedModelViewPart extends ViewPart {
 		componentErrorToleranceTextFD.left= new FormAttachment(componentErrorToleranceLabel,10);
 		componentErrorToleranceTextFD.width = 50;
 		componentErrorToleranceText.setLayoutData(componentErrorToleranceTextFD);
+		componentErrorToleranceLabel = new Label(parent, SWT.NULL);
+		componentErrorToleranceLabel.setText("Error Tolerance : ");
+		componentErrorToleranceLabel.setFont(new Font(null, "", 10, 0));
+		
+		componentRequirementChangeProbabilityLabel = new Label(parent, SWT.NULL);
+		componentRequirementChangeProbabilityLabel.setText("Requirement Change Probability : ");
+		componentRequirementChangeProbabilityLabel.setFont(new Font(null, "", 10, 0));
+		FormData componentRequirementChangeProbabilityLabelFD = new FormData();
+		componentRequirementChangeProbabilityLabelFD.top= new FormAttachment(componentErrorToleranceLabel,10);
+		componentRequirementChangeProbabilityLabelFD.left= new FormAttachment(0,10);
+		componentRequirementChangeProbabilityLabel.setLayoutData(componentRequirementChangeProbabilityLabelFD);
+		
+		componentRequirementChangeProbabilityText = new Text(parent, SWT.BORDER|SWT.SINGLE);
+		componentRequirementChangeProbabilityText.addKeyListener(new KeyListener(){
+		
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyPressed(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyPressed(KeyEvent e) {}
+			
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyReleased(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyReleased(KeyEvent e) {
+				if(e.character==SWT.CR){
+					String textString = componentRequirementChangeProbabilityText.getText();
+					if(doubleCheck(textString)) {
+						((ComponentNode)selectedModel).setRequirementChangeProbability(Double.parseDouble(textString));
+					}else{
+						componentRequirementChangeProbabilityText.setText(String.valueOf(((ComponentNode)selectedModel).getRequirementChangeProbability()));
+					}
+				}
+			}
+		});
+		FormData componentRequirementChangeProbabilityTextFD = new FormData();
+		componentRequirementChangeProbabilityTextFD.top= new FormAttachment(componentErrorToleranceLabel,10);
+		componentRequirementChangeProbabilityTextFD.left= new FormAttachment(componentRequirementChangeProbabilityLabel,10);
+		componentRequirementChangeProbabilityTextFD.width = 50;
+		componentErrorToleranceText.setLayoutData(componentRequirementChangeProbabilityTextFD);
 		///////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////SubWorkflow////////////////////////////

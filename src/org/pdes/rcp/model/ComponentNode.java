@@ -41,6 +41,7 @@ public class ComponentNode extends NodeElement {
 	////////////////Variables//////////////////////////////////////////////////////////
 	private String name = "";
 	private double errorTolerance;
+	private double requirementChangeProbability;
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -50,6 +51,7 @@ public class ComponentNode extends NodeElement {
 		String newName = "New Component";
 		this.setName(newName);
 		this.setErrorTolerance(0.0);
+		this.setRequirementChangeProbability(0.0);
 	}
 	
 	/**
@@ -86,6 +88,24 @@ public class ComponentNode extends NodeElement {
 		double old = this.errorTolerance;
 		this.errorTolerance = errorTolerance;
 		firePropertyChange("errorTolerance",old,errorTolerance);
+	}
+
+	
+	/**
+	 * Get the Requirement Change Probability of ComponentNode
+	 * @return the reworkProbability
+	 */
+	public double getRequirementChangeProbability() {
+		return requirementChangeProbability;
+	}
+
+	
+	/**
+	 * Set the Requirement Change Probability of ComponentNode
+	 * @param requirementChangeProbability the requirementChangeProbability to set
+	 */
+	public void setRequirementChangeProbability(double requirementChangeProbability) {
+		this.requirementChangeProbability = requirementChangeProbability;
 	}
 	
 }

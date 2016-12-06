@@ -49,6 +49,7 @@ public class BaseComponent {
 	private final String nodeId; // ComponentNode ID
 	private final String name;
 	private final double errorTolerance;
+	private final double requirementChangeProbability;
 	private final List<BaseComponent> dependingComponentList = new ArrayList<>();
 	private final List<BaseComponent> dependedComponentList = new ArrayList<>();
 	private final List<BaseTask> targetedTaskList = new ArrayList<>();
@@ -68,6 +69,7 @@ public class BaseComponent {
 		this.nodeId = componentNode.getId();
 		this.name = componentNode.getName();
 		this.errorTolerance = componentNode.getErrorTolerance();
+		this.requirementChangeProbability = componentNode.getRequirementChangeProbability();
 	}
 	
 	/**
@@ -182,6 +184,13 @@ public class BaseComponent {
 	 */
 	public double getErrorTolerance() {
 		return errorTolerance;
+	}
+
+	/**
+	 * @return the requirementChangeProbability
+	 */
+	public double getRequirementChangeProbability() {
+		return requirementChangeProbability;
 	}
 
 	/**

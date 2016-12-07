@@ -29,6 +29,7 @@
 package org.pdes.simulator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.pdes.simulator.base.PDES_AbstractSimulator;
 import org.pdes.simulator.model.base.BaseFacility;
@@ -86,6 +87,34 @@ public class PDES_HybridSimulator extends PDES_AbstractSimulator {
 			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
 			time++;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.pdes.simulator.base.PDES_AbstractSimulator#allocateReadyTasksToFreeResources(java.util.List, java.util.List, java.util.List)
+	 */
+	@Override
+	public void allocateReadyTasksToFreeResources(List<BaseTask> readyTaskList, List<BaseWorker> freeWorkerList,
+			List<BaseFacility> freeFacilityList) {
+		this.sortTasks(readyTaskList);
+		readyTaskList.forEach(task -> {
+			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
+				freeWorkerList.stream()
+				.filter(w -> w.hasSkill(task))
+				.collect(Collectors.toList())
+				.forEach(worker -> {
+					task.addAllocatedWorker(worker);
+					freeWorkerList.remove(worker);
+				});
+				if (task.isNeedFacility()) {
+					freeFacilityList.stream()
+					.filter(w -> w.hasSkill(task))
+					.forEachOrdered(facility -> {
+						task.addAllocatedFacility(facility);
+						freeFacilityList.remove(facility);
+					});
+				}
+			}
+		});
 	}
 
 	/**

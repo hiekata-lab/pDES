@@ -54,8 +54,12 @@ public class BaseComponent {
 	private final List<BaseComponent> dependedComponentList = new ArrayList<>();
 	private final List<BaseTask> targetedTaskList = new ArrayList<>();
 	
+	
 	// Changeable variable on simulation
 	private double error;
+	private int reworkCount;
+	private boolean reworkFlag;
+	
 	
 	//Other
 	private final Random random = new Random();
@@ -326,6 +330,50 @@ public class BaseComponent {
 										.allMatch(t -> t.isFinished());
 	}
 
+	/**
+	 * @return the reworkCount
+	 */
+	public int getReworkCount() {
+		return reworkCount;
+	}
+
+	/**
+	 * @param reworkCount the reworkCount to set
+	 */
+	public void setReworkCount(int reworkCount) {
+		this.reworkCount = reworkCount;
+	}
+	
+	/**
+	 * Add rework count
+	 * @param 
+	 */
+	public void addReworkCount() {
+		this.reworkCount++;
+	}
+
+	/**
+	 * @return the reworkFlag
+	 */
+	public boolean isReworkFlag() {
+		return reworkFlag;
+	}
+
+	/**
+	 * @param reworkFlag the reworkFlag to set
+	 */
+	public void setReworkFlag(boolean reworkFlag) {
+		this.reworkFlag = reworkFlag;
+	}
+
+	/**
+	 * Set rework
+	 * @param
+	 */
+	public void setRework() {
+		/// Only for considering hybrid process.
+	}
+	
 	/**
 	 * Review Component.
 	 * @param if rework or not

@@ -883,9 +883,6 @@ public class SelectedModelViewPart extends ViewPart {
 		componentErrorToleranceTextFD.left= new FormAttachment(componentErrorToleranceLabel,10);
 		componentErrorToleranceTextFD.width = 50;
 		componentErrorToleranceText.setLayoutData(componentErrorToleranceTextFD);
-		componentErrorToleranceLabel = new Label(parent, SWT.NULL);
-		componentErrorToleranceLabel.setText("Error Tolerance : ");
-		componentErrorToleranceLabel.setFont(new Font(null, "", 10, 0));
 		
 		componentRequirementChangeProbabilityLabel = new Label(parent, SWT.NULL);
 		componentRequirementChangeProbabilityLabel.setText("Requirement Change Probability : ");
@@ -923,7 +920,7 @@ public class SelectedModelViewPart extends ViewPart {
 		componentRequirementChangeProbabilityTextFD.top= new FormAttachment(componentErrorToleranceLabel,10);
 		componentRequirementChangeProbabilityTextFD.left= new FormAttachment(componentRequirementChangeProbabilityLabel,10);
 		componentRequirementChangeProbabilityTextFD.width = 50;
-		componentErrorToleranceText.setLayoutData(componentRequirementChangeProbabilityTextFD);
+		componentRequirementChangeProbabilityText.setLayoutData(componentRequirementChangeProbabilityTextFD);
 		///////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////SubWorkflow////////////////////////////

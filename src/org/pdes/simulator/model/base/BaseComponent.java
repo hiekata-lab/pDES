@@ -214,6 +214,20 @@ public class BaseComponent {
 	}
 	
 	/**
+	 * @return the dependingComponentList
+	 */
+	public List<BaseComponent> getDependingComponentList() {
+		return dependingComponentList;
+	}
+
+	/**
+	 * @return the dependedComponentList
+	 */
+	public List<BaseComponent> getDependedComponentList() {
+		return dependedComponentList;
+	}
+
+	/**
 	 * Get the list of targeted task.
 	 * @return the targetedTaskList
 	 */

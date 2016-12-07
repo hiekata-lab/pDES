@@ -604,6 +604,13 @@ public class BaseTask {
 	
 
 	/**
+	 * @param actualWorkAmount the actualWorkAmount to set
+	 */
+	public void setActualWorkAmount(double actualWorkAmount) {
+		this.actualWorkAmount = actualWorkAmount;
+	}
+
+	/**
 	 * Get the state(int) of this task.
 	 * @return the stateInt
 	 */

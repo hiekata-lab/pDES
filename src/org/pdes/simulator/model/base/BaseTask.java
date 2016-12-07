@@ -40,6 +40,10 @@ import org.pdes.rcp.model.TaskNode;
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  *
  */
+/**
+ * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ *
+ */
 public class BaseTask {
 	
 	private enum TaskState {
@@ -345,11 +349,27 @@ public class BaseTask {
 	}
 	
 	/**
+	 * Set the state NONE.
+	 * @param
+	 */
+	public void setNone() {
+		state = TaskState.NONE;
+	}
+	
+	/**
 	 * Check whether the state of this task is READY.
 	 * @return
 	 */
-	public boolean isReady() {
+ 	public boolean isReady() {
 		return state == TaskState.READY;
+	}
+
+	/**
+	 * Set the state READY.
+	 * @param
+	 */
+	public void setReady() {
+		state = TaskState.READY;
 	}
 	
 	/**
@@ -361,11 +381,27 @@ public class BaseTask {
 	}
 	
 	/**
+	 * Set the state WORKING.
+	 * @param
+	 */
+	public void setWorking() {
+		state = TaskState.WORKING;
+	}
+	
+	/**
 	 * Check whether the state of this task is ADDITIONAL WORKING.
 	 * @return
 	 */
 	public boolean isWorkingAdditionally() {
 		return state == TaskState.WORKING_ADDITIONALLY;
+	}
+
+	/**
+	 * Set the state WORKING_ADDITIONALLY.
+	 * @param
+	 */
+	public void setWorkingAdditionally() {
+		state = TaskState.WORKING_ADDITIONALLY;
 	}
 	
 	/**
@@ -380,6 +416,15 @@ public class BaseTask {
 	 * Check whether this task has the attributes of additional work.
 	 * @return
 	 */
+	
+	/**
+	 * Set the state FINISHED.
+	 * @param
+	 */
+	public void setFinished() {
+		state = TaskState.FINISHED;
+	}
+	
 	public boolean hasAdditionalTask() {
 		return additionalWorkAmount > 0;
 	}
@@ -584,6 +629,13 @@ public class BaseTask {
 		return stateInt;
 	}
 	
+	/**
+	 * @param stateInt the stateInt to set
+	 */
+	public void setStateInt(int stateInt) {
+		this.stateInt = stateInt;
+	}
+
 	/**
 	 * Get the ready time list
 	 * @return the readyTimeList

@@ -122,7 +122,7 @@ public class ProjectDiagram extends Diagram {
 							Map<String,Double> errorDetectRateMap = worker.getErrorDetectRateMap();
 							for(Iterator<Entry<String, Double>> it = errorDetectRateMap.entrySet().iterator();it.hasNext();){
 								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
-								pw.println("					<ErrorDetectSkill name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
+								pw.println("					<ErrorDetectRate name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
 							}
 							pw.println("				</Worker>");
 						}

@@ -370,7 +370,7 @@ public class BaseComponent {
 	 * Set rework
 	 * @param
 	 */
-	public void setRework() {
+	public void setRework(int time) {
 		/// Only for considering hybrid process.
 	}
 	

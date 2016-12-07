@@ -347,7 +347,7 @@ public class SelectedModelViewPart extends ViewPart {
 		teamNameText.setLayoutData(teamNameTextFD);
 		
 		workerTableLabel = new Label(parent, SWT.NULL);
-		workerTableLabel.setText("[Workers]\nskill: work amount[parson-day]/error probability");
+		workerTableLabel.setText("[Workers]\nskill: work amount[parson-day/day]/error rate[#/day]/error detect rate[#/day]");
 		workerTableLabel.setFont(new Font(null, "", 10, 0));
 		FormData workerTableLabelFD = new FormData();
 		workerTableLabelFD.top= new FormAttachment(teamNameLabel,12);
@@ -480,7 +480,7 @@ public class SelectedModelViewPart extends ViewPart {
 		
 		
 		facilityTableLabel = new Label(parent, SWT.NULL);
-		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day/day]/error rate[/day]/error detect rate[/day]");
+		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day/day]/error rate[#/day]/error detect rate[#/day]");
 		facilityTableLabel.setFont(new Font(null, "", 10, 0));
 		FormData facilityTableLabelFD = new FormData();
 		facilityTableLabelFD.top= new FormAttachment(workerTable,20);

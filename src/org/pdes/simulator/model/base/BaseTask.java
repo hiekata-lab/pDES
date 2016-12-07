@@ -133,8 +133,8 @@ public class BaseTask {
 	private List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
 	private List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
 	private boolean additionalTaskFlag = false;
-	private BaseWorker allocatedWorker = null;
-	private BaseFacility allocatedFacility = null;
+	private List<BaseWorker> allocatedWorkerList = new ArrayList<BaseWorker>();
+	private List<BaseFacility> allocatedFacilityList = new ArrayList<BaseFacility>();
 	
 	/**
 	 * This is the constructor.
@@ -162,8 +162,8 @@ public class BaseTask {
 		state = TaskState.NONE;
 		stateInt = 0;
 		additionalTaskFlag = false;
-		allocatedWorker = null;
-		allocatedFacility = null;
+		allocatedWorkerList.clear();;
+		allocatedFacilityList.clear();
 	}
 	
 	/**
@@ -209,17 +209,21 @@ public class BaseTask {
 	 * @param time
 	 */
 	public void checkWorking(int time) {
-		if (isReady() && allocatedWorker != null) {
+		if (isReady() && allocatedWorkerList.size() != 0) {
 			state = TaskState.WORKING;
 			stateInt = 2;
 			addStartTime(time);
-			allocatedWorker.setStateWorking();
-			allocatedWorker.addStartTime(time);
-			allocatedWorker.addWorkedTask(this);
+			for (BaseWorker w : allocatedWorkerList) {
+				w.setStateWorking();
+				w.addStartTime(time);
+				w.addWorkedTask(this);
+			}
 			if (needFacility) {
-				allocatedFacility.setStateWorking();
-				allocatedFacility.addStartTime(time);
-				allocatedFacility.addWorkedTask(this);
+				for (BaseFacility f : allocatedFacilityList) {
+					f.setStateWorking();
+					f.addStartTime(time);
+					f.addWorkedTask(this);
+				}
 			}
 		}
 	}
@@ -240,13 +244,17 @@ public class BaseTask {
 				//Finish normally.
 				state = TaskState.FINISHED;
 				stateInt = 4;
-				allocatedWorker.setStateFree();
-				allocatedWorker.addFinishTime(time);
-				if (needFacility) {
-					allocatedFacility.setStateFree();
-					allocatedFacility.addFinishTime(time);
+				for (BaseWorker w : allocatedWorkerList) {
+					w.setStateFree();
+					w.addFinishTime(time);
 				}
-				
+				if (needFacility) {
+					for (BaseFacility f : allocatedFacilityList) {
+						f.setStateFree();
+						f.addFinishTime(time);							
+					}
+				}
+			
 				if (additionalTaskFlag) {
 					//Additional work
 					//TODO check and update the logic of adding additional work.
@@ -258,26 +266,32 @@ public class BaseTask {
 					addStartTime(time + 1);
 					
 					//Just assign worker and facility again.
-					allocatedWorker.addStartTime(time+1);
-					allocatedWorker.addWorkedTask(this);
-					if (needFacility) {
-						allocatedFacility.addStartTime(time+1);
-						allocatedFacility.addWorkedTask(this);
+					for (BaseWorker w : allocatedWorkerList) {
+						w.addStartTime(time+1);
+						w.addWorkedTask(this);
 					}
-					
+					if (needFacility) {
+						for (BaseFacility f : allocatedFacilityList) {
+							f.addStartTime(time+1);
+							f.addWorkedTask(this);
+						}
+					}
 					additionalTaskFlag = false;
 				}
-				
 			} else if (isWorkingAdditionally()) {
 				addFinishTime(time);
 				remainingWorkAmount = 0;
 				state = TaskState.FINISHED;
 				stateInt = 4;
-				allocatedWorker.setStateFree();
-				allocatedWorker.addFinishTime(time);
+				for (BaseWorker w : allocatedWorkerList) {
+					w.setStateFree();
+					w.addFinishTime(time);
+				}
 				if (needFacility) {
-					allocatedFacility.setStateFree();
-					allocatedFacility.addFinishTime(time);
+					for (BaseFacility f : allocatedFacilityList) {
+						f.setStateFree();
+						f.addFinishTime(time);
+					}
 				}
 			}
 		}
@@ -293,13 +307,19 @@ public class BaseTask {
 	 */
 	public void perform(int time, boolean componentErrorRework) {
 		if (isWorking() || isWorkingAdditionally()) {
-			double workAmount = allocatedWorker.getWorkAmountSkillPoint(this);
-			double noErrorProbability = 1.0 - allocatedWorker.getErrorRate(this); // Probability of success this task
-			allocatedWorker.work();
+			double workAmount = 0.0;
+			double noErrorProbability = 0.0; // Probability of success this task
+			for (BaseWorker w : allocatedWorkerList) {
+				workAmount += w.getWorkAmountSkillPoint(this);
+				noErrorProbability *= 1.0 - w.getErrorRate(this);
+				w.work();
+			}
 			if (needFacility) {
-				workAmount *= allocatedFacility.getWorkAmountSkillPoint(this);
-				noErrorProbability *= 1.0 - allocatedFacility.getErrorRate(this);
-				allocatedFacility.work();
+				for (BaseFacility f : allocatedFacilityList) {
+					workAmount += f.getWorkAmountSkillPoint(this);
+					noErrorProbability *= 1.0 - f.getErrorRate(this);
+					f.work();
+				}
 			}
 			remainingWorkAmount -= workAmount;
 			for (BaseComponent c : targetComponentList) {
@@ -627,43 +647,43 @@ public class BaseTask {
 	}
 
 	/**
-	 * Get the allocated worker.
-	 * @return the allocatedWorker
+	 * Get the allocated worker list.
+	 * @return the allocatedWorkerList
 	 */
-	public BaseWorker getAllocatedWorker() {
-		return allocatedWorker;
+	public List<BaseWorker> getAllocatedWorkerList() {
+		return allocatedWorkerList;
 	}
 
 	/**
-	 * Set the allocated worker.
-	 * @param allocatedWorker the allocatedWorker to set
+	 * Add the allocated worker.
+	 * @param allocatedWorker
 	 */
-	public void setAllocatedWorker(BaseWorker allocatedWorker) {
-		this.allocatedWorker = allocatedWorker;
+	public void addAllocatedWorker(BaseWorker allocatedWorker) {
+		this.allocatedWorkerList.add(allocatedWorker);
 	}
 
 	/**
-	 * Get the allocated facility.
-	 * @return the workingFacility
+	 * Get the allocated facility list.
+	 * @return the workingFacilityList
 	 */
-	public BaseFacility getAllocatedFacility() {
-		return allocatedFacility;
+	public List<BaseFacility> getAllocatedFacilityList() {
+		return allocatedFacilityList;
 	}
 
 	/**
-	 * Set the allocated facility.
-	 * @param allocatedFacility the allocatedFacility to set
+	 * Add the allocated facility.
+	 * @param allocatedFacility
 	 */
-	public void setAllocatedFacility(BaseFacility allocatedFacility) {
-		this.allocatedFacility = allocatedFacility;
+	public void addAllocatedFacility(BaseFacility allocatedFacility) {
+		this.allocatedFacilityList.add(allocatedFacility);
 	}
 	
 	/**
 	 * Transfer to text data.
 	 */
 	public String toString() {
-		String worker = (allocatedWorker != null) ? allocatedWorker.getName() : "";
-		String facility = (allocatedFacility != null) ? allocatedFacility.getName() : "";
+		String worker = (allocatedWorkerList.size() != 0) ? allocatedWorkerList.stream().map(w -> w.getName()).collect(Collectors.joining()) : "";
+		String facility = (allocatedFacilityList.size() != 0) ? allocatedFacilityList.stream().map(f -> f.getName()).collect(Collectors.joining()) : "";
 		String inputTaskNames = String.join(",", inputTaskList.stream().map(t -> t.getName()).collect(Collectors.toList())); // DEBUG
 		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, remainingWorkAmount, allocatedTeam.getName(), worker, facility, inputTaskNames);
 	}

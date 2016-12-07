@@ -262,25 +262,7 @@ public class BaseTask {
 				if (additionalTaskFlag) {
 					//Additional work
 					//TODO check and update the logic of adding additional work.
-					state = TaskState.WORKING_ADDITIONALLY;
-					stateInt = 3;
-					remainingWorkAmount = additionalWorkAmount;
-					actualWorkAmount += additionalWorkAmount;
-					addReadyTime(time + 1);
-					addStartTime(time + 1);
-					
-					//Just assign worker and facility again.
-					for (BaseWorker w : allocatedWorkerList) {
-						w.addStartTime(time+1);
-						w.addWorkedTask(this);
-					}
-					if (needFacility) {
-						for (BaseFacility f : allocatedFacilityList) {
-							f.addStartTime(time+1);
-							f.addWorkedTask(this);
-						}
-					}
-					additionalTaskFlag = false;
+					setRework(time);
 				}
 			} else if (isWorkingAdditionally()) {
 				addFinishTime(time);
@@ -767,4 +749,30 @@ public class BaseTask {
 	public void setTypeInt(int typeInt) {
 		this.typeInt = typeInt;
 	}
+	
+	/**
+	 * set rework
+	 * @param 
+	 */
+	public void setRework(int time) {
+		state = TaskState.WORKING_ADDITIONALLY;
+		stateInt = 3;
+		remainingWorkAmount = additionalWorkAmount;
+		actualWorkAmount += additionalWorkAmount;
+		addReadyTime(time + 1);
+		addStartTime(time + 1);
+		
+		//Just assign worker and facility again.
+		for (BaseWorker w : allocatedWorkerList) {
+			w.addStartTime(time+1);
+			w.addWorkedTask(this);
+		}
+		if (needFacility) {
+			for (BaseFacility f : allocatedFacilityList) {
+				f.addStartTime(time+1);
+				f.addWorkedTask(this);
+			}
+		}
+		additionalTaskFlag = false;
+	}	
 }

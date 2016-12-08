@@ -144,7 +144,7 @@ public class BaseResource {
 	 */
 	public double getWorkAmountSkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return workAmountSkillMap.get(task.getName());
+		return workAmountSkillMap.getOrDefault(task.getName(), 0.0);
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class BaseResource {
 	 */
 	public double getErrorRate(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return errorRateMap.get(task.getName());
+		return errorRateMap.getOrDefault(task.getName(), 0.0);
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class BaseResource {
 	 */
 	public double getErrorDetectRate(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return errorDetectRateMap.get(task.getName());
+		return errorDetectRateMap.getOrDefault(task.getName(), 0.0);
 	}
 	
 	/**

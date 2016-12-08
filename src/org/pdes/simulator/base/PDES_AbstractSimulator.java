@@ -262,7 +262,12 @@ public abstract class PDES_AbstractSimulator {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
 			// header
-			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
+			pw.println(String.join(separator, new String[]{
+					"Total Cost", String.valueOf(project.getTotalCost()), 
+					"Duration", String.valueOf(project.getDuration()),
+					"Total Work Amount", String.valueOf(project.getTotalActualWorkAmount()),
+					"Total Undetected Error", String.valueOf(project.getTotalUndetectedError())
+					}));
 			
 			// workflow
 			pw.println();
@@ -287,14 +292,15 @@ public abstract class PDES_AbstractSimulator {
 			// product
 			pw.println();
 			pw.println("Gantt chart of each Component");
-			pw.println(String.join(separator , new String[]{"Product", "Component", "Error/Error Torerance", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Undetected Error", "Error Torerance", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
 			this.productList.forEach(p -> {
 				String productName = "Product ("+p.getDueDate()+")";
 				p.getComponentList().forEach(c -> {
 					List<String> baseInfo = new ArrayList<String>();
 					baseInfo.add(productName);
 					baseInfo.add(c.getName());
-					baseInfo.add(String.valueOf(c.getError())+"/"+String.valueOf(c.getErrorTolerance()));
+					baseInfo.add(String.valueOf(c.getError()));
+					baseInfo.add(String.valueOf(c.getErrorTolerance()));
 					IntStream.range(0, c.getFinishTimeList().size()).forEach(i -> {
 						baseInfo.add(String.valueOf(c.getStartTimeList().get(i)));
 						baseInfo.add(String.valueOf(c.getFinishTimeList().get(i)));

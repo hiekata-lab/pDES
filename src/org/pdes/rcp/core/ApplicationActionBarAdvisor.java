@@ -35,11 +35,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.pdes.rcp.actions.MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction;
-import org.pdes.rcp.actions.MultiRunPDES_SimulatorConsideringHybridProcessAction;
 import org.pdes.rcp.actions.NewProjectFileAction;
 import org.pdes.rcp.actions.OneRunPDES_BasicSimulatorAction;
 import org.pdes.rcp.actions.OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction;
-import org.pdes.rcp.actions.OneRunPDES_SimulatorConsideringHybridProcessAction;
 import org.pdes.rcp.actions.OpenProjectFileAction;
 import org.pdes.rcp.actions.SaveAsFileAction;
 import org.pdes.rcp.actions.SaveFileAction;
@@ -56,9 +54,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private OpenProjectFileAction open = new OpenProjectFileAction();
 	private OneRunPDES_BasicSimulatorAction basicSim = new OneRunPDES_BasicSimulatorAction();
 	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
-	private OneRunPDES_SimulatorConsideringHybridProcessAction hpSim = new OneRunPDES_SimulatorConsideringHybridProcessAction();
 	private MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction multi_retSim = new MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
-	private MultiRunPDES_SimulatorConsideringHybridProcessAction multi_hpSim = new MultiRunPDES_SimulatorConsideringHybridProcessAction();
 	
 	/**
 	 * This is the constructor.
@@ -98,11 +94,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		simulationMenu.add(runMenu);
 		runMenu.add(basicSim);
 		runMenu.add(retSim);
-		runMenu.add(hpSim);
 		MenuManager multi_runMenu = new MenuManager("Run multiple");
 		simulationMenu.add(multi_runMenu);
 		multi_runMenu.add(multi_retSim);
-		multi_runMenu.add(multi_hpSim);
 	}
 	
 }

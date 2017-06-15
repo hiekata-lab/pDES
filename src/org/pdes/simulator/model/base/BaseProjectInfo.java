@@ -235,16 +235,4 @@ public class BaseProjectInfo {
 				.max()
 				.orElse(0);
 	}
-
-	/**
-	 * Get the total undetected error considering all products.
-	 * @return
-	 */
-	public double getTotalUndetectedError(){
-		return productList.stream()
-				.flatMapToDouble(p -> p.getComponentList().stream()
-						.mapToDouble(c -> c.getError())
-						)
-				.sum();
-	}
 }

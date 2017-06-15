@@ -53,8 +53,7 @@ public class BaseResource {
 	protected final String name;
 	protected final double costPerTime;
 	protected Map<String, Double> workAmountSkillMap; // skill map of work amount <taskname, skill point>
-	protected Map<String, Double> errorRateMap; // skill map of error rate <taskname, error rate>
-	protected Map<String, Double> errorDetectRateMap; // skill map of error detection <taskname, error detect rate>
+	protected Map<String, Double> qualitySkillMap; // skill map of quality <taskname, skill point>
 	protected BaseTeam team;
 	
 	// Changeable variable on simulation
@@ -75,8 +74,7 @@ public class BaseResource {
 		this.name = resourceElement.getName();
 		this.costPerTime = resourceElement.getCost();
 		this.workAmountSkillMap = resourceElement.getWorkAmountSkillMap();
-		this.errorRateMap = resourceElement.getErrorRateMap();
-		this.errorDetectRateMap = resourceElement.getErrorDetectRateMap();
+		this.qualitySkillMap = resourceElement.getQualitySkillMap();
 		this.team = team;
 	}
 	
@@ -144,27 +142,17 @@ public class BaseResource {
 	 */
 	public double getWorkAmountSkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return workAmountSkillMap.getOrDefault(task.getName(), 0.0);
+		return workAmountSkillMap.get(task.getName());
 	}
 	
 	/**
-	 * Get the error generate skill point of "task".
+	 * Get the quality skill point of "task".
 	 * @param task
 	 * @return
 	 */
-	public double getErrorRate(BaseTask task){
+	public double getQualitySkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return errorRateMap.getOrDefault(task.getName(), 0.0);
-	}
-
-	/**
-	 * Get the error detect skill point of "task".
-	 * @param task
-	 * @return
-	 */
-	public double getErrorDetectRate(BaseTask task){
-		if (!hasSkill(task)) return 0.0;
-		return errorDetectRateMap.getOrDefault(task.getName(), 0.0);
+		return qualitySkillMap.get(task.getName());
 	}
 	
 	/**
@@ -250,21 +238,13 @@ public class BaseResource {
 	}
 
 	/**
-	 * Get the skill map of error rate.
-	 * @return the errorRateMap
+	 * Get the skill map of quality.
+	 * @return the qualitySkillMap
 	 */
-	public Map<String, Double> getErrorRateMap() {
-		return errorRateMap;
+	public Map<String, Double> getQualitySkillMap() {
+		return qualitySkillMap;
 	}
 
-	/**
-	 * Get the skill map of error detect rate.
-	 * @return the errorDetectRateMap
-	 */
-	public Map<String, Double> getErrorDetectRateMap() {
-		return errorDetectRateMap;
-	}
-	
 	/**
 	 * Get the team which has this Resource.
 	 * @return the team
@@ -328,16 +308,8 @@ public class BaseResource {
 			sb.append(" ");
 		}
 		sb.deleteCharAt(sb.length() - 1);
-		sb.append(") ER(");
-		for (Map.Entry<String, Double> entry : errorRateMap.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append("=");
-			sb.append(entry.getValue());
-			sb.append(" ");
-		}
-		sb.deleteCharAt(sb.length() - 1);
-		sb.append(") EDR(");
-		for (Map.Entry<String, Double> entry : errorDetectRateMap.entrySet()) {
+		sb.append(") Q(");
+		for (Map.Entry<String, Double> entry : qualitySkillMap.entrySet()) {
 			sb.append(entry.getKey());
 			sb.append("=");
 			sb.append(entry.getValue());

@@ -49,17 +49,12 @@ public class BaseComponent {
 	private final String nodeId; // ComponentNode ID
 	private final String name;
 	private final double errorTolerance;
-	private final double requirementChangeProbability;
 	private final List<BaseComponent> dependingComponentList = new ArrayList<>();
 	private final List<BaseComponent> dependedComponentList = new ArrayList<>();
 	private final List<BaseTask> targetedTaskList = new ArrayList<>();
 	
-	
 	// Changeable variable on simulation
 	private double error;
-	private int reworkCount;
-	private boolean reworkFlag;
-	
 	
 	//Other
 	private final Random random = new Random();
@@ -73,7 +68,6 @@ public class BaseComponent {
 		this.nodeId = componentNode.getId();
 		this.name = componentNode.getName();
 		this.errorTolerance = componentNode.getErrorTolerance();
-		this.requirementChangeProbability = componentNode.getRequirementChangeProbability();
 	}
 	
 	/**
@@ -113,22 +107,6 @@ public class BaseComponent {
 	 */
 	public void updateErrorValue(double noErrorProbability) {
 		if (random.nextDouble() >= noErrorProbability) error++;
-	}
-
-	/**
-	 * Add error.
-	 * @param generatedError
-	 */
-	public void addError(double generatedError) {
-		error += generatedError;
-	}
-
-	/**
-	 * Remove error.
-	 * @param detectedError
-	 */
-	public void removeError(double detectedError) {
-		error -= detectedError;
 	}
 	
 	/**
@@ -191,13 +169,6 @@ public class BaseComponent {
 	}
 
 	/**
-	 * @return the requirementChangeProbability
-	 */
-	public double getRequirementChangeProbability() {
-		return requirementChangeProbability;
-	}
-
-	/**
 	 * Get the list of directly depending components.
 	 * @return the dependingComponentList
 	 */
@@ -213,20 +184,6 @@ public class BaseComponent {
 		return dependedComponentList;
 	}
 	
-	/**
-	 * @return the dependingComponentList
-	 */
-	public List<BaseComponent> getDependingComponentList() {
-		return dependingComponentList;
-	}
-
-	/**
-	 * @return the dependedComponentList
-	 */
-	public List<BaseComponent> getDependedComponentList() {
-		return dependedComponentList;
-	}
-
 	/**
 	 * Get the list of targeted task.
 	 * @return the targetedTaskList
@@ -333,67 +290,6 @@ public class BaseComponent {
 	 */
 	public void setError(double error) {
 		this.error = error;
-	}
-
-	/**
-	 * Check finished.
-	 * @return if finished or not 
-	 */
-	public boolean isFinished() {
-		return this.getTargetedTaskList().stream()
-										.allMatch(t -> t.isFinished());
-	}
-
-	/**
-	 * @return the reworkCount
-	 */
-	public int getReworkCount() {
-		return reworkCount;
-	}
-
-	/**
-	 * @param reworkCount the reworkCount to set
-	 */
-	public void setReworkCount(int reworkCount) {
-		this.reworkCount = reworkCount;
-	}
-	
-	/**
-	 * Add rework count
-	 * @param 
-	 */
-	public void addReworkCount() {
-		this.reworkCount++;
-	}
-
-	/**
-	 * @return the reworkFlag
-	 */
-	public boolean isReworkFlag() {
-		return reworkFlag;
-	}
-
-	/**
-	 * @param reworkFlag the reworkFlag to set
-	 */
-	public void setReworkFlag(boolean reworkFlag) {
-		this.reworkFlag = reworkFlag;
-	}
-
-	/**
-	 * Set rework
-	 * @param
-	 */
-	public void setRework(int time) {
-		/// Only for considering hybrid process.
-	}
-	
-	/**
-	 * Review Component.
-	 * @param if rework or not
-	 */
-	public boolean review() {
-		return false;
 	}
 	
 	/**

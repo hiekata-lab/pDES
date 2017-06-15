@@ -45,8 +45,7 @@ public abstract class ResourceElement extends AbstractModel{
 	protected String name;
 	protected double cost;
 	protected Map<String, Double> workAmountSkillMap = new HashMap<>();
-	protected Map<String, Double> errorRateMap = new HashMap<>();
-	protected Map<String, Double> errorDetectRateMap = new HashMap<>();
+	protected Map<String, Double> qualitySkillMap = new HashMap<>();
 	
 	/**
 	 * Get the id.
@@ -132,32 +131,16 @@ public abstract class ResourceElement extends AbstractModel{
 	 * Get the quality skill map of this ResourceElement.
 	 * @return the qualitySkillMap
 	 */
-	public Map<String, Double> getErrorRateMap() {
-		return errorRateMap;
+	public Map<String, Double> getQualitySkillMap() {
+		return qualitySkillMap;
 	}
 
 	/**
 	 * Set the quality skill map of this ResourceElement.
 	 * @param qualitySkillMap the qualitySkillMap to set
 	 */
-	public void setErrorRateMap(Map<String, Double> errorRateMap) {
-		this.errorRateMap = errorRateMap;
-	}
-
-	/**
-	 * Get the quality skill map of this ResourceElement.
-	 * @return the qualitySkillMap
-	 */
-	public Map<String, Double> getErrorDetectRateMap() {
-		return errorDetectRateMap;
-	}
-
-	/**
-	 * Set the quality skill map of this ResourceElement.
-	 * @param qualitySkillMap the qualitySkillMap to set
-	 */
-	public void setErrorDetectRateMap(Map<String, Double> errorDetectRateMap) {
-		this.errorDetectRateMap = errorDetectRateMap;
+	public void setQualitySkillMap(Map<String, Double> qualitySkillMap) {
+		this.qualitySkillMap = qualitySkillMap;
 	}
 
 	/**
@@ -180,41 +163,22 @@ public abstract class ResourceElement extends AbstractModel{
 	}
 	
 	/**
-	 * Add or revise of error rate information.
+	 * Add or revise of quality skill information.
 	 * @param skillName
 	 * @param skillLevel
 	 */
-	public void addSkillInErrorRateMap(String skillName, double skillLevel) {
-		this.errorRateMap.put(skillName, skillLevel);
+	public void addSkillInQualitySkillMap(String skillName, double skillLevel) {
+		this.qualitySkillMap.put(skillName, skillLevel);
 	}
 	
 	/**
-	 * Get the error rate level of "skillName" skill.
+	 * Get the quality skill level of "skillName" skill.
 	 * @param skillName
 	 * @return
 	 */
-	public double getErrorRateSkillLevel(String skillName) {
-		if(this.errorRateMap.get(skillName) == null) return 0;
-		return this.errorRateMap.get(skillName);
-	}
-	
-	/**
-	 * Add or revise of error detect rate information.
-	 * @param skillName
-	 * @param skillLevel
-	 */
-	public void addSkillInErrorDetectRateMap(String skillName, double skillLevel) {
-		this.errorDetectRateMap.put(skillName, skillLevel);
-	}
-	
-	/**
-	 * Get the error detect skill level of "skillName" skill.
-	 * @param skillName
-	 * @return
-	 */
-	public double getErrorDetectRateSkillLevel(String skillName) {
-		if(this.errorDetectRateMap.get(skillName) == null) return 0;
-		return this.errorDetectRateMap.get(skillName);
+	public double getQualitySkillLevel(String skillName) {
+		if(this.qualitySkillMap.get(skillName) == null) return 0;
+		return this.qualitySkillMap.get(skillName);
 	}
 	
 	/**
@@ -225,10 +189,7 @@ public abstract class ResourceElement extends AbstractModel{
 		for(String skillName:workAmountSkillMap.keySet()){
 			addSkillInWorkAmountSkillMap(skillName, 0.0);
 		}
-		for(String skillName:errorRateMap.keySet()){
-			addSkillInWorkAmountSkillMap(skillName, 0.0);
-		}
-		for(String skillName:errorDetectRateMap.keySet()){
+		for(String skillName:qualitySkillMap.keySet()){
 			addSkillInWorkAmountSkillMap(skillName, 0.0);
 		}
 	}

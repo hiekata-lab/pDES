@@ -47,7 +47,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -67,8 +66,6 @@ import org.pdes.rcp.model.base.AbstractModel;
 import org.pdes.rcp.model.base.Link;
 import org.pdes.rcp.dialog.InputSimpleTextDialog;
 import org.pdes.rcp.dialog.SelectSimpleDataDialog;
-import org.pdes.simulator.model.base.BaseTask;
-import org.pdes.simulator.model.base.BaseTask.TaskType;
 
 /**
  * This is the ViewPart class for editing the attributes of clicked model in ProjectDiagram.<br>
@@ -114,10 +111,9 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//2. Define SWT of clicking TaskNode
 	//If you add some attributes in TaskNode, add "setVisibleOfTaskSWT" method.
-	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel, taskTypeLabel;
+	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel;
 	private Text taskNameText, taskWorkAmountText, taskAdditionalWorkAmountText;
 	private Button taskNeedFacilityCheckBox;
-	private Combo taskTypeSelectBox;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -131,15 +127,12 @@ public class SelectedModelViewPart extends ViewPart {
 		taskAdditionalWorkAmountLabel.setVisible(visible);
 		taskAdditionalWorkAmountText.setVisible(visible);
 		taskNeedFacilityCheckBox.setVisible(visible);
-		taskTypeLabel.setVisible(visible);
-		taskTypeSelectBox.setVisible(visible);
 		
 		if(visible){
 			taskNameText.setText(((TaskNode) selectedModel).getName());
 			taskWorkAmountText.setText(String.valueOf(((TaskNode) selectedModel).getWorkAmount()));
 			taskAdditionalWorkAmountText.setText(String.valueOf(((TaskNode)selectedModel).getAdditionalWorkAmount()));
 			taskNeedFacilityCheckBox.setSelection(((TaskNode)selectedModel).isNeedFacility());
-			taskTypeSelectBox.select(((TaskNode)selectedModel).getTypeInt());
 		}
 	}
 	
@@ -147,8 +140,8 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//3. Define SWT of clicking ComponentNode
 	//If you add some attributes in ComponentNode, add "setVisibleOfComponentSWT" method.
-	private Label componentNameLabel, componentErrorToleranceLabel, componentRequirementChangeProbabilityLabel;
-	private Text componentNameText, componentErrorToleranceText, componentRequirementChangeProbabilityText;
+	private Label componentNameLabel, componentErrorToleranceLabel;
+	private Text componentNameText, componentErrorToleranceText;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -159,14 +152,10 @@ public class SelectedModelViewPart extends ViewPart {
 		componentNameText.setVisible(visible);
 		componentErrorToleranceLabel.setVisible(visible);
 		componentErrorToleranceText.setVisible(visible);
-		componentRequirementChangeProbabilityLabel.setVisible(visible);
-		componentRequirementChangeProbabilityText.setVisible(visible);
-		
 		
 		if(visible){
 			componentNameText.setText(((ComponentNode) selectedModel).getName());
 			componentErrorToleranceText.setText(String.valueOf(((ComponentNode) selectedModel).getErrorTolerance()));
-			componentRequirementChangeProbabilityText.setText(String.valueOf(((ComponentNode) selectedModel).getRequirementChangeProbability()));
 		}
 	}
 	
@@ -347,7 +336,7 @@ public class SelectedModelViewPart extends ViewPart {
 		teamNameText.setLayoutData(teamNameTextFD);
 		
 		workerTableLabel = new Label(parent, SWT.NULL);
-		workerTableLabel.setText("[Workers]\nskill: work amount[parson-day/day]/error rate[#/day]/error detect rate[#/day]");
+		workerTableLabel.setText("[Workers]\nskill: work amount[parson-day]/error probability");
 		workerTableLabel.setFont(new Font(null, "", 10, 0));
 		FormData workerTableLabelFD = new FormData();
 		workerTableLabelFD.top= new FormAttachment(teamNameLabel,12);
@@ -403,17 +392,15 @@ public class SelectedModelViewPart extends ViewPart {
 									}else if(column==1 && doubleCheck(text.getText())){ // cost
 										if(Double.valueOf(text.getText()) < 0.00) return;
 										worker.setCost(Double.valueOf(text.getText()));
-									}else{ // skill ( <work amount skill value>/<error rate value>/<error detect rate value> )
+									}else{ // skill ( <work amount skill value>/<quality skill value> )
 										String[] skillTexts = text.getText().split("/");
-										if (skillTexts.length != 3) return;
+										if (skillTexts.length != 2) return;
 										String workAmountSkillText = skillTexts[0];
-										String errorRateText = skillTexts[1];
-										String errorDetectRateText = skillTexts[2];
-										if (!(doubleCheck(workAmountSkillText) && doubleCheck(errorRateText))) return;
-										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(errorRateText) < 0.00) || (Double.valueOf(errorDetectRateText) < 0.00)) return;
+										String qualitySkillText = skillTexts[1];
+										if (!(doubleCheck(workAmountSkillText) && doubleCheck(qualitySkillText))) return;
+										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(qualitySkillText) < 0.00)) return;
 										worker.addSkillInWorkAmountSkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(workAmountSkillText));
-										worker.addSkillInErrorRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorRateText));
-										worker.addSkillInErrorDetectRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorDetectRateText));
+										worker.addSkillInQualitySkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(qualitySkillText));
 									}
 									redrawAllTableForTeam();
 									text.dispose();
@@ -480,7 +467,7 @@ public class SelectedModelViewPart extends ViewPart {
 		
 		
 		facilityTableLabel = new Label(parent, SWT.NULL);
-		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day/day]/error rate[#/day]/error detect rate[#/day]");
+		facilityTableLabel.setText("[Facilities]\nskill: work amount[parson-day]/error probability");
 		facilityTableLabel.setFont(new Font(null, "", 10, 0));
 		FormData facilityTableLabelFD = new FormData();
 		facilityTableLabelFD.top= new FormAttachment(workerTable,20);
@@ -536,17 +523,15 @@ public class SelectedModelViewPart extends ViewPart {
 									}else if(column==1 && doubleCheck(text.getText())){ // cost
 										if(Double.valueOf(text.getText()) < 0.00) return;
 										facility.setCost(Double.valueOf(text.getText()));
-									}else{ // skill ( <work amount skill value>/<quality skill value>/<quality skill value> )
+									}else{ // skill ( <work amount skill value>/<quality skill value> )
 										String[] skillTexts = text.getText().split("/");
-										if (skillTexts.length != 3) return;
+										if (skillTexts.length != 2) return;
 										String workAmountSkillText = skillTexts[0];
-										String errorRateText = skillTexts[1];
-										String errorDetectRateText = skillTexts[2];
-										if (!(doubleCheck(workAmountSkillText) && doubleCheck(errorRateText))) return;
-										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(errorRateText) < 0.00) || (Double.valueOf(errorDetectRateText) < 0.00)) return;
+										String qualitySkillText = skillTexts[1];
+										if (!(doubleCheck(workAmountSkillText) && doubleCheck(qualitySkillText))) return;
+										if((Double.valueOf(workAmountSkillText) < 0.00) || (Double.valueOf(qualitySkillText) < 0.00)) return;
 										facility.addSkillInWorkAmountSkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(workAmountSkillText));
-										facility.addSkillInErrorRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorRateText));
-										facility.addSkillInErrorDetectRateMap(allocatedTaskNameList.get(column-2), Double.valueOf(errorDetectRateText));
+										facility.addSkillInQualitySkillMap(allocatedTaskNameList.get(column-2), Double.valueOf(qualitySkillText));
 									}
 									redrawAllTableForTeam();
 									text.dispose();
@@ -652,43 +637,12 @@ public class SelectedModelViewPart extends ViewPart {
 		taskNameTextFD.left= new FormAttachment(taskNameLabel,10);
 		taskNameTextFD.right = new FormAttachment(95);
 		taskNameText.setLayoutData(taskNameTextFD);
-
-		taskTypeLabel = new Label(parent, SWT.NULL);
-		taskTypeLabel.setText("Task Type : ");
-		taskTypeLabel.setFont(new Font(null, "", 10, 0));
-		FormData taskTypeLabelFD = new FormData();
-		taskTypeLabelFD.top= new FormAttachment(taskNameLabel,10);
-		taskTypeLabelFD.left= new FormAttachment(0,10);
-		taskTypeLabel.setLayoutData(taskTypeLabelFD);
-		
-		FormData taskTypeSelectBoxFD = new FormData();
-		taskTypeSelectBoxFD.top = new FormAttachment(taskNameLabel, 10);
-		taskTypeSelectBoxFD.left = new FormAttachment(taskTypeLabel, 10);
-		taskTypeSelectBox = new Combo(parent, SWT.DROP_DOWN|SWT.READ_ONLY);
-		for (TaskType t : TaskType.values()) {
-			taskTypeSelectBox.add(t.toString());
-		}
-		taskTypeSelectBox.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e){
-				
-			}
-			public void widgetSelected(SelectionEvent e){
-				String typeString = taskTypeSelectBox.getText();
-				TaskType type = BaseTask.getTaskTypebyName(typeString);
-				if (type != null) {
-					((TaskNode)selectedModel).setTypeInt(type.getInt());
-				}
-				Combo bCombo = (Combo)e.widget;
-				System.out.println(bCombo.getText());
-			}
-		});
-		taskTypeSelectBox.setLayoutData(taskTypeSelectBoxFD);
 		
 		taskWorkAmountLabel = new Label(parent, SWT.NULL);
 		taskWorkAmountLabel.setText("Work Amount : ");
 		taskWorkAmountLabel.setFont(new Font(null, "", 10, 0));
 		FormData taskWorkAmountLabelFD = new FormData();
-		taskWorkAmountLabelFD.top= new FormAttachment(taskTypeLabel,10);
+		taskWorkAmountLabelFD.top= new FormAttachment(taskNameLabel,10);
 		taskWorkAmountLabelFD.left= new FormAttachment(0,10);
 		taskWorkAmountLabel.setLayoutData(taskWorkAmountLabelFD);
 		
@@ -719,7 +673,7 @@ public class SelectedModelViewPart extends ViewPart {
 			}
 		});
 		FormData taskWorkAmountTextFD = new FormData();
-		taskWorkAmountTextFD.top= new FormAttachment(taskTypeLabel,10);
+		taskWorkAmountTextFD.top= new FormAttachment(taskNameLabel,10);
 		taskWorkAmountTextFD.left= new FormAttachment(taskWorkAmountLabel,10);
 		taskWorkAmountTextFD.width = 50;
 		taskWorkAmountText.setLayoutData(taskWorkAmountTextFD);
@@ -883,44 +837,6 @@ public class SelectedModelViewPart extends ViewPart {
 		componentErrorToleranceTextFD.left= new FormAttachment(componentErrorToleranceLabel,10);
 		componentErrorToleranceTextFD.width = 50;
 		componentErrorToleranceText.setLayoutData(componentErrorToleranceTextFD);
-		
-		componentRequirementChangeProbabilityLabel = new Label(parent, SWT.NULL);
-		componentRequirementChangeProbabilityLabel.setText("Requirement Change Probability : ");
-		componentRequirementChangeProbabilityLabel.setFont(new Font(null, "", 10, 0));
-		FormData componentRequirementChangeProbabilityLabelFD = new FormData();
-		componentRequirementChangeProbabilityLabelFD.top= new FormAttachment(componentErrorToleranceLabel,10);
-		componentRequirementChangeProbabilityLabelFD.left= new FormAttachment(0,10);
-		componentRequirementChangeProbabilityLabel.setLayoutData(componentRequirementChangeProbabilityLabelFD);
-		
-		componentRequirementChangeProbabilityText = new Text(parent, SWT.BORDER|SWT.SINGLE);
-		componentRequirementChangeProbabilityText.addKeyListener(new KeyListener(){
-		
-			/*
-			* (non-Javadoc)
-			* @see org.eclipse.draw2d.KeyListener#keyPressed(org.eclipse.draw2d.KeyEvent)
-			*/
-			public void keyPressed(KeyEvent e) {}
-			
-			/*
-			* (non-Javadoc)
-			* @see org.eclipse.draw2d.KeyListener#keyReleased(org.eclipse.draw2d.KeyEvent)
-			*/
-			public void keyReleased(KeyEvent e) {
-				if(e.character==SWT.CR){
-					String textString = componentRequirementChangeProbabilityText.getText();
-					if(doubleCheck(textString)) {
-						((ComponentNode)selectedModel).setRequirementChangeProbability(Double.parseDouble(textString));
-					}else{
-						componentRequirementChangeProbabilityText.setText(String.valueOf(((ComponentNode)selectedModel).getRequirementChangeProbability()));
-					}
-				}
-			}
-		});
-		FormData componentRequirementChangeProbabilityTextFD = new FormData();
-		componentRequirementChangeProbabilityTextFD.top= new FormAttachment(componentErrorToleranceLabel,10);
-		componentRequirementChangeProbabilityTextFD.left= new FormAttachment(componentRequirementChangeProbabilityLabel,10);
-		componentRequirementChangeProbabilityTextFD.width = 50;
-		componentRequirementChangeProbabilityText.setLayoutData(componentRequirementChangeProbabilityTextFD);
 		///////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////SubWorkflow////////////////////////////
@@ -1120,28 +1036,20 @@ public class SelectedModelViewPart extends ViewPart {
 			item.setText(0, member.getName());
 			item.setText(1, String.valueOf(member.getCost()));
 			for(int j=0;j<teamSkillNameList.size();j++){
-				String text = "";
-				String separator = "/";
+				String text = "/";
 				
 				// skill of work amount
 				if(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)) != null){
-					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)));
+					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j))) + text;
 				}else{
-					text = "0.0";
+					text = "0.0" + text;
 				}
 				
-				// skill of error generate
-				if(member.getErrorRateMap().get(teamSkillNameList.get(j)) != null){
-					text = text + separator + String.valueOf(member.getErrorRateMap().get(teamSkillNameList.get(j)));
+				// skill of quality
+				if(member.getQualitySkillMap().get(teamSkillNameList.get(j)) != null){
+					text = text + String.valueOf(member.getQualitySkillMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = text + separator + "0.0";
-				}
-				
-				// skill of error detect
-				if(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)) != null){
-					text = text + separator + String.valueOf(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)));
-				}else{
-					text = text + separator + "0.0";
+					text = text + "0.0";
 				}
 				item.setText(j+2, text);
 			}
@@ -1184,28 +1092,20 @@ public class SelectedModelViewPart extends ViewPart {
 			item.setText(0, member.getName());
 			item.setText(1, String.valueOf(member.getCost()));
 			for(int j=0;j<teamSkillNameList.size();j++){
-				String text = "";
-				String separator = "/";
+				String text = "/";
 				
 				// skill of work amount
 				if(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)) != null){
-					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j)));
+					text = String.valueOf(member.getWorkAmountSkillMap().get(teamSkillNameList.get(j))) + text;
 				}else{
-					text = "0.0";
+					text = "0.0" + text;
 				}
 				
-				// skill of error generate
-				if(member.getErrorRateMap().get(teamSkillNameList.get(j)) != null){
-					text = text + separator + String.valueOf(member.getErrorRateMap().get(teamSkillNameList.get(j)));
+				// skill of quality
+				if(member.getQualitySkillMap().get(teamSkillNameList.get(j)) != null){
+					text = text + String.valueOf(member.getQualitySkillMap().get(teamSkillNameList.get(j)));
 				}else{
-					text = text + separator + "0.0";
-				}
-				
-				// skill of error detect
-				if(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)) != null){
-					text = text + separator + String.valueOf(member.getErrorDetectRateMap().get(teamSkillNameList.get(j)));
-				}else{
-					text = text + separator + "0.0";
+					text = text + "0.0";
 				}
 				item.setText(j+2, text);
 			}

@@ -43,8 +43,6 @@ public class TaskNode extends NodeElement {
 	private int workAmount;
 	private int additionalWorkAmount; //Additional work amount if the amount of error exceeds the limit.
 	private boolean needFacility; //Need facility or not
-	private int typeInt;
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -55,7 +53,6 @@ public class TaskNode extends NodeElement {
 		this.setName(newName);
 		this.setWorkAmount(10);
 		setNeedFacility(true);
-		setTypeInt(0);
 	}
 	
 	/**
@@ -130,21 +127,5 @@ public class TaskNode extends NodeElement {
 		boolean old = this.needFacility;
 		this.needFacility = needFacility;
 		firePropertyChange("needFacility", old, needFacility);
-	}
-
-	
-	/**
-	 * @return the type
-	 */
-	public int getTypeInt() {
-		return typeInt;
-	}
-
-	
-	/**
-	 * @param type the type to set
-	 */
-	public void setTypeInt(int typeInt) {
-		this.typeInt = typeInt;
 	}
 }

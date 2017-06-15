@@ -112,17 +112,10 @@ public class ProjectDiagram extends Diagram {
 								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
 								pw.println("					<WorkAmountSkill name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
 							}
-							Map<String,Double> qualitySkillMap = worker.getErrorRateMap();
+							Map<String,Double> qualitySkillMap = worker.getQualitySkillMap();
 							for(Iterator<Entry<String, Double>> it = qualitySkillMap.entrySet().iterator();it.hasNext();){
 								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
-								/// TODO: Change tag name, "QualitySkill", to "ErrorRate"
-								/// Now, keep this name in order to be able to load project files previous version.
 								pw.println("					<QualitySkill name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
-							}
-							Map<String,Double> errorDetectRateMap = worker.getErrorDetectRateMap();
-							for(Iterator<Entry<String, Double>> it = errorDetectRateMap.entrySet().iterator();it.hasNext();){
-								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
-								pw.println("					<ErrorDetectRate name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
 							}
 							pw.println("				</Worker>");
 						}
@@ -143,17 +136,10 @@ public class ProjectDiagram extends Diagram {
 								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
 								pw.println("					<WorkAmountSkill name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
 							}
-							/// TODO: Change tag name, "QualitySkill", to "ErrorRate"
-							/// Now, keep this name in order to be able to load project files previous version.
-							Map<String,Double> qualitySkillMap = facility.getErrorRateMap();
+							Map<String,Double> qualitySkillMap = facility.getQualitySkillMap();
 							for(Iterator<Entry<String, Double>> it = qualitySkillMap.entrySet().iterator();it.hasNext();){
 								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
 								pw.println("					<QualitySkill name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
-							}
-							Map<String,Double> errorDetectRateMap = facility.getErrorDetectRateMap();
-							for(Iterator<Entry<String, Double>> it = errorDetectRateMap.entrySet().iterator();it.hasNext();){
-								Entry<String, Double> entry = (Map.Entry<String, Double>)it.next();
-								pw.println("					<ErrorDetectRate name=\""+this.xmlEscape(entry.getKey())+"\" value=\""+entry.getValue()+"\"/>");
 							}
 							pw.println("				</Facility>");
 						}
@@ -165,7 +151,6 @@ public class ProjectDiagram extends Diagram {
 					TaskNode task = (TaskNode) node;
 					pw.println("		<TaskNode id=\""+task.getId()+"\" Left=\""+((NodeElement) node).getX()+"\" Top=\""+((NodeElement) node).getY()+"\" Width=\""+((NodeElement) node).getWidth()+"\" Height=\""+((NodeElement) node).getHeight()+"\">");
 					pw.println("			<Name>"+this.xmlEscape((task.getName()).toString())+"</Name>");
-					pw.println("			<Type>"+task.getTypeInt()+"</Type>");
 					pw.println("			<WorkAmount>"+task.getWorkAmount()+"</WorkAmount>");
 					pw.println("			<AdditionalWorkAmount>"+task.getAdditionalWorkAmount()+"</AdditionalWorkAmount>");
 					pw.println("			<NeedFacility>"+task.isNeedFacility()+"</NeedFacility>");
@@ -279,7 +264,6 @@ public class ProjectDiagram extends Diagram {
 						String tagName = tag.getNodeName();
 						String value = tag.getFirstChild().getNodeValue();
 						if(tagName.equals("Name")) task.setName(value);
-						else if(tagName.equals("Type")) task.setTypeInt(Integer.parseInt(value));
 						else if(tagName.equals("WorkAmount")) task.setWorkAmount(Integer.parseInt(value));
 						else if(tagName.equals("AdditionalWorkAmount")) task.setAdditionalWorkAmount(Integer.parseInt(value));
 						else if(tagName.equals("NeedFacility")) task.setNeedFacility(Boolean.parseBoolean(value));
@@ -435,10 +419,7 @@ public class ProjectDiagram extends Diagram {
 						if(childTagName.equals("Name")) resource.setName(childTag.getFirstChild().getNodeValue());
 						else if(childTagName.equals("Cost")) resource.setCost(Double.valueOf(childTag.getFirstChild().getNodeValue()));
 						else if(childTagName.equals("WorkAmountSkill")) resource.addSkillInWorkAmountSkillMap(childTag.getAttributes().getNamedItem("name").getNodeValue(), Double.valueOf(childTag.getAttributes().getNamedItem("value").getNodeValue()));
-						/// TODO: Change tag name, "QualitySkill", to "ErrorRate"
-						/// Now, keep this name in order to be able to load project files previous version.
-						else if(childTagName.equals("QualitySkill")) resource.addSkillInErrorRateMap(childTag.getAttributes().getNamedItem("name").getNodeValue(), Double.valueOf(childTag.getAttributes().getNamedItem("value").getNodeValue()));
-						else if(childTagName.equals("ErrorDetectRate")) resource.addSkillInErrorDetectRateMap(childTag.getAttributes().getNamedItem("name").getNodeValue(), Double.valueOf(childTag.getAttributes().getNamedItem("value").getNodeValue()));
+						else if(childTagName.equals("QualitySkill")) resource.addSkillInQualitySkillMap(childTag.getAttributes().getNamedItem("name").getNodeValue(), Double.valueOf(childTag.getAttributes().getNamedItem("value").getNodeValue()));
 					}
 				}
 			}

@@ -24,11 +24,11 @@ Please download pDES from this [URL](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/
 
 ## for Developer
 
-0. Download Eclipse (<= 4.5(Mars))
-	- *Eclipse4.6(Neon) cannot run this source on 7/25/2016. We will update this solution soon...*
+0. Download Eclipse
+	- ~~Eclipse 4.6(Neon) or latter Eclipse version cannot run this source on 7/25/2016. We will update this solution soon...~~
 	- For using this source on pure or old eclipse, you might have to install as following softwares:
 		- Eclipse Plug-in Development Environment
-		- Eclipse Rich Client Platform (RCP3)
+		- Eclipse RCP Plug-in Developer Resources
 		- Eclipse Graphical Editing Framework (GEF3)
 
 1. Fork it ([http://github.com/taiga4112/pDES/fork](http://github.com/taiga4112/pDES/fork)).

@@ -180,13 +180,13 @@ public abstract class PDES_AbstractSimulator {
 					if (task.isNeedFacility()) {
 						Optional<BaseFacility> availableFacility = freeFacilityList.stream().filter(w -> w.hasSkill(task)).findFirst();
 						availableFacility.ifPresent(facility -> {
-							task.setAllocatedWorker(worker);
+							task.addAllocatedWorker(worker);
 							task.setAllocatedFacility(facility);
 							freeWorkerList.remove(worker);
 							freeFacilityList.remove(facility);
 						});
 					}else{
-						task.setAllocatedWorker(worker);;
+						task.addAllocatedWorker(worker);;
 						freeWorkerList.remove(worker);
 					}
 				});

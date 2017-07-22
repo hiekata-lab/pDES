@@ -79,21 +79,23 @@ public abstract class AbstractSimulationAction extends Action {
 		}
 		
 		//2. Set the number of workflow and product
-		int workflowCount = 0;
-		InputSimpleTextDialog workflowCountTextDialog = new InputSimpleTextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		workflowCountTextDialog.setTitleAndMessage("The number of products (or workflows)", "Enter the number of products creating or workflows running.");
-		if (workflowCountTextDialog.open() == Window.OK) {
-			String text = workflowCountTextDialog.getTextString();
-			try {
-				workflowCount = Integer.valueOf(text);
-			} catch (NumberFormatException e) {
-				msgStream.println(String.format("\"%s\" is not integer value. Exit.", text));
+		int workflowCount = 1;
+			if(aggregateMode) {//Multiple mode has to be TURE of aggregateMode.
+			InputSimpleTextDialog workflowCountTextDialog = new InputSimpleTextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+			workflowCountTextDialog.setTitleAndMessage("The number of products (or workflows)", "Enter the number of products creating or workflows running.");
+			if (workflowCountTextDialog.open() == Window.OK) {
+				String text = workflowCountTextDialog.getTextString();
+				try {
+					workflowCount = Integer.valueOf(text);
+				} catch (NumberFormatException e) {
+					msgStream.println(String.format("\"%s\" is not integer value. Exit.", text));
+					return;
+				}
+			}
+			if (workflowCount <= 0) {
+				msgStream.println("Enter a positive integer value. Exit.");
 				return;
 			}
-		}
-		if (workflowCount <= 0) {
-			msgStream.println("Enter a positive integer value. Exit.");
-			return;
 		}
 		
 		//3. Set directory for save result.

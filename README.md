@@ -9,7 +9,7 @@ Application examples of pDES are as followings:
 - Heavy industry (Shipbuilding, Steel, etc.)
 - Software development project (Waterfall, Agile, Hybrid, etc.)
 
-This software is developed by Eclipse Rich Client Platform (RCP3) and Graphical Editing Framework(GEF3). Simulator is implemented based on previous researches.
+This software is developed by Eclipse Rich Client Platform (RCP) and Graphical Editing Framework(GEF3). Simulator is implemented based on previous our researches.
 
 ## Demo
 ![Interface](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/pDES/pictures/topInterface.png "topPage")
@@ -18,18 +18,17 @@ This software is developed by Eclipse Rich Client Platform (RCP3) and Graphical 
 - Java (1.8 or later)
 
 ## Download
-Please download pDES from this [URL](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/pDES/download)
-	- *Please download and install the latest Java from this [URL](http://www.oracle.com/technetwork/java/javase/downloads/index.html) if necessary.*
+Update soon...
 
 
 ## for Developer
 
 0. Download Eclipse
-	- ~~Eclipse 4.6(Neon) or latter Eclipse version cannot run this source on 7/25/2016. We will update this solution soon...~~
 	- For using this source on pure or old eclipse, you might have to install as following softwares:
 		- Eclipse Plug-in Development Environment
 		- Eclipse RCP Plug-in Developer Resources
 		- Eclipse Graphical Editing Framework (GEF3)
+			- From Eclipse 4.7 (Oxygen), GEF3 is already installed initially.
 
 1. Fork it ([http://github.com/taiga4112/pDES/fork](http://github.com/taiga4112/pDES/fork)).
 
@@ -55,4 +54,3 @@ Please download pDES from this [URL](http://www.nakl.t.u-tokyo.ac.jp/~mitsuyuki/
 ## Author
 
 [taiga4112](https://github.com/taiga4112)
-

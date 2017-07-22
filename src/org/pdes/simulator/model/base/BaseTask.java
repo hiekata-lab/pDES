@@ -164,12 +164,12 @@ public class BaseTask {
 			for(BaseWorker allocatedWorker : allocatedWorkerList) {
 				allocatedWorker.setStateWorking();
 				allocatedWorker.addStartTime(time);
-				allocatedWorker.addWorkedTask(this);
+				allocatedWorker.addAssignedTask(this);
 			}
 			if (needFacility) {
 				allocatedFacility.setStateWorking();
 				allocatedFacility.addStartTime(time);
-				allocatedFacility.addWorkedTask(this);
+				allocatedFacility.addAssignedTask(this);
 			}
 		}
 	}
@@ -212,11 +212,11 @@ public class BaseTask {
 					//Just assign worker and facility again.
 					for(BaseWorker allocatedWorker : allocatedWorkerList) {
 						allocatedWorker.addStartTime(time+1);
-						allocatedWorker.addWorkedTask(this);
+						allocatedWorker.addAssignedTask(this);
 					}
 					if (needFacility) {
 						allocatedFacility.addStartTime(time+1);
-						allocatedFacility.addWorkedTask(this);
+						allocatedFacility.addAssignedTask(this);
 					}
 					
 					additionalTaskFlag = false;
@@ -571,6 +571,15 @@ public class BaseTask {
 	 */
 	public List<BaseWorker> getAllocatedWorkerList() {
 		return allocatedWorkerList;
+	}
+	
+	/**
+	 * Check whether worker is already assigned or not.
+	 * @param worker
+	 * @return
+	 */
+	public boolean isAlreadyAssigned(BaseWorker worker) {
+		return allocatedWorkerList.stream().map(w -> w.getId()).anyMatch(worker.getId()::equals);
 	}
 
 	/**

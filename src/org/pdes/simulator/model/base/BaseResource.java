@@ -61,7 +61,7 @@ public class BaseResource {
 	protected double totalCost = 0;
 	protected final List<Integer> startTimeList = new ArrayList<Integer>(); // list of start time of one task
 	protected final List<Integer> finishTimeList = new ArrayList<Integer>(); // list of finish time of one task
-	protected final List<BaseTask> workedTaskList = new ArrayList<BaseTask>(); // list of worked task
+	protected final List<BaseTask> assignedTaskList = new ArrayList<BaseTask>(); // list of worked task
 	
 	/**
 	 * This is the constructor.
@@ -86,7 +86,7 @@ public class BaseResource {
 		totalCost = 0;
 		startTimeList.clear();
 		finishTimeList.clear();
-		workedTaskList.clear();
+		assignedTaskList.clear();
 	}
 	
 	/**
@@ -167,8 +167,8 @@ public class BaseResource {
 	 * Add assigned task.
 	 * @param task
 	 */
-	public void addWorkedTask(BaseTask task) {
-		workedTaskList.add(task);
+	public void addAssignedTask(BaseTask task) {
+		assignedTaskList.add(task);
 	}
 	
 	/**
@@ -287,10 +287,10 @@ public class BaseResource {
 
 	/**
 	 * Get the list of worked task.
-	 * @return the workedTaskList
+	 * @return the assignedTaskList
 	 */
-	public List<BaseTask> getWorkedTaskList() {
-		return workedTaskList;
+	public List<BaseTask> getAssignedTaskList() {
+		return assignedTaskList;
 	}
 	
 	/**

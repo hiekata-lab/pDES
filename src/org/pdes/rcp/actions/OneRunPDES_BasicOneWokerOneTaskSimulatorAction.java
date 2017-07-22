@@ -34,23 +34,22 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.IntStream;
 
 import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
-import org.pdes.simulator.PDES_BasicSimulator;
+import org.pdes.simulator.PDES_BasicOneWorkerOneTaskSimulator;
 import org.pdes.simulator.model.ProjectInfo;
+import org.pdes.simulator.model.base.BaseProjectInfo;
 
 /**
- * This is the Action class for running PDES_BasicSimulator considering rework of error tolerance at many times.<br>
+ * This is the Action class for running PDES_BasicSimulator at once.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction extends AbstractSimulationAction {
+public class OneRunPDES_BasicOneWokerOneTaskSimulatorAction extends AbstractSimulationAction {
 	
-	private final String text = "DES considering rework of error tolerance";
+	private final String text = "Basic DES";
 	
-	public MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction(){
-		this.aggregateMode = true;
+	public OneRunPDES_BasicOneWokerOneTaskSimulatorAction(){
 		this.setToolTipText(text);
 		this.setText(text);
 	}
@@ -60,20 +59,10 @@ public class MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction exten
 	 */
 	@Override
 	protected List<Future<String>> doSimulation(ProjectDiagram diagram, int workflowCount) {
-		
-		//Set the number of simulation
-		int numOfSimulation = this.setNumOfSimulation();
-		if(numOfSimulation < 0) {
-			this.aggregateMode = false;
-			return null;
-		}
-		
 		long start = System.currentTimeMillis();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Future<String>> resultList = new ArrayList<Future<String>>();
-		IntStream.range(0,numOfSimulation).forEach(i ->{
-			resultList.add(service.submit(new BasicSimulationTask(i, diagram, workflowCount, outputDir)));
-		});
+		resultList.add(service.submit(new BasicSimulationTask(0, diagram, workflowCount, outputDir)));
 		service.shutdown();
 		long end = System.currentTimeMillis();
 		msgStream.println("Processing time: " + ((end - start)) + " [millisec]");
@@ -109,15 +98,12 @@ public class MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction exten
 		 */
 		@Override
 		public String call() throws Exception {
-			ProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
-			PDES_BasicSimulator sim = new PDES_BasicSimulator(project);
-			sim.setConsiderReworkOfErrorTorelance(true);
+			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
+			PDES_BasicOneWorkerOneTaskSimulator sim = new PDES_BasicOneWorkerOneTaskSimulator(project);
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());
 		}
 	}
-	
-	
 
 }

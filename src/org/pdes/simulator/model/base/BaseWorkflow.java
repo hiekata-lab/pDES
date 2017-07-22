@@ -298,6 +298,14 @@ public class BaseWorkflow {
 	}
 	
 	/**
+	 * Get the list of READY tasks.
+	 * @return
+	 */
+	public List<BaseTask> getWorkingTaskList() {
+		return taskList.stream().filter(t -> t.isWorking()).collect(Collectors.toList());
+	}
+	
+	/**
 	 * Get the total scheduled work amount after simulation.
 	 * @return
 	 */

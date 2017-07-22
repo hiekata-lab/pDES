@@ -34,10 +34,9 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
-import org.pdes.rcp.actions.MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction;
 import org.pdes.rcp.actions.NewProjectFileAction;
-import org.pdes.rcp.actions.OneRunPDES_BasicSimulatorAction;
-import org.pdes.rcp.actions.OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction;
+import org.pdes.rcp.actions.OneRunPDES_BasicMultiWorkerMultiTaskSimulatorAction;
+import org.pdes.rcp.actions.OneRunPDES_BasicOneWokerOneTaskSimulatorAction;
 import org.pdes.rcp.actions.OpenProjectFileAction;
 import org.pdes.rcp.actions.SaveAsFileAction;
 import org.pdes.rcp.actions.SaveFileAction;
@@ -52,7 +51,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private SaveFileAction save = new SaveFileAction();
 	private SaveAsFileAction saveAs = new SaveAsFileAction();
 	private OpenProjectFileAction open = new OpenProjectFileAction();
-	private OneRunPDES_BasicSimulatorAction basicSim = new OneRunPDES_BasicSimulatorAction();
+	private OneRunPDES_BasicOneWokerOneTaskSimulatorAction basicSim = new OneRunPDES_BasicOneWokerOneTaskSimulatorAction();
+	private OneRunPDES_BasicMultiWorkerMultiTaskSimulatorAction basicMultiSim = new OneRunPDES_BasicMultiWorkerMultiTaskSimulatorAction();
 //	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
 //	private MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction multi_retSim = new MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
 	
@@ -93,6 +93,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager runMenu = new MenuManager("Run at once");
 		simulationMenu.add(runMenu);
 		runMenu.add(basicSim);
+		runMenu.add(basicMultiSim);
 //		runMenu.add(retSim);
 		MenuManager multi_runMenu = new MenuManager("Run multiple");
 		simulationMenu.add(multi_runMenu);

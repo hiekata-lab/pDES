@@ -37,7 +37,7 @@ import java.util.concurrent.Future;
 
 import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
-import org.pdes.simulator.PDES_BasicSimulator;
+import org.pdes.simulator.PDES_BasicOneWorkerOneTaskSimulator;
 import org.pdes.simulator.model.ProjectInfo;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 
@@ -45,11 +45,11 @@ import org.pdes.simulator.model.base.BaseProjectInfo;
  * This is the Action class for running PDES_BasicSimulator considering rework of error tolerance at once.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction extends AbstractSimulationAction {
+public class OneRunPDES_BasicOneWorkerOneTaskSimulatorConsideringReworkOfErrorToleranceAction extends AbstractSimulationAction {
 	
 	private final String text = "DES considering rework of error tolerance";
 	
-	public OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction(){
+	public OneRunPDES_BasicOneWorkerOneTaskSimulatorConsideringReworkOfErrorToleranceAction(){
 		this.setToolTipText(text);
 		this.setText(text);
 	}
@@ -99,7 +99,7 @@ public class OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction extends
 		@Override
 		public String call() throws Exception {
 			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
-			PDES_BasicSimulator sim = new PDES_BasicSimulator(project);
+			PDES_BasicOneWorkerOneTaskSimulator sim = new PDES_BasicOneWorkerOneTaskSimulator(project);
 			sim.setConsiderReworkOfErrorTorelance(true);
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));

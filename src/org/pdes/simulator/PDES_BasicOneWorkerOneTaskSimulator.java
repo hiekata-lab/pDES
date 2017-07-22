@@ -42,7 +42,7 @@ import org.pdes.simulator.model.base.BaseWorker;
  * Basic Simulator is the simulator which has no uncertainty (Rework of Error tolerance, etc.).<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class PDES_BasicSimulator extends PDES_AbstractSimulator {
+public class PDES_BasicOneWorkerOneTaskSimulator extends PDES_AbstractSimulator {
 	
 	private boolean considerReworkOfErrorTorelance = false;;
 	
@@ -53,7 +53,7 @@ public class PDES_BasicSimulator extends PDES_AbstractSimulator {
 	 * @param productList
 	 * @param simultaneousWorkflowLimit
 	 */
-	public PDES_BasicSimulator(BaseProjectInfo project) {
+	public PDES_BasicOneWorkerOneTaskSimulator(BaseProjectInfo project) {
 		super(project);
 	}
 

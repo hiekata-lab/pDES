@@ -121,6 +121,21 @@ public abstract class PDES_AbstractSimulator {
 	}
 	
 	/**
+	 * Get the list of Working tasks.
+	 * @return
+	 */
+	public List<BaseTask> getWorkingTaskList(){
+		return workflowList.stream()
+				.map(w -> w.getWorkingTaskList())
+				.collect(
+						() -> new ArrayList<>(),
+						(l, t) -> l.addAll(t),
+						(l1, l2) -> l1.addAll(l2)
+						);
+	}
+	
+	
+	/**
 	 * Sort Tasks as followings:<br>
 	 * 1. Due date<br>
 	 * 2. TSLACK (a task which Slack time(LS-ES) is lower has high priority)
@@ -165,7 +180,8 @@ public abstract class PDES_AbstractSimulator {
 	}
 	
 	/**
-	 * Allocate ready tasks to free workers and facilities if necessary.
+	 * Allocate ready tasks to free workers and facilities if necessary.<br>
+	 * This method is only for single task-worker simulator.
 	 * @param time 
 	 * @param readyTaskList
 	 * @param freeWorkerList
@@ -188,6 +204,34 @@ public abstract class PDES_AbstractSimulator {
 					}else{
 						task.addAllocatedWorker(worker);;
 						freeWorkerList.remove(worker);
+					}
+				});
+			}
+		});
+	}
+	
+	/**
+	 * Allocate ready and working tasks to all workers and free facilities if necessary.<br>
+	 * This method is only for multi-task simulation.
+	 * @param readyTaskAndWorkingTaskList
+	 * @param allWorkerList
+	 * @param freeFacilityList
+	 */
+	public void allocateTaskToResourcesForMultiTaskSimulation(List<BaseTask> readyTaskAndWorkingTaskList, List<BaseWorker> allWorkerList, List<BaseFacility> freeFacilityList) {
+		readyTaskAndWorkingTaskList.stream().forEachOrdered(task->{
+			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
+				allWorkerList.stream().filter(w -> w.hasSkill(task)).forEach(w -> {
+					if(!task.isAlreadyAssigned(w)) {
+						if (task.isNeedFacility()) {
+							Optional<BaseFacility> availableFacility = freeFacilityList.stream().filter(f -> f.hasSkill(task)).findFirst();
+							availableFacility.ifPresent(facility -> {
+								task.addAllocatedWorker(w);
+								task.setAllocatedFacility(facility);
+								freeFacilityList.remove(facility);
+							});
+						}else {
+							task.addAllocatedWorker(w);
+						}
 					}
 				});
 			}
@@ -262,7 +306,7 @@ public abstract class PDES_AbstractSimulator {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
 			// header
-			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
+			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()+1), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
 			
 			// workflow
 			pw.println();
@@ -305,7 +349,7 @@ public abstract class PDES_AbstractSimulator {
 			// Organization
 			pw.println();
 			pw.println("Gantt chart of each Resource");
-			pw.println(String.join(separator , new String[]{"Team", "Type", "Name", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time", "Assigned Task", "Start Time", "Finish Time"}));
+			pw.println(String.join(separator , new String[]{"Team", "Type", "Name", "Start Time", "Finish Time"}));
 			this.organization.getTeamList().forEach(t -> {
 				String teamName = t.getName();
 				
@@ -315,12 +359,11 @@ public abstract class PDES_AbstractSimulator {
 					baseInfo.add(teamName);
 					baseInfo.add("Worker");
 					baseInfo.add(w.getName());
-					IntStream.range(0, w.getFinishTimeList().size()).forEach(i -> {
+					IntStream.range(0, w.getAssignedTaskList().size()).forEach(i -> {
 						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
 						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
-						baseInfo.add(w.getWorkedTaskList().get(i).getName());
 					});
-					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));;
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));
 				});
 				
 				//Facilities
@@ -332,9 +375,8 @@ public abstract class PDES_AbstractSimulator {
 					IntStream.range(0, w.getFinishTimeList().size()).forEach(i -> {
 						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
 						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
-						baseInfo.add(w.getWorkedTaskList().get(i).getName());
 					});
-					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));;
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));
 				});
 			});
 			

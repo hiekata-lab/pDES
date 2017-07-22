@@ -201,7 +201,7 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//6. Define SWT of clicking Diagram
 	//If you add some attributes in ProjectEditor, add "setVisibleOfDiagramSWT" method.
-	private Label diagramConcurrencyLimitLabel;
+	private Label diagramSimulationConstraintsLabel, diagramConcurrencyLimitLabel;
 	private Text diagramConcurrencyLimitText;
 	
 	/**
@@ -209,6 +209,7 @@ public class SelectedModelViewPart extends ViewPart {
 	 * @param visible
 	 */
 	private void setVisibleOfDiagramSWT(boolean visible){
+		diagramSimulationConstraintsLabel.setVisible(visible);
 		diagramConcurrencyLimitLabel.setVisible(visible);
 		diagramConcurrencyLimitText.setVisible(visible);
 		
@@ -601,7 +602,6 @@ public class SelectedModelViewPart extends ViewPart {
 		
 		
 		///////////////////////Task////////////////////////////
-		// タスク名
 		taskNameLabel = new Label(parent, SWT.NULL);
 		taskNameLabel.setText("Name : ");
 		taskNameLabel.setFont(new Font(null, "", 10, 0));
@@ -914,12 +914,20 @@ public class SelectedModelViewPart extends ViewPart {
 		///////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////Diagram////////////////////////////
+		diagramSimulationConstraintsLabel = new Label(parent, SWT.NULL);
+		diagramSimulationConstraintsLabel.setText("[Simulation Constraints]");
+		diagramSimulationConstraintsLabel.setFont(new Font(null, "", 10, 0));
+		FormData diagramSimulationConstraintsLabelFD = new FormData();
+		diagramSimulationConstraintsLabelFD.top = new FormAttachment(0,10);
+		diagramSimulationConstraintsLabelFD.left = new FormAttachment(0,10);
+		diagramSimulationConstraintsLabel.setLayoutData(diagramSimulationConstraintsLabelFD);
+		
 		diagramConcurrencyLimitLabel = new Label(parent, SWT.NULL);
 		diagramConcurrencyLimitLabel.setText("Concurrency Limit of Workflow: ");
 		diagramConcurrencyLimitLabel.setFont(new Font(null, "", 10, 0));
 		FormData diagramConcurrencyLimitLabelFD = new FormData();
-		diagramConcurrencyLimitLabelFD.top = new FormAttachment(0,10);
-		diagramConcurrencyLimitLabelFD.left = new FormAttachment(0,10);
+		diagramConcurrencyLimitLabelFD.top = new FormAttachment(diagramSimulationConstraintsLabel,10);
+		diagramConcurrencyLimitLabelFD.left = new FormAttachment(5,10);
 		diagramConcurrencyLimitLabel.setLayoutData(diagramConcurrencyLimitLabelFD);
 		
 		diagramConcurrencyLimitText = new Text(parent, SWT.BORDER|SWT.SINGLE);
@@ -946,7 +954,7 @@ public class SelectedModelViewPart extends ViewPart {
 			}
 		});
 		FormData diagramConcurrencyLimitTextFD = new FormData();
-		diagramConcurrencyLimitTextFD.top = new FormAttachment(0,10);
+		diagramConcurrencyLimitTextFD.top = new FormAttachment(diagramSimulationConstraintsLabel,10);
 		diagramConcurrencyLimitTextFD.left = new FormAttachment(diagramConcurrencyLimitLabel,10);
 		diagramConcurrencyLimitTextFD.width = 50;
 		diagramConcurrencyLimitText.setLayoutData(diagramConcurrencyLimitTextFD);

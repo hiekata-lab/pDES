@@ -52,7 +52,7 @@ public class TaskNode extends NodeElement {
 		String newName = "New Task";
 		this.setName(newName);
 		this.setWorkAmount(10);
-		setNeedFacility(true);
+		setNeedFacility(false);
 	}
 	
 	/**

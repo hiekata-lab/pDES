@@ -53,8 +53,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private SaveAsFileAction saveAs = new SaveAsFileAction();
 	private OpenProjectFileAction open = new OpenProjectFileAction();
 	private OneRunPDES_BasicSimulatorAction basicSim = new OneRunPDES_BasicSimulatorAction();
-	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
-	private MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction multi_retSim = new MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
+//	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
+//	private MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction multi_retSim = new MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
 	
 	/**
 	 * This is the constructor.
@@ -93,10 +93,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager runMenu = new MenuManager("Run at once");
 		simulationMenu.add(runMenu);
 		runMenu.add(basicSim);
-		runMenu.add(retSim);
+//		runMenu.add(retSim);
 		MenuManager multi_runMenu = new MenuManager("Run multiple");
 		simulationMenu.add(multi_runMenu);
-		multi_runMenu.add(multi_retSim);
+//		multi_runMenu.add(multi_retSim);
 	}
 	
 }

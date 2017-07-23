@@ -183,13 +183,13 @@ public abstract class PDES_AbstractSimulator {
 	
 	/**
 	 * Allocate ready tasks to free workers and facilities if necessary.<br>
-	 * This method is only for single task-worker simulator.
+	 * This method is only for single-task worker simulator.
 	 * @param time 
 	 * @param readyTaskList
 	 * @param freeWorkerList
 	 * @param freeFacilityList
 	 */
-	public void allocateReadyTasksToFreeResources(List<BaseTask> readyTaskList, List<BaseWorker> freeWorkerList, List<BaseFacility> freeFacilityList){
+	public void allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(List<BaseTask> readyTaskList, List<BaseWorker> freeWorkerList, List<BaseFacility> freeFacilityList){
 		this.sortTasks(readyTaskList);
 		readyTaskList.stream().forEachOrdered(task -> {
 			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
@@ -214,12 +214,12 @@ public abstract class PDES_AbstractSimulator {
 	
 	/**
 	 * Allocate ready and working tasks to all workers and free facilities if necessary.<br>
-	 * This method is only for multi-task simulation.
+	 * This method is only for multi-task worker simulation.
 	 * @param readyTaskAndWorkingTaskList
 	 * @param allWorkerList
 	 * @param freeFacilityList
 	 */
-	public void allocateTaskToResourcesForMultiTaskSimulation(List<BaseTask> readyTaskAndWorkingTaskList, List<BaseWorker> allWorkerList, List<BaseFacility> freeFacilityList) {
+	public void allocateTaskToResourcesForMultiTaskWorkerSimulation(List<BaseTask> readyTaskAndWorkingTaskList, List<BaseWorker> allWorkerList, List<BaseFacility> freeFacilityList) {
 		readyTaskAndWorkingTaskList.stream().forEachOrdered(task->{
 			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
 				allWorkerList.stream().filter(w -> w.hasSkill(task)).forEach(w -> {

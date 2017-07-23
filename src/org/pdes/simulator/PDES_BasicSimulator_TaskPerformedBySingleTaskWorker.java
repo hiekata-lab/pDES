@@ -77,7 +77,7 @@ public class PDES_BasicSimulator_TaskPerformedBySingleTaskWorker extends PDES_Ab
 			this.sortFacilities(freeFacilityList);
 			
 			//3. Allocate ready tasks to free resources
-			this.allocateReadyTasksToFreeResources(readyTaskList, freeWorkerList, freeFacilityList);
+			this.allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(readyTaskList, freeWorkerList, freeFacilityList);
 			
 			//4. Perform WORKING tasks and update the status of each task.
 			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);

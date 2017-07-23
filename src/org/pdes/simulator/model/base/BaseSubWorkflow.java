@@ -43,7 +43,6 @@ import org.pdes.simulator.model.Task;
  * @author Hiroya Matsubara <matsubara@is.k.u-tokyo.ac.jp>
  *
  */
-@SuppressWarnings({"unchecked","deprecation"})
 public class BaseSubWorkflow {
 	private final String nodeId; // SubWorkflowNodeID
 	private final String name;

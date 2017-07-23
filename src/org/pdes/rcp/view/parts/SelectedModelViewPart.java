@@ -40,7 +40,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
@@ -55,6 +54,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.pdes.rcp.dialog.InputSimpleTextDialog;
+import org.pdes.rcp.dialog.SelectSimpleDataDialog;
 import org.pdes.rcp.model.ComponentNode;
 import org.pdes.rcp.model.FacilityElement;
 import org.pdes.rcp.model.ProjectDiagram;
@@ -64,8 +65,6 @@ import org.pdes.rcp.model.TeamNode;
 import org.pdes.rcp.model.WorkerElement;
 import org.pdes.rcp.model.base.AbstractModel;
 import org.pdes.rcp.model.base.Link;
-import org.pdes.rcp.dialog.InputSimpleTextDialog;
-import org.pdes.rcp.dialog.SelectSimpleDataDialog;
 
 /**
  * This is the ViewPart class for editing the attributes of clicked model in ProjectDiagram.<br>
@@ -83,8 +82,10 @@ public class SelectedModelViewPart extends ViewPart {
 	//If you add some attributes in TeamNode, add "setVisibleOfTeamSWT" method.
 	private Label teamNameLabel;
 	private Text teamNameText;
+	@SuppressWarnings("unused")
 	private Label workerTableLabel, facilityTableLabel;
 	private Table workerTable, facilityTable;
+	@SuppressWarnings("unused")
 	private Button addWorkerButton, deleteWorkerButton, addFacilityButton, deleteFacilityButton;
 	
 	/**
@@ -111,8 +112,11 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//2. Define SWT of clicking TaskNode
 	//If you add some attributes in TaskNode, add "setVisibleOfTaskSWT" method.
+	@SuppressWarnings("unused")
 	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel;
+	@SuppressWarnings("unused")
 	private Text taskNameText, taskWorkAmountText, taskAdditionalWorkAmountText;
+	@SuppressWarnings("unused")
 	private Button taskNeedFacilityCheckBox;
 	
 	/**
@@ -140,7 +144,9 @@ public class SelectedModelViewPart extends ViewPart {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//3. Define SWT of clicking ComponentNode
 	//If you add some attributes in ComponentNode, add "setVisibleOfComponentSWT" method.
+	@SuppressWarnings("unused")
 	private Label componentNameLabel, componentErrorToleranceLabel;
+	@SuppressWarnings("unused")
 	private Text componentNameText, componentErrorToleranceText;
 	
 	/**
@@ -1067,6 +1073,7 @@ public class SelectedModelViewPart extends ViewPart {
 	/**
 	 * Redraw facilityTable
 	 */
+	@SuppressWarnings("unused")
 	private void redrawFacilityTable(){
 		//Initialize
 		while ( facilityTable.getColumnCount() > 0 ) {

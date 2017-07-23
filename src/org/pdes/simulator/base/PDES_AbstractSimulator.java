@@ -60,6 +60,8 @@ public abstract class PDES_AbstractSimulator {
 	
 	protected int time = 0;
 	
+	protected boolean considerReworkOfErrorTorelance = false;
+	
 	/**
 	 * This is the constructor.
 	 * @param workflowList
@@ -385,5 +387,21 @@ public abstract class PDES_AbstractSimulator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Check whether this simulator considers rework of error tolerance or not.
+	 * @return the considerReworkOfErrorTorelance
+	 */
+	public boolean isConsiderReworkOfErrorTorelance() {
+		return considerReworkOfErrorTorelance;
+	}
+
+	/**
+	 * Set the simulation condition whether this simulator considers rework of error tolerance or not.
+	 * @param considerReworkOfErrorTorelance the considerReworkOfErrorTorelance to set
+	 */
+	public void setConsiderReworkOfErrorTorelance(boolean considerReworkOfErrorTorelance) {
+		this.considerReworkOfErrorTorelance = considerReworkOfErrorTorelance;
 	}
 }

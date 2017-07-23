@@ -38,13 +38,11 @@ import org.pdes.simulator.model.base.BaseWorker;
 
 /**
  * This is the basic discrete event simulator of this application.<br>
- * This simulator is developed based on Hiroya Matsubara's master thesis.<br>
- * Basic Simulator is the simulator which has no uncertainty (Rework of Error tolerance, etc.).<br>
+ * Simulator result has no uncertainty (Rework of Error tolerance, etc.).<br>]
+ * [single task workers & task performed by one worker]
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class PDES_BasicOneWorkerOneTaskSimulator extends PDES_AbstractSimulator {
-	
-	private boolean considerReworkOfErrorTorelance = false;;
+public class PDES_BasicSimulator_TaskPerformedBySingleTaskWorker extends PDES_AbstractSimulator {
 	
 	/**
 	 * This is the constructor.
@@ -53,7 +51,7 @@ public class PDES_BasicOneWorkerOneTaskSimulator extends PDES_AbstractSimulator 
 	 * @param productList
 	 * @param simultaneousWorkflowLimit
 	 */
-	public PDES_BasicOneWorkerOneTaskSimulator(BaseProjectInfo project) {
+	public PDES_BasicSimulator_TaskPerformedBySingleTaskWorker(BaseProjectInfo project) {
 		super(project);
 	}
 
@@ -85,21 +83,5 @@ public class PDES_BasicOneWorkerOneTaskSimulator extends PDES_AbstractSimulator 
 			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
 			time++;
 		}
-	}
-
-	/**
-	 * Check whether this simulator considers rework of error tolerance or not.
-	 * @return the considerReworkOfErrorTorelance
-	 */
-	public boolean isConsiderReworkOfErrorTorelance() {
-		return considerReworkOfErrorTorelance;
-	}
-
-	/**
-	 * Set the simulation condition whether this simulator considers rework of error tolerance or not.
-	 * @param considerReworkOfErrorTorelance the considerReworkOfErrorTorelance to set
-	 */
-	public void setConsiderReworkOfErrorTorelance(boolean considerReworkOfErrorTorelance) {
-		this.considerReworkOfErrorTorelance = considerReworkOfErrorTorelance;
 	}
 }

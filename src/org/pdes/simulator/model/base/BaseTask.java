@@ -191,7 +191,9 @@ public class BaseTask {
 				state = TaskState.FINISHED;
 				stateInt = 4;
 				for(BaseWorker allocatedWorker : allocatedWorkerList) {
-					allocatedWorker.setStateFree();
+					if(allocatedWorker.getAssignedTaskList().stream().filter(t -> t.getStateInt() < 4).count() == 0) {
+						allocatedWorker.setStateFree();
+					}
 					allocatedWorker.addFinishTime(time);
 				}
 				if (needFacility) {
@@ -254,12 +256,10 @@ public class BaseTask {
 			for(BaseWorker allocatedWorker : allocatedWorkerList) {
 				workAmount += allocatedWorker.getWorkAmountSkillPoint(this);
 				noErrorProbability -= allocatedWorker.getQualitySkillPoint(this); // Probability of success this task
-				allocatedWorker.work();
 			}
 			if (needFacility) {
 				workAmount *= allocatedFacility.getWorkAmountSkillPoint(this);
 				noErrorProbability *= 1.0 - allocatedFacility.getQualitySkillPoint(this);
-				allocatedFacility.work();
 			}
 			remainingWorkAmount -= workAmount;
 			for (BaseComponent c : targetComponentList) {

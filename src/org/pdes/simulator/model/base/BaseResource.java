@@ -122,7 +122,7 @@ public class BaseResource {
 	/**
 	 * Working in simulation. In this simulation, total cost of this resource have to be updated.
 	 */
-	public void work() {
+	public void addLaborCost() {
 		totalCost += costPerTime;
 	}
 	

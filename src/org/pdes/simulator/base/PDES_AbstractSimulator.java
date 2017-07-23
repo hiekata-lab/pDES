@@ -278,13 +278,13 @@ public abstract class PDES_AbstractSimulator {
 	 * @param componentErrorRework 
 	 */
 	public void performAndUpdateAllWorkflow(int time, boolean componentErrorRework){
-		workflowList.forEach(w -> {
-			w.checkWorking(time);//READY -> WORKING
-			w.perform(time, componentErrorRework);//update information of WORKING task in each workflow
-			w.checkFinished(time);// WORKING -> WORKING_ADDITIONALLY or FINISHED
-			w.checkReady(time);// NONE -> READY
-			w.updatePERTData();//Update PERT information
-		});
+		workflowList.forEach(w -> w.checkWorking(time));//READY -> WORKING
+		organization.getWorkingWorkerList().stream().forEach(w -> w.addLaborCost());//pay labor cost
+		organization.getWorkingFacilityList().stream().forEach(f -> f.addLaborCost());//pay labor cost
+		workflowList.forEach(w -> w.perform(time, componentErrorRework));//update information of WORKING task in each workflow
+		workflowList.forEach(w -> w.checkFinished(time));// WORKING -> WORKING_ADDITIONALLY or FINISHED
+		workflowList.forEach(w -> w.checkReady(time));// NONE -> READY
+		workflowList.forEach(w -> w.updatePERTData());//Update PERT information
 	}
 	
 	/**

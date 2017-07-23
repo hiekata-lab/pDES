@@ -137,12 +137,16 @@ public class BaseResource {
 	
 	/**
 	 * Get the work amount skill point of "task".
+	 * if this resource will do multi-tasks at the same time, allocation is divided to working tasks equally. 
 	 * @param task
 	 * @return
 	 */
 	public double getWorkAmountSkillPoint(BaseTask task){
 		if (!hasSkill(task)) return 0.0;
-		return workAmountSkillMap.get(task.getName());
+		double skillPoint = workAmountSkillMap.get(task.getName());
+		long sumOfWorkingTaskInThisTime = this.getAssignedTaskList().stream().filter(t -> t.getStateInt()==2||task.getStateInt()==3).count();
+		double progress = skillPoint / sumOfWorkingTaskInThisTime;
+		return progress;
 	}
 	
 	/**

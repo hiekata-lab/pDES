@@ -47,7 +47,7 @@ import org.pdes.simulator.model.base.BaseProjectInfo;
  */
 public class OneRunPDES_BasicSimulator_TaskPerformedByMultiTaskWorkersAction extends AbstractSimulationAction {
 	
-	private final String text = "Basic DES (multi-task worker & task performed by multiple workers)";
+	private final String text = "Basic DES (a task performed by multi-task workers)";
 	
 	public OneRunPDES_BasicSimulator_TaskPerformedByMultiTaskWorkersAction(){
 		this.setToolTipText(text);

@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jface.action.Action;
@@ -51,6 +52,9 @@ import org.pdes.rcp.core.Activator;
 import org.pdes.rcp.dialog.InputSimpleTextDialog;
 import org.pdes.rcp.model.ProjectDiagram;
 import org.pdes.rcp.view.editor.ProjectEditor;
+import org.pdes.simulator.model.ProjectInfo;
+import org.pdes.simulator.model.base.BaseProjectInfo;
+import org.pdes.simulator.model.base.BaseTask;
 
 /**
  * This is the abstract One Run Simulation Action.<br>
@@ -70,7 +74,7 @@ public abstract class AbstractSimulationAction extends Action {
 	@Override
 	public void run() {
 		
-		//1. Check whether Project is opened or not.
+		//0. Check whether Project is opened or not.
 		IWorkbench ib = PlatformUI.getWorkbench();
 		ProjectEditor pe = (ProjectEditor) ib.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		if(pe == null){
@@ -78,9 +82,25 @@ public abstract class AbstractSimulationAction extends Action {
 			return;
 		}
 		
+		//1. Check whether Project will be finished or not by checking workers skill.
+		boolean skillCheckResult = true;
+		ProjectDiagram pd = (ProjectDiagram)pe.getDiagram();
+		BaseProjectInfo project = new ProjectInfo(pd, 1);
+		List<BaseTask> taskList = project.getWorkflowList().stream().flatMap(w -> w.getTaskList().stream()).collect(Collectors.toList());
+		for(BaseTask task : taskList){
+			if(!project.getOrganization().getWorkerList().stream().filter(worker -> worker.hasSkill(task)==true).findFirst().isPresent()) {
+				msgStream.println(String.format("\"%s\" cannot be done because of skill information. Exit.", task.getName()));
+				skillCheckResult = false;
+			}
+		}
+		if(!skillCheckResult) {
+			MessageDialog.openError(ib.getActiveWorkbenchWindow().getShell(), "Error", "Simulation will not be finished because of skill loss.");
+			return;
+		}
+		
 		//2. Set the number of workflow and product
 		int workflowCount = 1;
-			if(aggregateMode) {//Multiple mode has to be TURE of aggregateMode.
+		if(aggregateMode) {//Multiple mode has to be TURE of aggregateMode.
 			InputSimpleTextDialog workflowCountTextDialog = new InputSimpleTextDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 			workflowCountTextDialog.setTitleAndMessage("The number of products (or workflows)", "Enter the number of products creating or workflows running.");
 			if (workflowCountTextDialog.open() == Window.OK) {
@@ -115,12 +135,12 @@ public abstract class AbstractSimulationAction extends Action {
 		this.outputDir = saveDir.getPath();
 		
 		//4. Run simulation
-		List<Future<String>> result = this.doSimulation((ProjectDiagram)pe.getDiagram(), workflowCount);
+		List<Future<String>> result = this.doSimulation(pd, workflowCount);
 		
 		//5. Save the result of simulation
 		if(aggregateMode) this.saveResult("aggregate.csv", result);
 		
-		msgStream.println("A result was saved to " + outputDir);
+		msgStream.println("A result will be saved to " + outputDir);
 	}
 	
 	

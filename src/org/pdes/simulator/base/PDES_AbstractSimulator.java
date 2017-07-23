@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.pdes.simulator.model.base.BaseFacility;
@@ -208,6 +209,37 @@ public abstract class PDES_AbstractSimulator {
 						freeWorkerList.remove(worker);
 					}
 				});
+			}
+		});
+	}
+	
+	/**
+	 * Allocate ready tasks to free workers and facilities if necessary.<br>
+	 * This method is only for single-task workers simulator.
+	 * @param time 
+	 * @param readyAndWorkingTaskList
+	 * @param freeWorkerList
+	 * @param freeFacilityList
+	 */
+	public void allocateReadyTasksToFreeResourcesForSingleTaskWorkersSimulation(List<BaseTask> readyAndWorkingTaskList, List<BaseWorker> freeWorkerList, List<BaseFacility> freeFacilityList){
+		this.sortTasks(readyAndWorkingTaskList);
+		readyAndWorkingTaskList.stream().forEachOrdered(task -> {
+			if(this.checkSatisfyingWorkflowLimitForStartingTask(task)){
+				List<BaseWorker> allocatingWorkers = freeWorkerList.stream().filter(w -> w.hasSkill(task)).collect(Collectors.toList());
+				for(BaseWorker worker : allocatingWorkers) {
+					if (task.isNeedFacility()) {
+						Optional<BaseFacility> availableFacility = freeFacilityList.stream().filter(w -> w.hasSkill(task)).findFirst();
+						availableFacility.ifPresent(facility -> {
+							task.addAllocatedWorker(worker);
+							task.setAllocatedFacility(facility);
+							freeWorkerList.remove(worker);
+							freeFacilityList.remove(facility);
+						});
+					}else{
+						task.addAllocatedWorker(worker);
+						freeWorkerList.remove(worker);
+					}
+				}
 			}
 		});
 	}

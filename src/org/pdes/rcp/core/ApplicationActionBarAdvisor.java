@@ -36,6 +36,7 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.pdes.rcp.actions.NewProjectFileAction;
 import org.pdes.rcp.actions.OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction;
+import org.pdes.rcp.actions.OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkersAction;
 import org.pdes.rcp.actions.OneRunPDES_BasicSimulator_TaskPerformedByMultiTaskWorkersAction;
 import org.pdes.rcp.actions.OpenProjectFileAction;
 import org.pdes.rcp.actions.SaveAsFileAction;
@@ -52,6 +53,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private SaveAsFileAction saveAs = new SaveAsFileAction();
 	private OpenProjectFileAction open = new OpenProjectFileAction();
 	private OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction basicSimSingleTaskWorker = new OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction();
+	private OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkersAction basicSimSingleTaskWorkers = new OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkersAction();
 	private OneRunPDES_BasicSimulator_TaskPerformedByMultiTaskWorkersAction basicSimMultiTaskWorker = new OneRunPDES_BasicSimulator_TaskPerformedByMultiTaskWorkersAction();
 //	private OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction retSim = new OneRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
 //	private MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction multi_retSim = new MultiRunPDES_SimulatorConsideringReworkOfErrorToleranceAction();
@@ -93,6 +95,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager runMenu = new MenuManager("Run at once");
 		simulationMenu.add(runMenu);
 		runMenu.add(basicSimSingleTaskWorker);
+		runMenu.add(basicSimSingleTaskWorkers);
 		runMenu.add(basicSimMultiTaskWorker);
 //		runMenu.add(retSim);
 		MenuManager multi_runMenu = new MenuManager("Run multiple");

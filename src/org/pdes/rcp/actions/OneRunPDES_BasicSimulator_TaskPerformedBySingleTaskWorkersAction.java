@@ -37,19 +37,19 @@ import java.util.concurrent.Future;
 
 import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
-import org.pdes.simulator.PDES_BasicSimulator_TaskPerformedBySingleTaskWorker;
+import org.pdes.simulator.PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers;
 import org.pdes.simulator.model.ProjectInfo;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 
 /**
- * This is the Action class for running PDES_BasicSimulator_TaskPerformedBySingleTaskWorker at once.<br>
+ * This is the Action class for running PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers at once.<br>
  * @author Taiga Mitsuyuki <mitsuyuki@sys.t.u-tokyo.ac.jp>
  */
-public class OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction extends AbstractSimulationAction {
+public class OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkersAction extends AbstractSimulationAction {
 	
-	private final String text = "Basic DES (one task performed by one single task worker)";
+	private final String text = "Basic DES (one task performed by single task workers)";
 	
-	public OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction(){
+	public OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkersAction(){
 		this.setToolTipText(text);
 		this.setText(text);
 	}
@@ -99,7 +99,7 @@ public class OneRunPDES_BasicSimulator_TaskPerformedBySingleTaskWorkerAction ext
 		@Override
 		public String call() throws Exception {
 			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
-			PDES_BasicSimulator_TaskPerformedBySingleTaskWorker sim = new PDES_BasicSimulator_TaskPerformedBySingleTaskWorker(project);
+			PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers sim = new PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers(project);
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());

@@ -60,6 +60,7 @@ public class BaseTask {
 	private final String nodeId; // TaskNode ID
 	private final String name;
 	private final double defaultWorkAmount;
+	private final double progress;
 	private final double additionalWorkAmount;
 	private final boolean needFacility;
 	private final List<BaseTask> inputTaskList = new ArrayList<>();
@@ -93,6 +94,7 @@ public class BaseTask {
 		this.nodeId = taskNode.getId();
 		this.name = taskNode.getName();
 		this.defaultWorkAmount = taskNode.getWorkAmount();
+		this.progress = taskNode.getProgress();
 		this.additionalWorkAmount = taskNode.getAdditionalWorkAmount();
 		this.needFacility = taskNode.isNeedFacility();
 	}
@@ -105,10 +107,24 @@ public class BaseTask {
 		eft = 0;
 		lst = 0;
 		lft = 0;
-		remainingWorkAmount = defaultWorkAmount;
-		actualWorkAmount = defaultWorkAmount;
+		
+		remainingWorkAmount = defaultWorkAmount * (1.0 - progress);
+		actualWorkAmount = defaultWorkAmount * (1.0 - progress);
+		
 		state = TaskState.NONE;
 		stateInt = 0;
+		if(progress > 0.0 && progress <1.0) {
+			state = TaskState.READY;
+			stateInt = 1;
+			this.readyTimeList.add(-1);
+		}else if(progress>=1.0){
+			state = TaskState.FINISHED;
+			stateInt = 4;
+			this.readyTimeList.add(-1);
+			this.startTimeList.add(-1);
+			this.finishTimeList.add(-1);
+		}
+		
 		additionalTaskFlag = false;
 		allocatedWorkerList = new ArrayList<>();
 		allocatedFacility = null;

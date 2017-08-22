@@ -113,9 +113,9 @@ public class SelectedModelViewPart extends ViewPart {
 	//2. Define SWT of clicking TaskNode
 	//If you add some attributes in TaskNode, add "setVisibleOfTaskSWT" method.
 	@SuppressWarnings("unused")
-	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel;
+	private Label taskNameLabel, taskWorkAmountLabel, taskAdditionalWorkAmountLabel, taskProgressLabel;
 	@SuppressWarnings("unused")
-	private Text taskNameText, taskWorkAmountText, taskAdditionalWorkAmountText;
+	private Text taskNameText, taskWorkAmountText, taskAdditionalWorkAmountText, taskProgressText;
 	@SuppressWarnings("unused")
 	private Button taskNeedFacilityCheckBox;
 	
@@ -128,6 +128,8 @@ public class SelectedModelViewPart extends ViewPart {
 		taskNameText.setVisible(visible);
 		taskWorkAmountLabel.setVisible(visible);
 		taskWorkAmountText.setVisible(visible);
+		taskProgressLabel.setVisible(visible);
+		taskProgressText.setVisible(visible);
 //		taskAdditionalWorkAmountLabel.setVisible(visible);
 //		taskAdditionalWorkAmountText.setVisible(visible);
 //		taskNeedFacilityCheckBox.setVisible(visible);
@@ -135,6 +137,7 @@ public class SelectedModelViewPart extends ViewPart {
 		if(visible){
 			taskNameText.setText(((TaskNode) selectedModel).getName());
 			taskWorkAmountText.setText(String.valueOf(((TaskNode) selectedModel).getWorkAmount()));
+			taskProgressText.setText(String.valueOf(((TaskNode) selectedModel).getProgress()));
 //			taskAdditionalWorkAmountText.setText(String.valueOf(((TaskNode)selectedModel).getAdditionalWorkAmount()));
 //			taskNeedFacilityCheckBox.setSelection(((TaskNode)selectedModel).isNeedFacility());
 		}
@@ -683,6 +686,46 @@ public class SelectedModelViewPart extends ViewPart {
 		taskWorkAmountTextFD.left= new FormAttachment(taskWorkAmountLabel,10);
 		taskWorkAmountTextFD.width = 50;
 		taskWorkAmountText.setLayoutData(taskWorkAmountTextFD);
+		
+        taskProgressLabel = new Label(parent, SWT.NULL);
+        taskProgressLabel.setText("Progress(0.0 - 1.0) : ");
+        taskProgressLabel.setFont(new Font(null, "", 10, 0));
+        FormData taskProgressLabelFD = new FormData();
+        taskProgressLabelFD.top= new FormAttachment(taskWorkAmountLabel,10);
+        taskProgressLabelFD.left= new FormAttachment(0,10);
+        taskProgressLabel.setLayoutData(taskProgressLabelFD);
+        
+        taskProgressText = new Text(parent, SWT.BORDER|SWT.SINGLE);
+        taskProgressText.addKeyListener(new KeyListener(){
+
+            /*
+             * (non-Javadoc)
+             * @see org.eclipse.draw2d.KeyListener#keyPressed(org.eclipse.draw2d.KeyEvent)
+             */
+            @Override
+            public void keyPressed(KeyEvent e) {}
+
+            /*
+             * (non-Javadoc)
+             * @see org.eclipse.draw2d.KeyListener#keyReleased(org.eclipse.draw2d.KeyEvent)
+             */
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.character==SWT.CR){
+                    String textString = taskProgressText.getText();
+                    if(doubleCheck(textString)) {
+                        ((TaskNode)selectedModel).setProgress(Double.parseDouble(textString));
+                    }else{
+                        taskProgressText.setText(String.valueOf(((TaskNode)selectedModel).getProgress()));
+                    }
+                }
+            }
+        });
+        FormData taskProgressTextFD = new FormData();
+        taskProgressTextFD.top= new FormAttachment(taskWorkAmountLabel,10);
+        taskProgressTextFD.left= new FormAttachment(taskProgressLabel,10);
+        taskProgressTextFD.width = 50;
+        taskProgressText.setLayoutData(taskProgressTextFD);		
 		
 //		taskAdditionalWorkAmountLabel = new Label(parent, SWT.NULL);
 //		taskAdditionalWorkAmountLabel.setText("Additional Work Amount : ");

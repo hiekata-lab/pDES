@@ -152,6 +152,7 @@ public class ProjectDiagram extends Diagram {
 					pw.println("		<TaskNode id=\""+task.getId()+"\" Left=\""+((NodeElement) node).getX()+"\" Top=\""+((NodeElement) node).getY()+"\" Width=\""+((NodeElement) node).getWidth()+"\" Height=\""+((NodeElement) node).getHeight()+"\">");
 					pw.println("			<Name>"+this.xmlEscape((task.getName()).toString())+"</Name>");
 					pw.println("			<WorkAmount>"+task.getWorkAmount()+"</WorkAmount>");
+					pw.println("			<Progress>"+task.getProgress()+"</Progress>");
 					pw.println("			<AdditionalWorkAmount>"+task.getAdditionalWorkAmount()+"</AdditionalWorkAmount>");
 					pw.println("			<NeedFacility>"+task.isNeedFacility()+"</NeedFacility>");
 					pw.println("		</TaskNode>");
@@ -265,6 +266,7 @@ public class ProjectDiagram extends Diagram {
 						String value = tag.getFirstChild().getNodeValue();
 						if(tagName.equals("Name")) task.setName(value);
 						else if(tagName.equals("WorkAmount")) task.setWorkAmount(Integer.parseInt(value));
+						else if(tagName.equals("Progress")) task.setProgress(Double.parseDouble(value));
 						else if(tagName.equals("AdditionalWorkAmount")) task.setAdditionalWorkAmount(Integer.parseInt(value));
 						else if(tagName.equals("NeedFacility")) task.setNeedFacility(Boolean.parseBoolean(value));
 					}

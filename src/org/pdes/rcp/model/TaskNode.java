@@ -41,6 +41,7 @@ public class TaskNode extends NodeElement {
 	////////////////Variables//////////////////////////////////////////////////////////
 	private String name = "";
 	private int workAmount;
+	private double progress;
 	private int additionalWorkAmount; //Additional work amount if the amount of error exceeds the limit.
 	private boolean needFacility; //Need facility or not
 	//////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,7 @@ public class TaskNode extends NodeElement {
 		String newName = "New Task";
 		this.setName(newName);
 		this.setWorkAmount(10);
+		this.setProgress(0.0);
 		setNeedFacility(false);
 	}
 	
@@ -82,6 +84,14 @@ public class TaskNode extends NodeElement {
 		return workAmount;
 	}
 	
+	/**
+	 * Get the progress of TaskNode
+	 * @return the progress from 0.0 to 1.0
+	 */
+	public double getProgress() {
+		return progress;
+	}
+	
 
 	/**
 	 * Set the work amount of TaskNode.
@@ -91,6 +101,16 @@ public class TaskNode extends NodeElement {
 		int old = this.workAmount;
 		this.workAmount = workAmount;
 		firePropertyChange("workAmount",old,workAmount);
+	}
+	
+	/**
+	 * Set the progress of TaskNode.
+	 * @param progress the progress to set
+	 */
+	public void setProgress(double progress) {
+		double old = this.progress;
+		this.progress = progress;
+		firePropertyChange("progress",old,progress);
 	}
 	
 	/**
@@ -128,4 +148,5 @@ public class TaskNode extends NodeElement {
 		this.needFacility = needFacility;
 		firePropertyChange("needFacility", old, needFacility);
 	}
+	
 }

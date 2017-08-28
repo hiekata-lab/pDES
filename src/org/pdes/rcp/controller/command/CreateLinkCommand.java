@@ -122,7 +122,7 @@ public class CreateLinkCommand extends Command {
 			if(this.hasSomeLinkBetweenNodeElement()) return false;//IF a link has existed in the same place THEN wrong.
 			if(!(source instanceof TeamNode)) return false;
 			if(!(target instanceof TaskNode)) return false;
-			if(target.getIncomingLinkList().stream().filter(link -> link instanceof AllocationLink).count()>0) return false;//Only one team can be assigned to one Task.
+			//if(target.getIncomingLinkList().stream().filter(link -> link instanceof AllocationLink).count()>0) return false;//Only one team can be assigned to one Task.
 			return true;
 		}else if(link instanceof TargetComponentLink){
 			if(this.hasSomeLinkBetweenNodeElement()) return false;//IF a link has existed in the same place THEN wrong.

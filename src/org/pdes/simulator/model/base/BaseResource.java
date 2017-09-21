@@ -132,7 +132,7 @@ public class BaseResource {
 	 * @return
 	 */
 	public boolean hasSkill(BaseTask task) {
-		return (task.getAllocatedTeam().equals(team) && workAmountSkillMap.containsKey(task.getName()) && workAmountSkillMap.get(task.getName()) > 0.0);
+		return (task.getAllocatedTeamList().stream().anyMatch(t -> t.equals(team)) && workAmountSkillMap.containsKey(task.getName()) && workAmountSkillMap.get(task.getName()) > 0.0);
 	}
 	
 	/**

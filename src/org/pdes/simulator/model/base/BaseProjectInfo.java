@@ -171,7 +171,7 @@ public class BaseProjectInfo {
 					.filter(team -> team.getNodeId().equals(link.getOriginNode().getId()))
 					.findFirst()
 					.get();
-			destinationTask.setAllocatedTeam(originTeam);
+			destinationTask.addAllocatedTeam(originTeam);
 		});
 	}
 

@@ -66,7 +66,7 @@ public class BaseTask {
 	private final List<BaseTask> inputTaskList = new ArrayList<>();
 	private final List<BaseTask> outputTaskList = new ArrayList<>();
 	private int dueDate;
-	private BaseTeam allocatedTeam;
+	private List<BaseTeam> allocatedTeamList = new ArrayList<>();
 	private final List<BaseComponent> targetComponentList = new ArrayList<>();
 	
 	// Changeable variable on simulation
@@ -397,19 +397,19 @@ public class BaseTask {
 	}
 
 	/**
-	 * Get allocated team of this task.
+	 * Get allocated team list of this task.
 	 * @return the allocatedTeam
 	 */
-	public BaseTeam getAllocatedTeam() {
-		return allocatedTeam;
+	public List<BaseTeam> getAllocatedTeamList() {
+		return allocatedTeamList;
 	}
 
 	/**
-	 * Set allocated team of this task.
+	 * Add allocated team of this task.
 	 * @param allocatedTeam the allocatedTeam to set
 	 */
-	public void setAllocatedTeam(BaseTeam allocatedTeam) {
-		this.allocatedTeam = allocatedTeam;
+	public void addAllocatedTeam(BaseTeam allocatedTeam) {
+		this.allocatedTeamList.add(allocatedTeam);
 	}
 
 	/**
@@ -629,6 +629,6 @@ public class BaseTask {
 		String worker = (allocatedWorkerList.size() > 0) ? String.join(",", allocatedWorkerList.stream().map(w -> w.getName()).collect(Collectors.toList())) : "";
 		String facility = (allocatedFacility != null) ? allocatedFacility.getName() : "";
 		String inputTaskNames = String.join(",", inputTaskList.stream().map(t -> t.getName()).collect(Collectors.toList())); // DEBUG
-		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, remainingWorkAmount, allocatedTeam.getName(), worker, facility, inputTaskNames);
+		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, remainingWorkAmount, allocatedTeamList.stream().map(BaseTeam::getName).collect(Collectors.joining(",")), worker, facility, inputTaskNames);
 	}
 }

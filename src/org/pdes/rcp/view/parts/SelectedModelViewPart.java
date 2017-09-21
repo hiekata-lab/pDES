@@ -648,7 +648,7 @@ public class SelectedModelViewPart extends ViewPart {
 		taskNameText.setLayoutData(taskNameTextFD);
 		
 		taskWorkAmountLabel = new Label(parent, SWT.NULL);
-		taskWorkAmountLabel.setText("Work Amount : ");
+		taskWorkAmountLabel.setText("Default workload : ");
 		taskWorkAmountLabel.setFont(new Font(null, "", 10, 0));
 		FormData taskWorkAmountLabelFD = new FormData();
 		taskWorkAmountLabelFD.top= new FormAttachment(taskNameLabel,10);
@@ -688,7 +688,7 @@ public class SelectedModelViewPart extends ViewPart {
 		taskWorkAmountText.setLayoutData(taskWorkAmountTextFD);
 		
         taskProgressLabel = new Label(parent, SWT.NULL);
-        taskProgressLabel.setText("Progress(0.0 - 1.0) : ");
+        taskProgressLabel.setText("Progress rate (0.0 - 1.0) : ");
         taskProgressLabel.setFont(new Font(null, "", 10, 0));
         FormData taskProgressLabelFD = new FormData();
         taskProgressLabelFD.top= new FormAttachment(taskWorkAmountLabel,10);

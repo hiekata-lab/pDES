@@ -45,6 +45,7 @@ import org.pdes.simulator.model.base.BaseOrganization;
 import org.pdes.simulator.model.base.BaseProduct;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 import org.pdes.simulator.model.base.BaseWorkflow;
 
@@ -352,7 +353,8 @@ public abstract class PDES_AbstractSimulator {
 					List<String> baseInfo = new ArrayList<String>();
 					baseInfo.add(workflowName);
 					baseInfo.add(t.getName());
-					baseInfo.add(t.getAllocatedTeam().getName());
+					//baseInfo.add(t.getAllocatedTeam().getName());
+					baseInfo.add(t.getAllocatedTeamList().stream().map(BaseTeam::getName).collect(Collectors.joining("+")));
 					IntStream.range(0, t.getFinishTimeList().size()).forEach(i -> {
 						baseInfo.add(String.valueOf(t.getReadyTimeList().get(i)));
 						baseInfo.add(String.valueOf(t.getStartTimeList().get(i)));

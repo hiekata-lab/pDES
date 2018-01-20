@@ -47,7 +47,7 @@ import org.pdes.simulator.model.base.BaseProjectInfo;
  */
 public class OneRunPDES_OidaSimulatorAction extends AbstractSimulationAction {
 	
-	private final String text = "笈田シミュレータ(1回起動)";
+	private final String text = "Basic DES (with Brokering / One time)";
 	
 	public OneRunPDES_OidaSimulatorAction(){
 		this.setToolTipText(text);

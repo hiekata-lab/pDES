@@ -39,7 +39,8 @@ import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * これは笈田さん博士研究用シミュレータです.ご自由にお使いください
+ * Simulation to design "Broker Function Position" in Organization.
+ * 
  * @author Yoshiaki Oida<yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
@@ -59,12 +60,25 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			//0. Check finished or not.
 			if(checkAllTasksAreFinished()) return;
 			
+			/**
+			 * ToDo
+			 * 1. To confirm how to call the project member based on the component. 
+			 * 
+			 * 2. To implement Request Class time_to_execute = N
+			 *  N-- (for each time step)
+			 *  
+			 * 3.
+			 */
+			
+			
 			//1. Get ready task and free resources
 			List<BaseTask> readyTaskList = this.getReadyTaskList();
 			List<BaseTask> workingTaskList = this.getWorkingTaskList();
 			List<BaseTask> readyAndWorkingTaskList = Arrays.asList(readyTaskList,workingTaskList).stream().flatMap(list -> list.stream()).collect(Collectors.toList());
 			List<BaseWorker> freeWorkerList = organization.getFreeWorkerList();
 			List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
+			
+			
 			
 			//2. Sort ready task and free resources
 			this.sortTasks(readyAndWorkingTaskList);

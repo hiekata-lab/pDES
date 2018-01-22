@@ -28,12 +28,18 @@
  */
 package org.pdes.simulator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.pdes.simulator.base.PDES_AbstractSimulator;
+import org.pdes.simulator.model.Component;
+import org.pdes.simulator.model.ProjectInfo;
+import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseFacility;
+import org.pdes.simulator.model.base.BaseProduct;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseWorker;
@@ -55,6 +61,34 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	@Override
 	public void execute() {
 		this.initialize();
+		
+		ArrayList<BaseComponent> projectList_sample = new ArrayList<>();
+		for (BaseProduct p : this.productList) {
+			for(BaseComponent c : p.getComponentList()) {
+				projectList_sample.add(c);
+				System.out.println(c);
+				System.out.println(c.getTargetedTaskList());
+			}	
+		}
+		//Project Portfolio Initialize
+		ArrayList<BaseComponent> projectList =this.productList.stream()
+				.map(p -> p.getComponentList())
+				.collect(
+						() -> new ArrayList<>(),
+						(l,c) -> l.addAll(c),
+						(l1,l2) -> l1.addAll(l2)
+						);
+		int numOfProject = projectList.size();
+		
+		System.out.println("Number of project : " + numOfProject);
+		System.out.println("Project portfolio : " + projectList);
+		projectList.stream().forEach(c -> System.out.println(c.getName()+" : "+c.getTargetedTaskList()));
+		
+		
+		//projectList.get(0).getAssignedWorkerList(); *to implement
+		//assignedProjectListをResourceに追加する
+		//
+		
 		while(true){
 			
 			//0. Check finished or not.
@@ -67,26 +101,29 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			 * 2. To implement Request Class time_to_execute = N
 			 *  N-- (for each time step)
 			 *  
-			 * 3.
+			 * 3. To implement ResourcePool Class
+			 * 4. To implement Broker Interface
+			 * 5. Uncertainty for work load. Expected/True 
 			 */
-			
-			
+
+			//0. Projectごとへの配分を決める
+			/**
+			 * プロジェクトごとの以下を決めればあは，動くと思われる．
+			 * ・タスクリスト
+			 * ・作業者リスト
+			 */
 			//1. Get ready task and free resources
 			List<BaseTask> readyTaskList = this.getReadyTaskList();
-			List<BaseTask> workingTaskList = this.getWorkingTaskList();
-			List<BaseTask> readyAndWorkingTaskList = Arrays.asList(readyTaskList,workingTaskList).stream().flatMap(list -> list.stream()).collect(Collectors.toList());
 			List<BaseWorker> freeWorkerList = organization.getFreeWorkerList();
 			List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
 			
-			
-			
 			//2. Sort ready task and free resources
-			this.sortTasks(readyAndWorkingTaskList);
+			this.sortTasks(readyTaskList);
 			this.sortWorkers(freeWorkerList);
 			this.sortFacilities(freeFacilityList);
 			
 			//3. Allocate ready tasks to free resources
-			this.allocateReadyTasksToFreeResourcesForSingleTaskWorkersSimulation(readyAndWorkingTaskList, freeWorkerList, freeFacilityList);
+			this.allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(readyTaskList, freeWorkerList, freeFacilityList);
 			
 			//4. Perform WORKING tasks and update the status of each task.
 			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);

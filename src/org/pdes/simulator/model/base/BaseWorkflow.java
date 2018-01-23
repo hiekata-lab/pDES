@@ -296,7 +296,7 @@ public class BaseWorkflow {
 	public List<BaseTask> getReadyTaskList() {
 		return taskList.stream().filter(t -> t.isReady()).collect(Collectors.toList());
 	}
-	
+		
 	/**
 	 * Get the list of READY tasks.
 	 * @return

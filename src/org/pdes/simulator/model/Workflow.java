@@ -29,12 +29,14 @@
 package org.pdes.simulator.model;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseWorkflow;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Workflow extends BaseWorkflow {
@@ -54,6 +56,16 @@ public class Workflow extends BaseWorkflow {
 	public Workflow(int dueDate, List<BaseTask> taskList) {
 		super(dueDate, taskList);
 		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * Get the list of READY tasks.
+	 * @return
+	 */
+	public List<BaseTask> getReadyTaskList(BaseComponent c) {
+		return super.getTaskList().stream()
+				.filter(t -> t.getTargetComponentList().contains(c)) //Project 
+				.filter(t -> t.isReady()).collect(Collectors.toList());
 	}
 
 }

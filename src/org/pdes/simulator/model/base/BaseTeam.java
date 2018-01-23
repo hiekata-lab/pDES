@@ -79,7 +79,7 @@ public class BaseTeam {
 	public List<BaseWorker> getFreeWorkerList() {
 		return workerList.stream().filter(w -> w.isFree()).collect(Collectors.toList());
 	}
-	
+		
 	/**
 	 * Get the list of working workers.
 	 * @return

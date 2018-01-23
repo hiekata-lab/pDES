@@ -28,11 +28,16 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.pdes.rcp.model.TeamNode;
+import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseTeam;
+import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida  <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Team extends BaseTeam {
@@ -43,6 +48,16 @@ public class Team extends BaseTeam {
 	public Team(TeamNode teamNode) {
 		super(teamNode);
 		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * Get the list of free workers.
+	 * @return
+	 */
+	public List<BaseWorker> getFreeWorkerList(BaseComponent c) {
+		return super.getWorkerList().stream()
+				.filter(w -> ((Worker)w).getCurrentAssignedProject().equals(c)) //Project
+				.filter(w -> w.isFree()).collect(Collectors.toList());
 	}
 
 }

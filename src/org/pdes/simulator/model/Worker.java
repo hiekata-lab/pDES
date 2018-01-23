@@ -28,16 +28,26 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.pdes.rcp.model.WorkerElement;
+import org.pdes.simulator.model.base.BaseComponent;
+import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Worker extends BaseWorker {
 
+	// Changeable variable on simulation
+	private BaseComponent currentAssignedProject = null; // current assigned project
+	protected final List<BaseComponent> assignedProjectHistoryList = new ArrayList<BaseComponent>(); // list of assigned project history list.
+	protected final List<BaseTask> assignedTaskHistoryList = new ArrayList<BaseTask>(); // list of assigned task history list.
+			
 	/**
 	 * @param workerElement
 	 * @param team
@@ -46,5 +56,29 @@ public class Worker extends BaseWorker {
 		super(workerElement, team);
 		// TODO Auto-generated constructor stub
 	}
+	
+	/**
+	 * Initialize
+	 */
+	
+	@Override
+	public void initialize() {
+		state = ResourceState.FREE;
+		totalCost = 0;
+		startTimeList.clear();
+		finishTimeList.clear();
+		assignedTaskList.clear();
+		//Additional Initialization
+		assignedProjectHistoryList.clear();
+		assignedTaskHistoryList.clear();
+		setCurrentAssignedProject(null);
+	}
 
+	public BaseComponent getCurrentAssignedProject() {
+		return currentAssignedProject;
+	}
+
+	public void setCurrentAssignedProject(BaseComponent currentAssignedProject) {
+		this.currentAssignedProject = currentAssignedProject;
+	}
 }

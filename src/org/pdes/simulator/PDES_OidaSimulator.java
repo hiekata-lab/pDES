@@ -29,17 +29,13 @@
 package org.pdes.simulator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.pdes.simulator.base.PDES_AbstractSimulator;
-import org.pdes.simulator.model.Component;
-import org.pdes.simulator.model.ProjectInfo;
+import org.pdes.simulator.model.Organization;
+import org.pdes.simulator.model.Workflow;
+import org.pdes.simulator.model.Worker;
 import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseFacility;
-import org.pdes.simulator.model.base.BaseProduct;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseWorker;
@@ -62,14 +58,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public void execute() {
 		this.initialize();
 		
-		ArrayList<BaseComponent> projectList_sample = new ArrayList<>();
-		for (BaseProduct p : this.productList) {
-			for(BaseComponent c : p.getComponentList()) {
-				projectList_sample.add(c);
-				System.out.println(c);
-				System.out.println(c.getTargetedTaskList());
-			}	
-		}
 		//Project Portfolio Initialize
 		ArrayList<BaseComponent> projectList =this.productList.stream()
 				.map(p -> p.getComponentList())
@@ -82,21 +70,16 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		
 		System.out.println("Number of project : " + numOfProject);
 		System.out.println("Project portfolio : " + projectList);
-		projectList.stream().forEach(c -> System.out.println(c.getName()+" : "+c.getTargetedTaskList()));
-		
-		
-		//projectList.get(0).getAssignedWorkerList(); *to implement
-		//assignedProjectListをResourceに追加する
-		//
+		projectList.stream().forEach(c -> System.out.println(c.getId() + "--" + c.getNodeId() + "--" +c.getName() + " : " + c.getTargetedTaskList()));
 		
 		while(true){
-			
 			//0. Check finished or not.
 			if(checkAllTasksAreFinished()) return;
 			
 			/**
 			 * ToDo
 			 * 1. To confirm how to call the project member based on the component. 
+			 * →DONE
 			 * 
 			 * 2. To implement Request Class time_to_execute = N
 			 *  N-- (for each time step)
@@ -106,29 +89,50 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			 * 5. Uncertainty for work load. Expected/True 
 			 */
 
-			//0. Projectごとへの配分を決める
-			/**
-			 * プロジェクトごとの以下を決めればあは，動くと思われる．
-			 * ・タスクリスト
-			 * ・作業者リスト
-			 */
-			//1. Get ready task and free resources
-			List<BaseTask> readyTaskList = this.getReadyTaskList();
-			List<BaseWorker> freeWorkerList = organization.getFreeWorkerList();
-			List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
+			//0. Project allocation
+			List<BaseWorker> workerList = this.organization.getWorkerList();
+			for(BaseWorker w : workerList) {
+				((Worker)w).setCurrentAssignedProject(projectList.get(0)); //same project
+			}
 			
-			//2. Sort ready task and free resources
-			this.sortTasks(readyTaskList);
-			this.sortWorkers(freeWorkerList);
-			this.sortFacilities(freeFacilityList);
+			for(	BaseComponent c : projectList) {
+				//1. Get ready task and free resources
+				List<BaseTask> readyTaskList = this.getReadyTaskList(c);
+				List<BaseWorker> freeWorkerList = ((Organization)organization).getFreeWorkerList(c);
+				List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
+				
+				/**
+				 * Don't want change the following part.
+				 */
+				
+				//2. Sort ready task and free resources
+				this.sortTasks(readyTaskList);
+				this.sortWorkers(freeWorkerList);
+				this.sortFacilities(freeFacilityList);
+
+				//3. Allocate ready tasks to free resources
+				this.allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(readyTaskList, freeWorkerList, freeFacilityList);
+
+				//4. Perform WORKING tasks and update the status of each task.
+				this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
+			}
 			
-			//3. Allocate ready tasks to free resources
-			this.allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(readyTaskList, freeWorkerList, freeFacilityList);
-			
-			//4. Perform WORKING tasks and update the status of each task.
-			this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
 			time++;
 		}
+	}
+	
+	/**
+	 * Get the list of READY tasks.
+	 * @return
+	 */
+	public List<BaseTask> getReadyTaskList(BaseComponent c){
+		return super.workflowList.stream()
+				.map(w -> ((Workflow)w).getReadyTaskList(c))
+				.collect(
+						() -> new ArrayList<>(),
+						(l, t) -> l.addAll(t),
+						(l1, l2) -> l1.addAll(l2)
+						);
 	}
 
 }

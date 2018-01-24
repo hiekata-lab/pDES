@@ -51,8 +51,8 @@ public class Task extends BaseTask {
 	@Override
 	public void initializeWorkAmount() {
 		//super.setRemainingWorkAmount(super.getDefaultWorkAmount());
-		super.setRemainingWorkAmount(estimateWorkAmount());
 		super.setActualWorkAmount(super.getDefaultWorkAmount());
+		super.setRemainingWorkAmount(estimateWorkAmount());
 		//setExpectedWorkAmount(estimateWorkAmount());
 	}
 	
@@ -60,8 +60,8 @@ public class Task extends BaseTask {
 		//とりあえず，タスクにはコンポーネントが一つだと仮定する．
 		double sigma = super.getTargetComponentList().get(0).getSigma();
 		//http://commons.apache.org/proper/commons-math/download_math.cgi をど運輸
-		//Math３の標準正規分布を用いる．
-		return getDefaultWorkAmount() + Math.pow(sigma, 2);
+		//Math３の標準正規分布を用いる．以下適当．
+		return getActualWorkAmount() + Math.pow(sigma, 2);
 	}
 		
 	/**

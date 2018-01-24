@@ -36,13 +36,22 @@ import org.pdes.simulator.model.base.BaseComponent;
  *
  */
 public class Component extends BaseComponent {
+	private double sigma;
 
 	/**
 	 * @param componentNode
 	 */
 	public Component(ComponentNode componentNode) {
 		super(componentNode);
-		// TODO Auto-generated constructor stub
+		setSigma(0.5);
+	}
+
+	public double getSigma() {
+		return sigma;
+	}
+
+	public void setSigma(double sigma) {
+		this.sigma = sigma;
 	}
 
 }

@@ -31,6 +31,7 @@ package org.pdes.simulator;
 import java.util.ArrayList;
 import java.util.List;
 import org.pdes.simulator.base.PDES_AbstractSimulator;
+import org.pdes.simulator.model.Component;
 import org.pdes.simulator.model.Organization;
 import org.pdes.simulator.model.Workflow;
 import org.pdes.simulator.model.Worker;
@@ -58,6 +59,15 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public void execute() {
 		this.initialize();
 		
+//		//Project Portfolio Initialize
+//		ArrayList<Component> projectList =this.productList.stream()
+//				.map(p -> p.getComponentList())
+//				.collect(
+//						() -> new ArrayList<>(),
+//						(l,c) -> l.addAll((List<Component>)c),//どうキャストする？w
+//						(l1,l2) -> l1.addAll(l2)
+//						);
+		
 		//Project Portfolio Initialize
 		ArrayList<BaseComponent> projectList =this.productList.stream()
 				.map(p -> p.getComponentList())
@@ -78,33 +88,52 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			/**
 			 * ToDo
-			 * 1. To confirm how to call the project member based on the component. 
-			 * →DONE
-			 * 
-			 * 2. To implement Request Class time_to_execute = N
+			 * ・ To confirm how to call the project member based on the component. 
+			 * 　-> Done
+			 * ・Uncertainty for work load. Expected/True
+			 * 　-> Doing
+			 * ・To implement ResourcePool Class
+			 * 　->Doing
+			 * ・ To implement Request Class time_to_execute = N
 			 *  N-- (for each time step)
-			 *  
-			 * 3. To implement ResourcePool Class
+			 * 
 			 * 4. To implement Broker Interface
-			 * 5. Uncertainty for work load. Expected/True 
+			 * 
+			 * 
+			 * Issue 1/24
+			 * １．List<BaseComponent>クラスをList<Component>クラスにキャストする良いやり方は？
+			 * ２．WorkAmountの持ち方について
+			 * ３．正規分布生成方法 in Java はあるか？
+			 * ４．UIにて，正しい入力を入れて，シミュレータの中で見積誤差を乗せた
+			 * 　　スケジュールを算出する．
+			 * 　　※もし，本シミュレータを実利用する場合は，真の作業量は知らないはずなので，
+			 * 　　シミュレータに入れたものが見積作業量となるが，今回の目的は組織設計なので，
+			 * 　　シミュレーションを実利用することは考慮しない．
+			 * ５.current Assign Project（Component）がnullであれば,
+			 *  ResourcePoolとみなしたいが他にいい方法はあるか．
+			 * 
+			 * 
 			 */
 
 			//0. Project allocation
 			List<BaseWorker> workerList = this.organization.getWorkerList();
+			
+			//Allocation Algorithm.
+			
+			//Test
 			for(BaseWorker w : workerList) {
 				((Worker)w).setCurrentAssignedProject(projectList.get(0)); //same project
 			}
 			
 			for(	BaseComponent c : projectList) {
-				//1. Get ready task and free resources
+				//1. Get ready task and free resources for each project.
 				List<BaseTask> readyTaskList = this.getReadyTaskList(c);
 				List<BaseWorker> freeWorkerList = ((Organization)organization).getFreeWorkerList(c);
-				List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();
+				List<BaseFacility> freeFacilityList = organization.getFreeFacilityList();//ignore
 				
 				/**
-				 * Don't want change the following part.
+				 * Don't want change the following part if possible.
 				 */
-				
 				//2. Sort ready task and free resources
 				this.sortTasks(readyTaskList);
 				this.sortWorkers(freeWorkerList);
@@ -116,7 +145,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				//4. Perform WORKING tasks and update the status of each task.
 				this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
 			}
-			
+
 			time++;
 		}
 	}
@@ -134,5 +163,31 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						(l1, l2) -> l1.addAll(l2)
 						);
 	}
+	
+	/**
+	 * Perform and update all workflow in this time.
+	 * @param time 
+	 * @param componentErrorRework 
+	 */
+	@Override
+	public void performAndUpdateAllWorkflow(int time, boolean componentErrorRework){
+		workflowList.forEach(w -> w.checkWorking(time));//READY -> WORKING
+		organization.getWorkingWorkerList().stream().forEach(w -> w.addLaborCost());//pay labor cost
+		organization.getWorkingFacilityList().stream().forEach(f -> f.addLaborCost());//pay labor cost
+		workflowList.forEach(w -> ((Workflow)w).perform(time));//update information of WORKING task in each workflow
+		workflowList.forEach(w -> w.checkFinished(time));// WORKING -> WORKING_ADDITIONALLY or FINISHED
+		workflowList.forEach(w -> w.checkReady(time));// NONE -> READY
+		workflowList.forEach(w -> w.updatePERTData());//Update PERT information
+	}
+	
+	/**
+	 * Save the simulation result to the given directory.
+	 * @param outputDir
+	 */
+	@Override
+	public void saveResultFilesInDirectory(String outputDir, String fileName){
+		//TO IMPLEMENT Average Project Delay -> CSV Output
+	}
+	
 
 }

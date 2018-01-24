@@ -58,6 +58,19 @@ public class Workflow extends BaseWorkflow {
 		// TODO Auto-generated constructor stub
 	}
 	
+	/*--Additional Method--*/
+	
+	/**
+	 * Initialize
+	 */
+	@Override
+	public void initialize() {
+		super.getTaskList().forEach(t -> ((Task)t).initialize());
+		super.setCriticalPathLength(0);
+		super.updatePERTData();
+		super.checkReady(0);
+	}
+	
 	/**
 	 * Get the list of READY tasks.
 	 * @return
@@ -66,6 +79,15 @@ public class Workflow extends BaseWorkflow {
 		return super.getTaskList().stream()
 				.filter(t -> t.getTargetComponentList().contains(c)) //Project 
 				.filter(t -> t.isReady()).collect(Collectors.toList());
+	}
+	
+	/**
+	 * Perform all tasks and forwarding time.
+	 * @param componentErrorRework 
+	 * @param time
+	 */
+	public void perform(int time) {
+		super.getTaskList().forEach(t -> ((Task)t).perform(time));
 	}
 
 }

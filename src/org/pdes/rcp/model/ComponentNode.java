@@ -41,6 +41,7 @@ public class ComponentNode extends NodeElement {
 	////////////////Variables//////////////////////////////////////////////////////////
 	private String name = "";
 	private double errorTolerance;
+	private double sigma;
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -50,6 +51,7 @@ public class ComponentNode extends NodeElement {
 		String newName = "New Component";
 		this.setName(newName);
 		this.setErrorTolerance(0.0);
+		this.setSigma(0.0);
 	}
 	
 	/**
@@ -86,6 +88,24 @@ public class ComponentNode extends NodeElement {
 		double old = this.errorTolerance;
 		this.errorTolerance = errorTolerance;
 		firePropertyChange("errorTolerance",old,errorTolerance);
+	}
+	
+	/**
+	 * Get the Sigma of ComponentNode
+	 * @return the sigma
+	 */
+	public double getSigma() {
+		return sigma;
+	}
+
+	/**
+	 * Set the Sigma of ComponentNode
+	 * @param Sigma the Sigma to set
+	 */
+	public void setSigma(double sigma) {
+		double old = this.sigma;
+		this.sigma = sigma;
+		firePropertyChange("Sigma",old,sigma);
 	}
 	
 }

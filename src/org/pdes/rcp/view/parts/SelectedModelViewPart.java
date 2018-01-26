@@ -148,9 +148,9 @@ public class SelectedModelViewPart extends ViewPart {
 	//3. Define SWT of clicking ComponentNode
 	//If you add some attributes in ComponentNode, add "setVisibleOfComponentSWT" method.
 	@SuppressWarnings("unused")
-	private Label componentNameLabel, componentErrorToleranceLabel;
+	private Label componentNameLabel, componentSigmaLabel, componentErrorToleranceLabel;
 	@SuppressWarnings("unused")
-	private Text componentNameText, componentErrorToleranceText;
+	private Text componentNameText, componentSigmaText, componentErrorToleranceText;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -159,11 +159,14 @@ public class SelectedModelViewPart extends ViewPart {
 	private void setVisibleOfComponentSWT(boolean visible){
 		componentNameLabel.setVisible(visible);
 		componentNameText.setVisible(visible);
+		componentSigmaLabel.setVisible(visible);
+		componentSigmaText.setVisible(visible);
 //		componentErrorToleranceLabel.setVisible(visible);
 //		componentErrorToleranceText.setVisible(visible);
 		
 		if(visible){
 			componentNameText.setText(((ComponentNode) selectedModel).getName());
+			componentSigmaText.setText(String.valueOf(((ComponentNode) selectedModel).getSigma()));
 //			componentErrorToleranceText.setText(String.valueOf(((ComponentNode) selectedModel).getErrorTolerance()));
 		}
 	}
@@ -848,6 +851,44 @@ public class SelectedModelViewPart extends ViewPart {
 		componentNameTextFD.left= new FormAttachment(componentNameLabel,10);
 		componentNameTextFD.right = new FormAttachment(95);
 		componentNameText.setLayoutData(componentNameTextFD);
+		
+		componentSigmaLabel = new Label(parent, SWT.NULL);
+		componentSigmaLabel.setText("sigma : ");
+		componentSigmaLabel.setFont(new Font(null, "", 10, 0));
+		FormData componentSigmaLabelFD = new FormData();
+		componentSigmaLabelFD.top= new FormAttachment(componentNameLabel,10);
+		componentSigmaLabelFD.left= new FormAttachment(0,10);
+		componentSigmaLabel.setLayoutData(componentSigmaLabelFD);
+		
+		componentSigmaText = new Text(parent, SWT.BORDER|SWT.SINGLE);
+		componentSigmaText.addKeyListener(new KeyListener(){
+		
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyPressed(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyPressed(KeyEvent e) {}
+			
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyReleased(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyReleased(KeyEvent e) {
+				if(e.character==SWT.CR){
+					String textString = componentSigmaText.getText();
+					if(doubleCheck(textString)) {
+						((ComponentNode)selectedModel).setSigma(Double.parseDouble(textString));
+					}else{
+						componentSigmaText.setText(String.valueOf(((ComponentNode)selectedModel).getSigma()));
+					}
+				}
+			}
+		});
+		FormData componentSigmaTextFD = new FormData();
+		componentSigmaTextFD.top= new FormAttachment(componentNameLabel,10);
+		componentSigmaTextFD.left= new FormAttachment(componentSigmaLabel,10);
+		componentSigmaTextFD.width = 50;
+		componentSigmaText.setLayoutData(componentSigmaTextFD);
 		
 //		componentErrorToleranceLabel = new Label(parent, SWT.NULL);
 //		componentErrorToleranceLabel.setText("Error Tolerance : ");

@@ -59,23 +59,24 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public void execute() {
 		this.initialize();
 		
+		//Project Portfolio Initialize
+		ArrayList<Component> projectList =this.productList.stream()
+				.flatMap(p -> p.getComponentList().stream())
+				.collect(
+						() -> new ArrayList<>(),
+						(l,c) -> l.add((Component)c),
+						(l1,l2) -> l1.addAll(l2)
+						);
+		
 //		//Project Portfolio Initialize
-//		ArrayList<Component> projectList =this.productList.stream()
+//		ArrayList<BaseComponent> projectList2 =this.productList.stream()
 //				.map(p -> p.getComponentList())
 //				.collect(
 //						() -> new ArrayList<>(),
-//						(l,c) -> l.addAll((List<Component>)c),//どうキャストする？w
+//						(l,c) -> l.addAll(c),
 //						(l1,l2) -> l1.addAll(l2)
 //						);
 		
-		//Project Portfolio Initialize
-		ArrayList<BaseComponent> projectList =this.productList.stream()
-				.map(p -> p.getComponentList())
-				.collect(
-						() -> new ArrayList<>(),
-						(l,c) -> l.addAll(c),
-						(l1,l2) -> l1.addAll(l2)
-						);
 		int numOfProject = projectList.size();
 		
 		System.out.println("Number of project : " + numOfProject);
@@ -88,29 +89,31 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			/**
 			 * ToDo
-			 * ・ To confirm how to call the project member based on the component. 
-			 * 　-> Done
-			 * ・Uncertainty for work load. Expected/True
-			 * 　-> Doing
-			 * ・To implement ResourcePool Class
-			 * 　->Doing
-			 * ・ To implement Request Class time_to_execute = N
-			 *  N-- (for each time step)
-			 * 
-			 * 4. To implement Broker Interface
+			 * 	
+			 * - ResourcePool Class　not
+			 * - Default Allocation
+			 * - Worker 追加　Resource Calender(t)
+			 * - Request Class time_to_execute = N　 N-- (for each time step)
+			 *  Broker Interface
 			 * 
 			 * 
 			 * Issue 1/24
 			 * １．List<BaseComponent>クラスをList<Component>クラスにキャストする良いやり方は？
+			 * 
 			 * ２．WorkAmountの持ち方について
-			 * ３．正規分布生成方法 in Java はあるか？
+			 *    Remaining → 各PMが認識している残コスト
+			 *    Actual → 実際のコスト
+			 *    Default → 今回は実際のコストを入れるものとする．
+			 *    
 			 * ４．UIにて，正しい入力を入れて，シミュレータの中で見積誤差を乗せた
 			 * 　　スケジュールを算出する．
 			 * 　　※もし，本シミュレータを実利用する場合は，真の作業量は知らないはずなので，
 			 * 　　シミュレータに入れたものが見積作業量となるが，今回の目的は組織設計なので，
 			 * 　　シミュレーションを実利用することは考慮しない．
+			 * 
 			 * ５.current Assign Project（Component）がnullであれば,
 			 *  ResourcePoolとみなしたいが他にいい方法はあるか．
+			 *  6.各コンポーネント（プロジェクト）をGUIから不確実性を指定して値を取れるようにする
 			 * 
 			 * 
 			 */

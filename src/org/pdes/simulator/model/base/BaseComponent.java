@@ -53,9 +53,6 @@ public class BaseComponent {
 	private final List<BaseComponent> dependedComponentList = new ArrayList<>();
 	private final List<BaseTask> targetedTaskList = new ArrayList<>();
 	
-	//Additional
-	private final double sigma;
-	
 	// Changeable variable on simulation
 	private double error;
 	
@@ -71,9 +68,6 @@ public class BaseComponent {
 		this.nodeId = componentNode.getId();
 		this.name = componentNode.getName();
 		this.errorTolerance = componentNode.getErrorTolerance();
-		
-		//Additional
-		this.sigma = 0.5;
 	}
 	
 	/**
@@ -304,9 +298,5 @@ public class BaseComponent {
 	public String toString() {
 		String dependingComponentNames = String.join(",", dependingComponentList.stream().map(c -> c.getName()).collect(Collectors.toList()));
 		return String.format("[%s] E=%f ETotal=%f dp=%s", name, error, getTotalErrorValue(), dependingComponentNames);
-	}
-
-	public double getSigma() {
-		return sigma;
 	}
 }

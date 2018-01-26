@@ -28,17 +28,20 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.Random;
+
 import org.pdes.rcp.model.TaskNode;
 import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * @author Yoshiaki Oida <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Task extends BaseTask {
 	private boolean firstTimeFlag = false;
 	private double expectedWorkAmount; // expected work amount
+	private Random r = new Random(0); // seed = 0
 
 	/**
 	 * @param taskNode
@@ -57,11 +60,10 @@ public class Task extends BaseTask {
 	}
 	
 	private double estimateWorkAmount() {
-		//とりあえず，タスクにはコンポーネントが一つだと仮定する．
-		double sigma = super.getTargetComponentList().get(0).getSigma();
-		//http://commons.apache.org/proper/commons-math/download_math.cgi をど運輸
-		//Math３の標準正規分布を用いる．以下適当．
-		return getActualWorkAmount() + Math.pow(sigma, 2);
+		//Assume one component for each task
+		double sigma = ((Component)super.getTargetComponentList().get(0)).getSigma();
+		//μ = Actual Work Amount，sigma = Estimation Skill for Project 
+		return getActualWorkAmount() + sigma*r.nextGaussian();
 	}
 		
 	/**
@@ -88,10 +90,12 @@ public class Task extends BaseTask {
 		}
 	}
 
+	//Use or Not
 	public double getExpectedWorkAmount() {
 		return expectedWorkAmount;
 	}
-
+	
+	//Use or Not
 	public void setExpectedWorkAmount(double expectedWorkAmount) {
 		this.expectedWorkAmount = expectedWorkAmount;
 	}

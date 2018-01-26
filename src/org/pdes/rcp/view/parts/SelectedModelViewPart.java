@@ -148,9 +148,9 @@ public class SelectedModelViewPart extends ViewPart {
 	//3. Define SWT of clicking ComponentNode
 	//If you add some attributes in ComponentNode, add "setVisibleOfComponentSWT" method.
 	@SuppressWarnings("unused")
-	private Label componentNameLabel, componentSigmaLabel, componentErrorToleranceLabel;
+	private Label componentNameLabel, componentSigmaLabel, componentDueDateLabel, componentErrorToleranceLabel;
 	@SuppressWarnings("unused")
-	private Text componentNameText, componentSigmaText, componentErrorToleranceText;
+	private Text componentNameText, componentSigmaText, componentDueDateText,  componentErrorToleranceText;
 	
 	/**
 	 * Set visible mode of each attributes of model.
@@ -161,12 +161,15 @@ public class SelectedModelViewPart extends ViewPart {
 		componentNameText.setVisible(visible);
 		componentSigmaLabel.setVisible(visible);
 		componentSigmaText.setVisible(visible);
+		componentDueDateLabel.setVisible(visible);
+		componentDueDateText.setVisible(visible);
 //		componentErrorToleranceLabel.setVisible(visible);
 //		componentErrorToleranceText.setVisible(visible);
 		
 		if(visible){
 			componentNameText.setText(((ComponentNode) selectedModel).getName());
 			componentSigmaText.setText(String.valueOf(((ComponentNode) selectedModel).getSigma()));
+			componentDueDateText.setText(String.valueOf(((ComponentNode) selectedModel).getDueDate()));
 //			componentErrorToleranceText.setText(String.valueOf(((ComponentNode) selectedModel).getErrorTolerance()));
 		}
 	}
@@ -816,6 +819,7 @@ public class SelectedModelViewPart extends ViewPart {
 		//////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////Component////////////////////////////
+		//Component Name
 		componentNameLabel = new Label(parent, SWT.NULL);
 		componentNameLabel.setText("Name : ");
 		componentNameLabel.setFont(new Font(null, "", 10, 0));
@@ -852,6 +856,7 @@ public class SelectedModelViewPart extends ViewPart {
 		componentNameTextFD.right = new FormAttachment(95);
 		componentNameText.setLayoutData(componentNameTextFD);
 		
+		//Component Sigma
 		componentSigmaLabel = new Label(parent, SWT.NULL);
 		componentSigmaLabel.setText("sigma : ");
 		componentSigmaLabel.setFont(new Font(null, "", 10, 0));
@@ -889,6 +894,45 @@ public class SelectedModelViewPart extends ViewPart {
 		componentSigmaTextFD.left= new FormAttachment(componentSigmaLabel,10);
 		componentSigmaTextFD.width = 50;
 		componentSigmaText.setLayoutData(componentSigmaTextFD);
+		
+		//Component Due Date
+		componentDueDateLabel = new Label(parent, SWT.NULL);
+		componentDueDateLabel.setText("dueDate : ");
+		componentDueDateLabel.setFont(new Font(null, "", 10, 0));
+		FormData componentDueDateLabelFD = new FormData();
+		componentDueDateLabelFD.top= new FormAttachment(componentSigmaLabel,10);
+		componentDueDateLabelFD.left= new FormAttachment(0,10);
+		componentDueDateLabel.setLayoutData(componentDueDateLabelFD);
+		
+		componentDueDateText = new Text(parent, SWT.BORDER|SWT.SINGLE);
+		componentDueDateText.addKeyListener(new KeyListener(){
+		
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyPressed(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyPressed(KeyEvent e) {}
+			
+			/*
+			* (non-Javadoc)
+			* @see org.eclipse.draw2d.KeyListener#keyReleased(org.eclipse.draw2d.KeyEvent)
+			*/
+			public void keyReleased(KeyEvent e) {
+				if(e.character==SWT.CR){
+					String textString = componentDueDateText.getText();
+					if(doubleCheck(textString)) {
+						((ComponentNode)selectedModel).setDueDate(Integer.parseInt(textString));
+					}else{
+						componentDueDateText.setText(String.valueOf(((ComponentNode)selectedModel).getDueDate()));
+					}
+				}
+			}
+		});
+		FormData componentDueDateTextFD = new FormData();
+		componentDueDateTextFD.top= new FormAttachment(componentSigmaLabel,10);
+		componentDueDateTextFD.left= new FormAttachment(componentDueDateLabel,10);
+		componentDueDateTextFD.width = 50;
+		componentDueDateText.setLayoutData(componentDueDateTextFD);
 		
 //		componentErrorToleranceLabel = new Label(parent, SWT.NULL);
 //		componentErrorToleranceLabel.setText("Error Tolerance : ");

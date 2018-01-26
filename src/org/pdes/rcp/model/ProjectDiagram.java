@@ -162,6 +162,7 @@ public class ProjectDiagram extends Diagram {
 					pw.println("			<Name>"+this.xmlEscape((component.getName()).toString())+"</Name>");
 					pw.println("			<ErrorTolerance>"+component.getErrorTolerance()+"</ErrorTolerance>");
 					pw.println("			<Sigma>"+component.getSigma()+"</Sigma>");
+					pw.println("			<DueDate>"+component.getDueDate()+"</DueDate>");
 					pw.println("		</ComponentNode>");
 				}else if(node instanceof SubWorkflowNode){
 					SubWorkflowNode subWorkflow = (SubWorkflowNode) node;
@@ -300,6 +301,7 @@ public class ProjectDiagram extends Diagram {
 						if(tagName.equals("Name")) component.setName(value);
 						else if(tagName.equals("ErrorTolerance")) component.setErrorTolerance(Double.parseDouble(value));
 						else if(tagName.equals("Sigma")) component.setSigma(Double.parseDouble(value));
+						else if(tagName.equals("DueDate")) component.setDueDate(Integer.parseInt(value));
 					}
 				}
 				this.addNodeElement(component);

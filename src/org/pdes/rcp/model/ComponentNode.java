@@ -29,6 +29,7 @@
 package org.pdes.rcp.model;
 
 import org.pdes.rcp.model.base.NodeElement;
+import org.pdes.simulator.PDES_OidaSimulator;
 
 /**
  * This is the Component class.<br>
@@ -42,6 +43,7 @@ public class ComponentNode extends NodeElement {
 	private String name = "";
 	private double errorTolerance;
 	private double sigma;
+	private int dueDate;
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -52,6 +54,7 @@ public class ComponentNode extends NodeElement {
 		this.setName(newName);
 		this.setErrorTolerance(0.0);
 		this.setSigma(0.0);
+		this.setDueDate(PDES_OidaSimulator.maxTime);
 	}
 	
 	/**
@@ -106,6 +109,25 @@ public class ComponentNode extends NodeElement {
 		double old = this.sigma;
 		this.sigma = sigma;
 		firePropertyChange("Sigma",old,sigma);
+	}
+
+	
+	/**
+	 * Get due date of project
+	 * @return
+	 */
+	public int getDueDate() {
+		return dueDate;
+	}
+
+	/**
+	 * Set due date of ComponentNnode
+	 * @param dueDate
+	 */
+	public void setDueDate(int dueDate) {
+		int old = this.dueDate;
+		this.dueDate = dueDate;
+		firePropertyChange("DueDate",old,dueDate);
 	}
 	
 }

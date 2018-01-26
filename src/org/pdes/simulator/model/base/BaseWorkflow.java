@@ -72,7 +72,7 @@ public class BaseWorkflow {
 	 */
 	public void initialize() {
 		taskList.forEach(t -> t.initialize());
-		criticalPathLength = 0;
+		setCriticalPathLength(0);
 		updatePERTData();
 		checkReady(0);
 	}
@@ -156,7 +156,7 @@ public class BaseWorkflow {
 			for(BaseTask task : taskList){
 				if(lastTaskId.equals(task.getId())) {
 					lateTaskList.add(task);
-					if(criticalPathLength < task.getEft()) criticalPathLength = task.getEft();
+					if(getCriticalPathLength() < task.getEft()) setCriticalPathLength(task.getEft());
 				}
 			}
 		}
@@ -166,8 +166,8 @@ public class BaseWorkflow {
 		for(BaseTask task : taskList){
 			for(BaseTask lateTask : lateTaskList){
 				if(task.getId().equals(lateTask.getId())){
-					task.setLft(criticalPathLength);
-					task.setLst(criticalPathLength - task.getRemainingWorkAmount());
+					task.setLft(getCriticalPathLength());
+					task.setLst(getCriticalPathLength() - task.getRemainingWorkAmount());
 					registerLsLf(task);
 				}
 			}
@@ -296,7 +296,7 @@ public class BaseWorkflow {
 	public List<BaseTask> getReadyTaskList() {
 		return taskList.stream().filter(t -> t.isReady()).collect(Collectors.toList());
 	}
-	
+		
 	/**
 	 * Get the list of READY tasks.
 	 * @return
@@ -362,5 +362,13 @@ public class BaseWorkflow {
 	 */
 	public String toString() {
 		return "duration=" + this.getDuration() + "\n" + String.join("\n", taskList.stream().map(t -> t.toString()).collect(Collectors.toList()));
+	}
+
+	public double getCriticalPathLength() {
+		return criticalPathLength;
+	}
+
+	public void setCriticalPathLength(double criticalPathLength) {
+		this.criticalPathLength = criticalPathLength;
 	}
 }

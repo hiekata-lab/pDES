@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!--Project Diagram-->
+<ProjectDiagram>
+	<ConcurrencyLimit>1</ConcurrencyLimit>
+	<NodeElementList>
+		<TeamNode id="367179446847" Left="417" Top="454" Width="0" Height="0">
+			<Name>Team 1</Name>
+			<WorkerList>
+				<Worker>
+					<Name>A</Name>
+					<Cost>10.0</Cost>
+					<WorkAmountSkill name="Task 1-4" value="2.0"/>
+					<WorkAmountSkill name="Task 2-3" value="2.0"/>
+					<WorkAmountSkill name="Task 1-3" value="1.0"/>
+					<WorkAmountSkill name="Task 2-2" value="1.0"/>
+					<WorkAmountSkill name="Task 1-2" value="1.0"/>
+					<WorkAmountSkill name="Task 2-1" value="2.0"/>
+					<WorkAmountSkill name="Task 1-1" value="2.0"/>
+					<QualitySkill name="Task 1-4" value="0.0"/>
+					<QualitySkill name="Task 2-3" value="0.0"/>
+					<QualitySkill name="Task 1-3" value="0.0"/>
+					<QualitySkill name="Task 2-2" value="0.0"/>
+					<QualitySkill name="Task 1-2" value="0.0"/>
+					<QualitySkill name="Task 2-1" value="0.0"/>
+					<QualitySkill name="Task 1-1" value="0.0"/>
+				</Worker>
+				<Worker>
+					<Name>B</Name>
+					<Cost>5.0</Cost>
+					<WorkAmountSkill name="Task 1-3" value="1.5"/>
+					<WorkAmountSkill name="Task 2-2" value="1.5"/>
+					<WorkAmountSkill name="Task 1-2" value="1.5"/>
+					<WorkAmountSkill name="Task 1-1" value="0.0"/>
+					<QualitySkill name="Task 1-3" value="0.0"/>
+					<QualitySkill name="Task 2-2" value="0.0"/>
+					<QualitySkill name="Task 1-2" value="0.0"/>
+					<QualitySkill name="Task 1-1" value="0.0"/>
+				</Worker>
+			</WorkerList>
+			<FacilityList/>
+		</TeamNode>
+		<TaskNode id="309687679057" Left="33" Top="211" Width="0" Height="0">
+			<Name>Task 1-1</Name>
+			<WorkAmount>4</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<TaskNode id="752790762823" Left="184" Top="269" Width="0" Height="0">
+			<Name>Task 1-2</Name>
+			<WorkAmount>6</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<TaskNode id="832334569401" Left="186" Top="118" Width="0" Height="0">
+			<Name>Task 1-3</Name>
+			<WorkAmount>5</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<TaskNode id="636437652474" Left="322" Top="197" Width="0" Height="0">
+			<Name>Task 1-4</Name>
+			<WorkAmount>3</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<TaskNode id="687043605224" Left="436" Top="207" Width="0" Height="0">
+			<Name>Task 2-1</Name>
+			<WorkAmount>2</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<ComponentNode id="628720001148" Left="25" Top="85" Width="0" Height="0">
+			<Name>Project 1</Name>
+			<ErrorTolerance>0.0</ErrorTolerance>
+		</ComponentNode>
+		<TaskNode id="020158171395" Left="587" Top="209" Width="0" Height="0">
+			<Name>Task 2-2</Name>
+			<WorkAmount>5</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<TaskNode id="340813389277" Left="750" Top="209" Width="0" Height="0">
+			<Name>Task 2-3</Name>
+			<WorkAmount>8</WorkAmount>
+			<Progress>0.0</Progress>
+			<AdditionalWorkAmount>0</AdditionalWorkAmount>
+			<NeedFacility>false</NeedFacility>
+		</TaskNode>
+		<ComponentNode id="027134370194" Left="579" Top="67" Width="0" Height="0">
+			<Name>Project 2</Name>
+			<ErrorTolerance>0.0</ErrorTolerance>
+		</ComponentNode>
+	</NodeElementList>
+	<LinkList>
+		<Link type="TargetComponentLink" org="628720001148" dst="309687679057">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="309687679057">
+		</Link>
+		<Link type="TaskLink" org="309687679057" dst="752790762823">
+		</Link>
+		<Link type="TargetComponentLink" org="628720001148" dst="752790762823">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="752790762823">
+		</Link>
+		<Link type="TargetComponentLink" org="628720001148" dst="832334569401">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="832334569401">
+		</Link>
+		<Link type="TaskLink" org="309687679057" dst="832334569401">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="636437652474">
+		</Link>
+		<Link type="TaskLink" org="832334569401" dst="636437652474">
+		</Link>
+		<Link type="TaskLink" org="752790762823" dst="636437652474">
+		</Link>
+		<Link type="TargetComponentLink" org="628720001148" dst="636437652474">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="687043605224">
+		</Link>
+		<Link type="TargetComponentLink" org="027134370194" dst="687043605224">
+		</Link>
+		<Link type="TargetComponentLink" org="027134370194" dst="020158171395">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="020158171395">
+		</Link>
+		<Link type="TaskLink" org="687043605224" dst="020158171395">
+		</Link>
+		<Link type="TargetComponentLink" org="027134370194" dst="340813389277">
+		</Link>
+		<Link type="AllocationLink" org="367179446847" dst="340813389277">
+		</Link>
+		<Link type="TaskLink" org="020158171395" dst="340813389277">
+		</Link>
+	</LinkList>
+</ProjectDiagram>

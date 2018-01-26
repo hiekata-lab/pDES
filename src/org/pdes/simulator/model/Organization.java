@@ -28,13 +28,16 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseOrganization;
 import org.pdes.simulator.model.base.BaseTeam;
+import org.pdes.simulator.model.base.BaseWorker;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Organization extends BaseOrganization {
@@ -45,6 +48,20 @@ public class Organization extends BaseOrganization {
 	public Organization(List<BaseTeam> teamList) {
 		super(teamList);
 		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * Get the list of free workers.
+	 * @return
+	 */
+	public List<BaseWorker> getFreeWorkerList(BaseComponent c) {
+		return super.getTeamList().stream()
+				.map(t -> ((Team)t).getFreeWorkerList(c))
+				.collect(
+					() -> new ArrayList<BaseWorker>(),
+					(l, t) -> l.addAll(t),
+					(l1, l2) -> l1.addAll(l2)
+				);
 	}
 
 }

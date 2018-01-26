@@ -108,8 +108,7 @@ public class BaseTask {
 		lst = 0;
 		lft = 0;
 		
-		remainingWorkAmount = defaultWorkAmount * (1.0 - progress);
-		actualWorkAmount = defaultWorkAmount * (1.0 - progress);
+		initializeWorkAmount();
 		
 		state = TaskState.NONE;
 		stateInt = 0;
@@ -128,6 +127,14 @@ public class BaseTask {
 		additionalTaskFlag = false;
 		allocatedWorkerList = new ArrayList<>();
 		allocatedFacility = null;
+	}
+
+	/**
+	 * 
+	 */
+	public void initializeWorkAmount() {
+		setRemainingWorkAmount(defaultWorkAmount * (1.0 - progress));
+		setActualWorkAmount(defaultWorkAmount * (1.0 - progress));
 	}
 	
 	/**
@@ -198,10 +205,10 @@ public class BaseTask {
 	 * @param time
 	 */
 	public void checkFinished(int time) {
-		if (remainingWorkAmount <= 0) {
+		if (getRemainingWorkAmount() <= 0) {
 			if (isWorking()) {
 				addFinishTime(time);
-				remainingWorkAmount = 0;
+				setRemainingWorkAmount(0);
 				
 				//Finish normally.
 				state = TaskState.FINISHED;
@@ -222,8 +229,8 @@ public class BaseTask {
 					//TODO check and update the logic of adding additional work.
 					state = TaskState.WORKING_ADDITIONALLY;
 					stateInt = 3;
-					remainingWorkAmount = additionalWorkAmount;
-					actualWorkAmount += additionalWorkAmount;
+					setRemainingWorkAmount(additionalWorkAmount);
+					setActualWorkAmount(getActualWorkAmount() + additionalWorkAmount);
 					addReadyTime(time + 1);
 					addStartTime(time + 1);
 					
@@ -242,7 +249,7 @@ public class BaseTask {
 				
 			} else if (isWorkingAdditionally()) {
 				addFinishTime(time);
-				remainingWorkAmount = 0;
+				setRemainingWorkAmount(0);
 				state = TaskState.FINISHED;
 				stateInt = 4;
 				for(BaseWorker allocatedWorker : allocatedWorkerList) {
@@ -277,7 +284,7 @@ public class BaseTask {
 				workAmount *= allocatedFacility.getWorkAmountSkillPoint(this);
 				noErrorProbability *= 1.0 - allocatedFacility.getQualitySkillPoint(this);
 			}
-			remainingWorkAmount -= workAmount;
+			setRemainingWorkAmount(getRemainingWorkAmount() - workAmount);
 			for (BaseComponent c : targetComponentList) {
 				c.updateErrorValue(noErrorProbability);
 			}
@@ -629,6 +636,14 @@ public class BaseTask {
 		String worker = (allocatedWorkerList.size() > 0) ? String.join(",", allocatedWorkerList.stream().map(w -> w.getName()).collect(Collectors.toList())) : "";
 		String facility = (allocatedFacility != null) ? allocatedFacility.getName() : "";
 		String inputTaskNames = String.join(",", inputTaskList.stream().map(t -> t.getName()).collect(Collectors.toList())); // DEBUG
-		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, remainingWorkAmount, allocatedTeamList.stream().map(BaseTeam::getName).collect(Collectors.joining(",")), worker, facility, inputTaskNames);
+		return String.format("[%s] %s WA=%f team=%s w=%s f=%s in=%s", name, state, getRemainingWorkAmount(), allocatedTeamList.stream().map(BaseTeam::getName).collect(Collectors.joining(",")), worker, facility, inputTaskNames);
+	}
+
+	public void setRemainingWorkAmount(double remainingWorkAmount) {
+		this.remainingWorkAmount = remainingWorkAmount;
+	}
+
+	public void setActualWorkAmount(double actualWorkAmount) {
+		this.actualWorkAmount = actualWorkAmount;
 	}
 }

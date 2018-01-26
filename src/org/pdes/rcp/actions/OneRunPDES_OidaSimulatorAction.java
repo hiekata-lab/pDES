@@ -37,7 +37,7 @@ import java.util.concurrent.Future;
 
 import org.pdes.rcp.actions.base.AbstractSimulationAction;
 import org.pdes.rcp.model.ProjectDiagram;
-import org.pdes.simulator.PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers;
+import org.pdes.simulator.PDES_OidaSimulator;
 import org.pdes.simulator.model.ProjectInfo;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 
@@ -47,7 +47,7 @@ import org.pdes.simulator.model.base.BaseProjectInfo;
  */
 public class OneRunPDES_OidaSimulatorAction extends AbstractSimulationAction {
 	
-	private final String text = "笈田シミュレータ(1回起動)";
+	private final String text = "Basic DES (with Brokering / One time)";
 	
 	public OneRunPDES_OidaSimulatorAction(){
 		this.setToolTipText(text);
@@ -99,7 +99,7 @@ public class OneRunPDES_OidaSimulatorAction extends AbstractSimulationAction {
 		@Override
 		public String call() throws Exception {
 			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
-			PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers sim = new PDES_BasicSimulator_TaskPerformedBySingleTaskWorkers(project);
+			PDES_OidaSimulator sim = new PDES_OidaSimulator(project);//Select Simulartor
 			sim.execute();
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());

@@ -32,21 +32,26 @@ import org.pdes.rcp.model.ComponentNode;
 import org.pdes.simulator.model.base.BaseComponent;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Component extends BaseComponent {
 	private final double sigma;
+	private final double dueDate;
 
 	/**
 	 * @param componentNode
 	 */
 	public Component(ComponentNode componentNode) {
 		super(componentNode);
-		this.sigma = 1.0;
+		this.sigma = componentNode.getSigma();
+		this.dueDate = componentNode.getDueDate();
 	}
 
 	public double getSigma() {
 		return sigma;
+	}
+	public double getDueDate() {
+		return dueDate;
 	}
 }

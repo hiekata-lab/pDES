@@ -72,6 +72,16 @@ public class Workflow extends BaseWorkflow {
 	}
 	
 	/**
+	 * Get the list of tasks.
+	 * @return
+	 */
+	public List<BaseTask> getTaskList(BaseComponent c) {
+		return super.getTaskList().stream()
+				.filter(t -> t.getTargetComponentList().contains(c)) //Project 
+				.collect(Collectors.toList());
+	}
+	
+	/**
 	 * Get the list of READY tasks.
 	 * @return
 	 */

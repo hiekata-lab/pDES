@@ -28,12 +28,13 @@
  */
 package org.pdes.simulator.model;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.WorkerElement;
+import org.pdes.simulator.PDES_OidaSimulator;
 import org.pdes.simulator.model.base.BaseComponent;
-import org.pdes.simulator.model.base.BaseTask;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
@@ -44,17 +45,18 @@ import org.pdes.simulator.model.base.BaseWorker;
 public class Worker extends BaseWorker {
 
 	// Changeable variable on simulation
-	private BaseComponent currentAssignedProject = null; // current assigned project
-	protected final List<BaseComponent> assignedProjectHistoryList = new ArrayList<BaseComponent>(); // list of assigned project history list.
-	protected final List<BaseTask> assignedTaskHistoryList = new ArrayList<BaseTask>(); // list of assigned task history list.
-			
+	private Component currentAssignedProject = null; // current assigned project
+	private Integer[] assignedProjectPlanArray; // list of assigned project history list.
+	private Integer[] assignedTaskPlanArray; // list of assigned task history list.
+	private Integer[] assignedProjectHistoryArray; // list of assigned project history list.
+	private Integer[] assignedTaskHistoryArray; // list of assigned task history list.
+	
 	/**
 	 * @param workerElement
 	 * @param team
 	 */
 	public Worker(WorkerElement workerElement, BaseTeam team) {
 		super(workerElement, team);
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**
@@ -68,17 +70,71 @@ public class Worker extends BaseWorker {
 		startTimeList.clear();
 		finishTimeList.clear();
 		assignedTaskList.clear();
+		
 		//Additional Initialization
-		assignedProjectHistoryList.clear();
-		assignedTaskHistoryList.clear();
+		assignedProjectPlanArray 	= new Integer[PDES_OidaSimulator.maxTime];
+		assignedProjectHistoryArray	= new Integer[PDES_OidaSimulator.maxTime];
+		assignedTaskPlanArray		= new Integer[PDES_OidaSimulator.maxTime];
+		assignedTaskHistoryArray		= new Integer[PDES_OidaSimulator.maxTime];//not use?
+		
+		for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+			assignedProjectHistoryArray[time] = -1;//not assigned
+		}
+		
 		setCurrentAssignedProject(null);
+	}
+	
+	/**
+	 * Get executable unfinished Task List regarding each Project 
+	 * @param c
+	 * @return
+	 */
+	public List<Task> getExecutableUnfinishedTaskList(Component c) {
+		return c.getTargetedTaskList().stream()
+				.filter(t -> !t.isFinished())
+				.filter(t -> this.getWorkAmountSkillPoint(t) > 0)
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
 	}
 
 	public BaseComponent getCurrentAssignedProject() {
 		return currentAssignedProject;
 	}
 
-	public void setCurrentAssignedProject(BaseComponent currentAssignedProject) {
+	public void setCurrentAssignedProject(Component currentAssignedProject) {
 		this.currentAssignedProject = currentAssignedProject;
 	}
+
+	public Integer[] getAssignedProjectPlanArray() {
+		return assignedProjectPlanArray;
+	}
+
+	public void setAssignedProjectPlanArray(int time, int ProjectIndex) {
+		this.assignedProjectPlanArray[time] = ProjectIndex;
+	}
+
+	public Integer[] getAssignedTaskPlanArray() {
+		return assignedTaskPlanArray;
+	}
+
+	public void setAssignedTaskPlanArray(int time, int TaskIndex) {
+		this.assignedTaskPlanArray[time] = TaskIndex;
+	}
+
+	public Integer[] getAssignedProjectHistoryArray() {
+		return assignedProjectHistoryArray;
+	}
+
+	public void setAssignedProjectHistoryArray(int time, int ProjectIndex)  {
+		this.assignedProjectHistoryArray[time] = ProjectIndex;
+	}
+
+	public Integer[] getAssignedTaskHistoryArray() {
+		return assignedTaskHistoryArray;
+	}
+
+	public void setAssignedTaskHistoryArray(int time, int TaskIndex) {
+		this.assignedTaskHistoryArray[time] = TaskIndex;
+	}
+	
 }

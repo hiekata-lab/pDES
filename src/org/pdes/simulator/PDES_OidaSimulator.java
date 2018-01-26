@@ -67,16 +67,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						(l,c) -> l.add((Component)c),
 						(l1,l2) -> l1.addAll(l2)
 						);
-		
-//		//Project Portfolio Initialize
-//		ArrayList<BaseComponent> projectList2 =this.productList.stream()
-//				.map(p -> p.getComponentList())
-//				.collect(
-//						() -> new ArrayList<>(),
-//						(l,c) -> l.addAll(c),
-//						(l1,l2) -> l1.addAll(l2)
-//						);
-		
+				
 		int numOfProject = projectList.size();
 		
 		System.out.println("Number of project : " + numOfProject);
@@ -98,8 +89,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			 * 
 			 * 
 			 * Issue 1/24
-			 * １．List<BaseComponent>クラスをList<Component>クラスにキャストする良いやり方は？
-			 * 
 			 * ２．WorkAmountの持ち方について
 			 *    Remaining → 各PMが認識している残コスト
 			 *    Actual → 実際のコスト
@@ -118,16 +107,32 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			 * 
 			 */
 
-			//0. Project allocation
+			//A. Allocation
 			List<BaseWorker> workerList = this.organization.getWorkerList();
 			
-			//Allocation Algorithm.
+			//1.Initial Allocation
+			
+			//Estimate Total Remaining Work Amount for each Project
+			
+			//Estimated Completion Time
+			
+			//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
+			
+			//2. Re-Allocation Algorithm.
+			
+			//Estimate Total Remaining Work Amount for each Project
+			
+			//Estimated Completion Time
+			
+			//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
+			
 			
 			//Test
 			for(BaseWorker w : workerList) {
 				((Worker)w).setCurrentAssignedProject(projectList.get(0)); //same project
 			}
 			
+			//B. Project Execution
 			for(	BaseComponent c : projectList) {
 				//1. Get ready task and free resources for each project.
 				List<BaseTask> readyTaskList = this.getReadyTaskList(c);

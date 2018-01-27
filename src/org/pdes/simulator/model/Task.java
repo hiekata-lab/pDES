@@ -29,9 +29,11 @@
 package org.pdes.simulator.model;
 
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.TaskNode;
 import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
@@ -98,6 +100,22 @@ public class Task extends BaseTask {
 	//Use or Not
 	public void setExpectedWorkAmount(double expectedWorkAmount) {
 		this.expectedWorkAmount = expectedWorkAmount;
+	}
+
+	/**
+	 * Transfer to text data.
+	 */
+	@Override
+	public String toString() {
+		String worker = (super.getAllocatedWorkerList().size() > 0) ? String.join(",", super.getAllocatedWorkerList().stream().map(w -> w.getName()).collect(Collectors.toList())) : "";
+		String inputTaskNames = String.join(",", this.getInputTaskList().stream().map(t -> t.getName()).collect(Collectors.toList())); // DEBUG
+		return String.format("[%s] %s EWA=%f AWA=%f AW=[%s] IN=[%s]", 
+				getName(), 
+				getState(),
+				getRemainingWorkAmount(), 
+				getActualWorkAmount(),
+				worker, 
+				inputTaskNames);
 	}
 
 }

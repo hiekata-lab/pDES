@@ -28,12 +28,16 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.WorkerElement;
 import org.pdes.simulator.PDES_OidaSimulator;
+import org.pdes.simulator.base.PDES_AbstractSimulator;
 import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
@@ -46,8 +50,8 @@ public class Worker extends BaseWorker {
 
 	// Changeable variable on simulation
 	private Component currentAssignedProject = null; // current assigned project
-	private Integer[] assignedProjectPlanArray; // list of assigned project history list.
-	private Integer[] assignedTaskPlanArray; // list of assigned task history list.
+	private List<Integer[]> assignedProjectPlanArrayList; // list of assigned project history list.
+	private Integer[] latestAssignedProjectPlanArray;
 	private Integer[] assignedProjectHistoryArray; // list of assigned project history list.
 	private Integer[] assignedTaskHistoryArray; // list of assigned task history list.
 	
@@ -72,14 +76,17 @@ public class Worker extends BaseWorker {
 		assignedTaskList.clear();
 		
 		//Additional Initialization
-		assignedProjectPlanArray 	= new Integer[PDES_OidaSimulator.maxTime];
-		assignedProjectHistoryArray	= new Integer[PDES_OidaSimulator.maxTime];
-		assignedTaskPlanArray		= new Integer[PDES_OidaSimulator.maxTime];
-		assignedTaskHistoryArray		= new Integer[PDES_OidaSimulator.maxTime];//not use?
+		assignedProjectPlanArrayList = new ArrayList<Integer[]>();
+		assignedProjectPlanArrayList.add(new Integer[1 + PDES_OidaSimulator.maxTime]);//time + plan array.	
+		latestAssignedProjectPlanArray = new Integer[PDES_OidaSimulator.maxTime];
 		
-		for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-			assignedProjectHistoryArray[time] = -1;//not assigned
-		}
+		assignedProjectHistoryArray	= new Integer[PDES_OidaSimulator.maxTime];
+		assignedTaskHistoryArray		= new Integer[PDES_OidaSimulator.maxTime];
+		
+		Arrays.fill(assignedProjectPlanArrayList.get(0), -1);//time = -1, not assigned
+		Arrays.fill(latestAssignedProjectPlanArray, -1);//not assigned
+		Arrays.fill(assignedProjectHistoryArray, -1);//not assigned
+		Arrays.fill(assignedTaskHistoryArray, -1);//not assigned
 		
 		setCurrentAssignedProject(null);
 	}
@@ -97,7 +104,7 @@ public class Worker extends BaseWorker {
 				.collect(Collectors.toList());
 	}
 
-	public BaseComponent getCurrentAssignedProject() {
+	public Component getCurrentAssignedProject() {
 		return currentAssignedProject;
 	}
 
@@ -105,20 +112,40 @@ public class Worker extends BaseWorker {
 		this.currentAssignedProject = currentAssignedProject;
 	}
 
-	public Integer[] getAssignedProjectPlanArray() {
-		return assignedProjectPlanArray;
+	public Integer[] getLatestAssignedProjectPlanArray() {
+		return this.latestAssignedProjectPlanArray;
 	}
-
-	public void setAssignedProjectPlanArray(int time, int ProjectIndex) {
-		this.assignedProjectPlanArray[time] = ProjectIndex;
+	
+	public void setAssignedProjectPlanArray(int time, int start, int end, int projectIndex) {
+//		//update latest assigned plan new
+//		Integer[] newLatest = new Integer[PDES_OidaSimulator.maxTime];
+//		System.arraycopy(this.latestAssignedProjectPlanArray, 0, newLatest, 0, this.latestAssignedProjectPlanArray.length);
+//		this.latestAssignedProjectPlanArray = newLatest;
+		
+		//update latest assigned plan
+		Arrays.fill(this.latestAssignedProjectPlanArray, start, end, projectIndex);
+		
+		//update assigned plan history 
+		Integer[] timeOneArray = {time};
+		Integer[] tmp = new Integer[latestAssignedProjectPlanArray.length + 1];
+		System.arraycopy(timeOneArray, 0, tmp, 0, timeOneArray.length);
+		System.arraycopy(this.latestAssignedProjectPlanArray, 0, tmp, timeOneArray.length, this.latestAssignedProjectPlanArray.length);
+		this.assignedProjectPlanArrayList.add(tmp);
 	}
-
-	public Integer[] getAssignedTaskPlanArray() {
-		return assignedTaskPlanArray;
-	}
-
-	public void setAssignedTaskPlanArray(int time, int TaskIndex) {
-		this.assignedTaskPlanArray[time] = TaskIndex;
+	public void setAssignedProjectPlanArray(int time, Integer[] assignedProjectPlanArray) {
+		//update latest assigned plan
+		if(assignedProjectPlanArray.length != this.latestAssignedProjectPlanArray.length) {
+			Exception e = new Exception("Length of assignedProjectPlanArray is different.");
+			e.printStackTrace();
+		}
+		this.latestAssignedProjectPlanArray = assignedProjectPlanArray;
+		
+		//update assigned plan history 
+		Integer[] timeOneArray = {time};
+		Integer[] tmp = new Integer[latestAssignedProjectPlanArray.length + 1];
+		System.arraycopy(timeOneArray, 0, tmp, 0, timeOneArray.length);
+		System.arraycopy(this.latestAssignedProjectPlanArray, 0, tmp, timeOneArray.length, this.latestAssignedProjectPlanArray.length);
+		this.assignedProjectPlanArrayList.add(tmp);
 	}
 
 	public Integer[] getAssignedProjectHistoryArray() {

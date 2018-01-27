@@ -56,7 +56,7 @@ public class Team extends BaseTeam {
 	 */
 	public List<BaseWorker> getFreeWorkerList(BaseComponent c) {
 		return super.getWorkerList().stream()
-				.filter(w -> ((Worker)w).getCurrentAssignedProject().equals(c)) //Project
+				.filter(w -> c.equals(((Worker)w).getCurrentAssignedProject())) //Project
 				.filter(w -> w.isFree()).collect(Collectors.toList());
 	}
 

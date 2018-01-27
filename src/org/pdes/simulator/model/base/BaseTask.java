@@ -530,7 +530,13 @@ public class BaseTask {
 		return actualWorkAmount;
 	}
 	
-	
+	/**
+	 * Get the state of this task.
+	 * @return the stateInt
+	 */
+	public TaskState getState() {
+		return state;
+	}	
 
 	/**
 	 * Get the state(int) of this task.

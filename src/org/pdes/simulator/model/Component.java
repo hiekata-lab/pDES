@@ -126,5 +126,11 @@ public class Component extends BaseComponent {
 				this.actualTotalWorkAmount,this.estimatedTotalWorkAmount, //Work Amount
 				this.estimatedRequiredResource, workerList.size(), assignedWorkerNames); //Resource
 	}
-	
+
+	public List<Task> getUnfinishedTaskList() {
+		return super.getTargetedTaskList().stream()
+				.filter(t -> !t.isFinished())
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
+	}	
 }

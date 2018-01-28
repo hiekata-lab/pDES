@@ -53,9 +53,8 @@ import org.pdes.simulator.model.base.BaseWorker;
 public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	
 	//Additional
-	static public final int maxTime = 100;
-	
-	private boolean considerReworkOfErrorTorelance = false;
+	static public final int maxTime = 100;	
+	private List<Worker> allWorkerList;
 	
 	public PDES_OidaSimulator(BaseProjectInfo project) {
 		super(project);
@@ -101,7 +100,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		System.out.println("*** Initial Allocation ***");
 		
 		//All Workers
-		List<Worker> allWorkerList = this.organization.getWorkerList().stream()
+		this.allWorkerList = this.organization.getWorkerList().stream()
 				.map(w -> (Worker)w)
 				.collect(Collectors.toList());
 		
@@ -151,12 +150,16 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		while(true){
 			if(time >= PDES_OidaSimulator.maxTime) {
 				System.out.println();
-				System.out.println("Time is over. Time "+time+" is larger than max time"+ PDES_OidaSimulator.maxTime+".");
+				System.out.println("t: "+time+" *** Time Over *** Time "+time+" is larger than max time"+ PDES_OidaSimulator.maxTime+".");
 				break;
 			}
 			
 			//0. Check finished or not.
-			if(checkAllTasksAreFinished()) return;
+			if(checkAllTasksAreFinished()) {
+				System.out.println();
+				System.out.println("t: "+time+" *** All Done *** No More Projects and Tasks. All Projects and Tasks Finihsed!");
+				return;
+			}
 			
 			/**
 			 * ToDo
@@ -168,12 +171,13 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			System.out.println();
 			System.out.println("t: " +time+ " *** Update Current Assigned Project ***");
 			
-			//Update Assigned Project Plan
+			//Update Worker Assigned Project based on Plan
 			allWorkerList.stream().forEach(w -> 
 				w.setCurrentAssignedProject(w.getLatestAssignedProjectPlanArray()[time] != -1 
 						? projectList.get(w.getLatestAssignedProjectPlanArray()[time]) : null)
 			);
-			//(vice-versa) Add assignment information in Project 
+			
+			//(vice-versa) Update Project(Component) Worker Assignment  based on Plan
 			projectList.stream().forEach(c ->
 					c.setWorkerList(
 							allWorkerList.stream()
@@ -182,15 +186,15 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 							)
 					);
 			
-			//Just confirm worker's Executable Task
+			//Just confirm worker's Assignment 
 			allWorkerList.stream().forEach(w -> 
 					System.out.println(w.getName() +" : "+(w.getCurrentAssignedProject()!=null ? w.getCurrentAssignedProject().getName():"Resource Pool"))
 				);
 			
-			/**
-			 * Allocation としての実績更新が必要
-			 * History
-			 */
+			//Update Worker Assignment History
+			allWorkerList.stream().forEach(w -> 
+					w.getAssignedProjectHistoryArray()[time] = w.getLatestAssignedProjectPlanArray()[time]
+				);	
 
 			//B. Project Execution
 			System.out.println();
@@ -216,7 +220,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				//4. Perform WORKING tasks and update the status of each task.
 				this.performAndUpdateAllWorkflow(time, c);
 				
-				//Just Show Unfinished Task List
+				//Just Show finished Task List
 				System.out.println(c.getName() + "(Finished) : " +c.getTargetedTaskList().stream()
 						.filter(t -> t.isFinished())
 						.map(t -> (Task)t)
@@ -234,10 +238,25 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				//System.out.println(c.getTargetedTaskList());
 				
 				//Just Show Unfinished Task List
-				System.out.println(c.getName() + "(Unfinished) : " +c.getTargetedTaskList().stream()
-						.filter(t -> !t.isFinished())
-						.map(t -> (Task)t)
-						.collect(Collectors.toList()));
+				System.out.println(c.getName() + "(Unfinished) : " + c.getUnfinishedTaskList());
+				
+				/**
+				 * If project finishes, Release all resources.
+				 */
+				if(c.getUnfinishedTaskList().size() == 0) {
+					int projectIndex = projectList.indexOf(c);
+					for (Worker w : c.getWorkerList()) {
+						boolean updateFlag = false;
+						for(int t = time+1; t < PDES_OidaSimulator.maxTime; t++) {
+							if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
+								w.getLatestAssignedProjectPlanArray()[t] = -1; //Release
+								updateFlag = true;
+							}
+						}
+						//Update AssignedProjectPlanArray
+						if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+					}
+				}
 				
 //				workerList.stream().forEach(w ->
 //						{
@@ -309,7 +328,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					int projectIndex = projectList.indexOf(c);
 					if(time <= c.getDueDate()) {//time <= due date
 						//Request Span(t+1 ~ dd)
-						Arrays.fill(requestSpan, time+1, c.getDueDate(), projectIndex);
+						Arrays.fill(requestSpan, time+1, PDES_OidaSimulator.maxTime, projectIndex);
 						
 						//Work Amount to be supply requested
 						estimatedLackOfWorkAmount = c.getEstimatedTotalWorkAmount();					
@@ -323,7 +342,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						}
 					}else {//time > due date
 						//Request Span(t+1 ~ ct)
-						Arrays.fill(requestSpan, time+1, (int)c.getEstimatedCompletionTime(time), projectIndex);
+						Arrays.fill(requestSpan, time+1, PDES_OidaSimulator.maxTime, projectIndex);
 						
 						//Work Amount as much as possible to be supply requested 
 						estimatedLackOfWorkAmount = c.getEstimatedTotalWorkAmount();											
@@ -353,10 +372,24 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 							//Update AssignedProjectPlanArray
 							if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
 						}
+						for(int t =  c.getDueDate(); t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
+							for (Worker w : workerListToBeSupplied) {
+								boolean updateFlag = false;
+								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
+								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
+									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
+									workAmountToBeSupplied += 1;
+									updateFlag = true;
+								}
+								//Update AssignedProjectPlanArray
+								if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+							}
+						}
+						
 					}else {//time > due date
 						//Select time slots to be supplied. Priority : 1.Time(Forward) -> 2.Worker
 						double workAmountToBeSupplied = 0;
-						for(int t = time+1; t < c.getEstimatedCompletionTime(time); t++) {
+						for(int t = time+1; t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
 							for (Worker w : workerListToBeSupplied) {
 								boolean updateFlag = false;
 								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
@@ -405,6 +438,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						(l1, l2) -> l1.addAll(l2)
 						);
 	}
+
+//Alternative
 //	public List<Task> getReadyTaskList(Component c){
 //		return super.workflowList.stream()
 //				.flatMap(w -> ((Workflow)w).getReadyTaskList(c).stream())
@@ -422,11 +457,25 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public void performAndUpdateAllWorkflow(int time, Component c){
 		workflowList.forEach(w -> ((Workflow)w).checkWorking(time, c));//READY -> WORKING
 		((Organization)organization).getWorkingWorkerList(c).stream().forEach(w -> w.addLaborCost());//pay labor cost
+		
+		//Update Task History Array
+		workflowList.forEach(wf -> {
+			((Organization)organization).getWorkingWorkerList().stream()
+				.forEach(wr -> {
+					((Worker)wr).getAssignedTaskHistoryArray()[time] = 
+							((Workflow)wf).getTaskList()
+							.indexOf(((Worker)wr).getAssignedTaskList().get(((Worker)wr).getAssignedTaskList().size()-1));
+			});});
+
 		//((Organization)organization).getWorkingFacilityList(c).stream().forEach(f -> f.addLaborCost());//pay labor cost //ignore
 		workflowList.forEach(w -> ((Workflow)w).perform(time, c));//update information of WORKING task in each workflow
 		workflowList.forEach(w -> ((Workflow)w).checkFinished(time, c));// WORKING -> WORKING_ADDITIONALLY or FINISHED
 		workflowList.forEach(w -> ((Workflow)w).checkReady(time, c));// NONE -> READY
 		workflowList.forEach(w -> ((Workflow)w).updatePERTData(c));//Update PERT information
+	}
+
+	public List<Worker> getAllWorkerList() {
+		return allWorkerList;
 	}
 	
 //	/**

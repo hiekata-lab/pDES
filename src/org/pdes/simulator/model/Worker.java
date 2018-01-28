@@ -147,6 +147,10 @@ public class Worker extends BaseWorker {
 		System.arraycopy(this.latestAssignedProjectPlanArray, 0, tmp, timeOneArray.length, this.latestAssignedProjectPlanArray.length);
 		this.assignedProjectPlanArrayList.add(tmp);
 	}
+	
+	public List<Integer[]> getAssignedProjectPlanArrayList(){
+		return assignedProjectPlanArrayList;
+	}
 
 	public Integer[] getAssignedProjectHistoryArray() {
 		return assignedProjectHistoryArray;

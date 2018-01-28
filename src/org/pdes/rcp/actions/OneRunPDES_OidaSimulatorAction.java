@@ -101,6 +101,29 @@ public class OneRunPDES_OidaSimulatorAction extends AbstractSimulationAction {
 			BaseProjectInfo project = new ProjectInfo(diagram, numOfWorkflow);
 			PDES_OidaSimulator sim = new PDES_OidaSimulator(project);//Select Simulartor
 			sim.execute();
+			//Visualize
+			sim.getAllWorkerList().stream().forEach(w -> {
+				System.out.println(w.getName()+" : AssignedProjectHistoryArray");
+				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+					System.out.print(w.getAssignedProjectHistoryArray()[time]+",");
+				}
+				System.out.println();
+				
+				System.out.println(w.getName()+" : AssignedTaskHistoryArray");
+				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+					System.out.print(w.getAssignedTaskHistoryArray()[time]+",");
+				}
+				System.out.println();
+				
+				System.out.println(w.getName()+" : AssignedProjectPlanArrayList");
+				for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
+					for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
+						System.out.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 
+					}
+					System.out.println();
+				}
+			});
+			
 			sim.saveResultFilesInDirectory(outputDirectoryPath, String.valueOf(no));
 			return String.format("%d,%f,%d,%f", no, project.getTotalCost(), project.getDuration(),project.getTotalActualWorkAmount());
 		}

@@ -251,8 +251,13 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
 				double estimatedDelay = c.getEstimatedCompletionTime(time) - c.getDueDate();
 				if(estimatedDelay < 0) {
-					//Work amount to release
-					//double estimatedReleasableWorkAmount = Math.floor((c.getDueDate()-1 - time) * c.getWorkerList().size()) - c.getEstimatedTotalWorkAmount();
+					/**
+					 * Release
+					 * ct' < dd
+					 * ⇔ time + WL'/|RA| < dd
+					 * ⇒ time < dd  ∵ WL'/|RA| > 0
+					 */
+					//Work amount to be released
 					double estimatedReleasableWorkAmount = 0;
 					for (int t = time+1; t < c.getDueDate(); t++){//t+1 ~ dd
 						double numOfResourceAtTime = 0;
@@ -267,28 +272,104 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					//No Release-able Resource -> next Project
 					if(estimatedReleasableWorkAmount < 0) continue;
 					
-					//Priority of Workers to be released. Which worker should be released? Min Maching Skill.
+					//Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
 					List<Worker> workerListToBeReleased = allWorkerList.stream()
 						.sorted((w1,w2) -> w1.getExecutableUnfinishedTaskList(c).size() - w2.getExecutableUnfinishedTaskList(c).size())//How About Skill Point 
 						.collect(Collectors.toList());
 					
+					//Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
 					int projectIndex = projectList.indexOf(c);
 					double workAmountToBeReleased = 0;
 					for (Worker w : workerListToBeReleased) {
+						boolean updateFlag = false;
 						for(int t = c.getDueDate()-1; t > time; t--) {
 							if(estimatedReleasableWorkAmount <= workAmountToBeReleased) break;
 							if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
 								w.getLatestAssignedProjectPlanArray()[t] = -1; //Release
 								workAmountToBeReleased += 1;
+								updateFlag = true;
 							}
 						}
 						//Update AssignedProjectPlanArray
-						w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+						if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
 					}
 				}else if(estimatedDelay > 0){
-
+					/**
+					 * Supply Request
+					 * ct' > dd
+					 * ⇔ time + WL'/|RA| > dd
+					 * ⇒ (time < dd) or (time > dd)
+					 */
+					//Request Span and Work amount to supply request
+					//Initialize
+					Integer[] requestSpan = new Integer[PDES_OidaSimulator.maxTime];
+					Arrays.fill(requestSpan, -1);
+					double estimatedLackOfWorkAmount = 0;
 					
+					int projectIndex = projectList.indexOf(c);
+					if(time <= c.getDueDate()) {//time <= due date
+						//Request Span(t+1 ~ dd)
+						Arrays.fill(requestSpan, time+1, c.getDueDate(), projectIndex);
+						
+						//Work Amount to be supply requested
+						estimatedLackOfWorkAmount = c.getEstimatedTotalWorkAmount();					
+						for (int t = time+1; t < c.getDueDate(); t++){//t+1 ~ dd
+							double numOfResourceAtTime = 0;
+							for (Worker w : allWorkerList) {
+								if(c.equals(w.getLatestAssignedProjectPlanArray()[t] != -1 
+										? projectList.get(w.getLatestAssignedProjectPlanArray()[t]) : null)) numOfResourceAtTime++;
+							}
+							estimatedLackOfWorkAmount -= numOfResourceAtTime;
+						}
+					}else {//time > due date
+						//Request Span(t+1 ~ ct)
+						Arrays.fill(requestSpan, time+1, (int)c.getEstimatedCompletionTime(time), projectIndex);
+						
+						//Work Amount as much as possible to be supply requested 
+						estimatedLackOfWorkAmount = c.getEstimatedTotalWorkAmount();											
+					}
 					
+					//No lack of Resource -> next Project
+					if(estimatedLackOfWorkAmount < 0) continue;
+					
+					//Priority of Workers to be supplied. Which worker should be supplied? "Maximum" Matching Skill.
+					List<Worker> workerListToBeSupplied = allWorkerList.stream()
+						.sorted((w1,w2) -> w2.getExecutableUnfinishedTaskList(c).size() - w1.getExecutableUnfinishedTaskList(c).size())//How About Skill Point 
+						.collect(Collectors.toList());
+					
+					if(time <= c.getDueDate()) {//time <= due date
+						//Select time slots to be supplied. Priority : 1.Worker -> 2.Time(Forward)
+						double workAmountToBeSupplied = 0;
+						for (Worker w : workerListToBeSupplied) {
+							boolean updateFlag = false;
+							for(int t = time+1; t < c.getDueDate(); t++) {
+								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
+								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
+									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
+									workAmountToBeSupplied += 1;
+									updateFlag = true;
+								}
+							}
+							//Update AssignedProjectPlanArray
+							if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+						}
+					}else {//time > due date
+						//Select time slots to be supplied. Priority : 1.Time(Forward) -> 2.Worker
+						double workAmountToBeSupplied = 0;
+						for(int t = time+1; t < c.getEstimatedCompletionTime(time); t++) {
+							for (Worker w : workerListToBeSupplied) {
+								boolean updateFlag = false;
+								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
+								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
+									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
+									workAmountToBeSupplied += 1;
+									updateFlag = true;
+								}
+								//Update AssignedProjectPlanArray
+								if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+							}
+						}
+					}	
 				}else {
 					//nothing
 				}

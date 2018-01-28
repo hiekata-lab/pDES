@@ -214,12 +214,10 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				this.allocateReadyTasksToFreeResourcesForSingleTaskWorkerSimulation(readyTaskList, freeWorkerList, freeFacilityList);
 
 				//4. Perform WORKING tasks and update the status of each task.
-				this.performAndUpdateAllWorkflow(time, considerReworkOfErrorTorelance);
+				this.performAndUpdateAllWorkflow(time, c);
 				
 				//Just Show Unfinished Task List
-				System.out.println("Finished Task List");
-				System.out.println(c.getTargetedTaskList());
-				System.out.println(c.getName() + " : " +c.getTargetedTaskList().stream()
+				System.out.println(c.getName() + "(Finished) : " +c.getTargetedTaskList().stream()
 						.filter(t -> t.isFinished())
 						.map(t -> (Task)t)
 						.collect(Collectors.toList()));
@@ -236,8 +234,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				//System.out.println(c.getTargetedTaskList());
 				
 				//Just Show Unfinished Task List
-				System.out.println("Unfinished Task List");
-				System.out.println(c.getName() + " : " +c.getTargetedTaskList().stream()
+				System.out.println(c.getName() + "(Unfinished) : " +c.getTargetedTaskList().stream()
 						.filter(t -> !t.isFinished())
 						.map(t -> (Task)t)
 						.collect(Collectors.toList()));
@@ -338,19 +335,17 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 //	}
 	
 	/**
-	 * Perform and update all workflow in this time.
+	 * Perform and update project c workflow in this time.
 	 * @param time 
-	 * @param componentErrorRework 
 	 */
-	@Override
-	public void performAndUpdateAllWorkflow(int time, boolean componentErrorRework){
-		workflowList.forEach(w -> w.checkWorking(time));//READY -> WORKING
-		organization.getWorkingWorkerList().stream().forEach(w -> w.addLaborCost());//pay labor cost
-		organization.getWorkingFacilityList().stream().forEach(f -> f.addLaborCost());//pay labor cost
-		workflowList.forEach(w -> ((Workflow)w).perform(time));//update information of WORKING task in each workflow
-		workflowList.forEach(w -> w.checkFinished(time));// WORKING -> WORKING_ADDITIONALLY or FINISHED
-		workflowList.forEach(w -> w.checkReady(time));// NONE -> READY
-		workflowList.forEach(w -> w.updatePERTData());//Update PERT information
+	public void performAndUpdateAllWorkflow(int time, Component c){
+		workflowList.forEach(w -> ((Workflow)w).checkWorking(time, c));//READY -> WORKING
+		((Organization)organization).getWorkingWorkerList(c).stream().forEach(w -> w.addLaborCost());//pay labor cost
+		//((Organization)organization).getWorkingFacilityList(c).stream().forEach(f -> f.addLaborCost());//pay labor cost //ignore
+		workflowList.forEach(w -> ((Workflow)w).perform(time, c));//update information of WORKING task in each workflow
+		workflowList.forEach(w -> ((Workflow)w).checkFinished(time, c));// WORKING -> WORKING_ADDITIONALLY or FINISHED
+		workflowList.forEach(w -> ((Workflow)w).checkReady(time, c));// NONE -> READY
+		workflowList.forEach(w -> ((Workflow)w).updatePERTData(c));//Update PERT information
 	}
 	
 //	/**

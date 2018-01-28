@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.TeamNode;
 import org.pdes.simulator.model.base.BaseComponent;
+import org.pdes.simulator.model.base.BaseFacility;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
@@ -54,10 +55,19 @@ public class Team extends BaseTeam {
 	 * Get the list of free workers.
 	 * @return
 	 */
-	public List<BaseWorker> getFreeWorkerList(BaseComponent c) {
+	public List<BaseWorker> getFreeWorkerList(Component c) {
 		return super.getWorkerList().stream()
 				.filter(w -> c.equals(((Worker)w).getCurrentAssignedProject())) //Project
 				.filter(w -> w.isFree()).collect(Collectors.toList());
 	}
-
+	
+	/**
+	 * Get the list of working workers.
+	 * @return
+	 */
+	public List<BaseWorker> getWorkingWorkerList(Component c) {
+		return super.getWorkerList().stream()
+				.filter(w -> c.equals(((Worker)w).getCurrentAssignedProject())) //Project
+				.filter(w -> w.isWorking()).collect(Collectors.toList());
+	}
 }

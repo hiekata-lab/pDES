@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pdes.simulator.model.base.BaseComponent;
+import org.pdes.simulator.model.base.BaseFacility;
 import org.pdes.simulator.model.base.BaseOrganization;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
@@ -54,7 +55,7 @@ public class Organization extends BaseOrganization {
 	 * Get the list of free workers.
 	 * @return
 	 */
-	public List<BaseWorker> getFreeWorkerList(BaseComponent c) {
+	public List<BaseWorker> getFreeWorkerList(Component c) {
 		return super.getTeamList().stream()
 				.map(t -> ((Team)t).getFreeWorkerList(c))
 				.collect(
@@ -63,5 +64,18 @@ public class Organization extends BaseOrganization {
 					(l1, l2) -> l1.addAll(l2)
 				);
 	}
-
+	
+	/**
+	 * Get the list of working workers.
+	 * @return
+	 */
+	public List<BaseWorker> getWorkingWorkerList(Component c) {
+		return super.getTeamList().stream()
+				.map(t -> ((Team)t).getWorkingWorkerList(c))
+				.collect(
+					() -> new ArrayList<BaseWorker>(),
+					(l, t) -> l.addAll(t),
+					(l1, l2) -> l1.addAll(l2)
+				);
+	}
 }

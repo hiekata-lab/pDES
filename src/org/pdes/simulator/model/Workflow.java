@@ -68,7 +68,7 @@ public class Workflow extends BaseWorkflow {
 	public void initialize() {
 		super.getTaskList().forEach(t -> ((Task)t).initialize());
 		super.setCriticalPathLength(0);
-		super.updatePERTData();
+		super.updatePERTData(0);
 		super.checkReady(0);
 	}
 	

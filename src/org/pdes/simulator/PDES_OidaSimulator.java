@@ -485,7 +485,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		workflowList.forEach(w -> ((Workflow)w).perform(time, c));//update information of WORKING task in each workflow
 		workflowList.forEach(w -> ((Workflow)w).checkFinished(time, c));// WORKING -> WORKING_ADDITIONALLY or FINISHED
 		workflowList.forEach(w -> ((Workflow)w).checkReady(time, c));// NONE -> READY
-		workflowList.forEach(w -> ((Workflow)w).updatePERTData(c));//Update PERT information
+		workflowList.forEach(w -> ((Workflow)w).updatePERTData(time,c));//Update PERT information
 	}
 
 	public List<Worker> getAllWorkerList() {

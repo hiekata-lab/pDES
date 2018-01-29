@@ -141,15 +141,15 @@ public class Workflow extends BaseWorkflow {
 	/**
 	 * Update the information of PERT attributes at this moment.
 	 */
-	public void updatePERTData(Component c) {
-		setEstEftData(c);
+	public void updatePERTData(int time, Component c) {
+		setEstEftData(time, c);
 		setLstLftData(c);
 	}
 	
 	/**
 	 * Calculate earliest start / finish time of all tasks by using only remaining work amount.
 	 */
-	private void setEstEftData(Component c){
+	private void setEstEftData(int time, Component c){
 		List<BaseTask> superTaskList = super.getTaskList().stream()
 		.filter(t -> t.getTargetComponentList().contains(c))
 		.collect(Collectors.toList());
@@ -159,7 +159,8 @@ public class Workflow extends BaseWorkflow {
 		// 1. Set the earliest finish time of head tasks.
 		for(BaseTask task : superTaskList){
 			if(task.getInputTaskList().size()==0){
-				task.setEft(task.getRemainingWorkAmount());
+				task.setEst(time);
+				task.setEft(time + task.getRemainingWorkAmount());
 				inputTaskList.add(task);
 			}
 		}
@@ -177,7 +178,7 @@ public class Workflow extends BaseWorkflow {
 							Double inputEst = inputTask.getEst();
 							Double est = Double.valueOf(inputEst) + inputTask.getRemainingWorkAmount();
 							Double eft = Double.valueOf(est) + task.getRemainingWorkAmount();
-							if(est >= preEst){
+							if(est > preEst){
 								task.setEst(est);
 								task.setEft(eft);
 								for (int l = 0; l < nextTaskList.size(); l++) {

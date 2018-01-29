@@ -267,15 +267,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					}
 				}
 				
-//				workerList.stream().forEach(w ->
-//						{
-//							System.out.print(w.getName()+" : ");
-//							Arrays.asList(w.getLatestAssignedProjectPlanArray()).stream()
-//						.forEach(ap -> System.out.print(ap+","));
-//							System.out.println();
-//						}
-//				);
-				
 				//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
 				double estimatedDelay = c.getEstimatedCompletionTime(time) - c.getDueDate();
 				if(estimatedDelay < 0) {

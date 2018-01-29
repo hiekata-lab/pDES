@@ -255,8 +255,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				/**
 				 * If project finishes, Release all resources.
 				 */
-				// Need to modify only one time execution all resource release.
-				if(c.getUnfinishedTaskList().size() == 0) {
+				if(c.getUnfinishedTaskList().size() == 0 && c.getFinishTime() == -1) {
 					//Project Finished.
 					c.setFinishTime(time);
 					
@@ -459,17 +458,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						(l1, l2) -> l1.addAll(l2)
 						);
 	}
-
-//Alternative
-//	public List<Task> getReadyTaskList(Component c){
-//		return super.workflowList.stream()
-//				.flatMap(w -> ((Workflow)w).getReadyTaskList(c).stream())
-//				.collect(
-//						() -> new ArrayList<>(),
-//						(l, t) -> l.add((Task)t),
-//						(l1, l2) -> l1.addAll(l2)
-//						);
-//	}
 	
 	/**
 	 * Perform and update project c workflow in this time.
@@ -523,6 +511,12 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			//summary
 			pw.println(String.join(separator, new String[]{
 					"Duration", String.valueOf(project.getDuration()+1), 
+					
+					/**
+					 * 1/30 Average Project Delay 
+					 * 
+					 */
+					
 					"Total Cost", String.valueOf(project.getTotalCost()),
 					"Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())
 					}));

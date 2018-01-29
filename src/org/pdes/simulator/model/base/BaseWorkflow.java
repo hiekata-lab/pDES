@@ -73,28 +73,29 @@ public class BaseWorkflow {
 	public void initialize() {
 		taskList.forEach(t -> t.initialize());
 		criticalPathLength = 0;
-		updatePERTData();
+		updatePERTData(0);
 		checkReady(0);
 	}
 	
 	/**
 	 * Update the information of PERT attributes at this moment.
 	 */
-	public void updatePERTData() {
-		setEstEftData();
+	public void updatePERTData(int time) {
+		setEstEftData(time);
 		setLstLftData();
 	}
 	
 	/**
 	 * Calculate earliest start / finish time of all tasks by using only remaining work amount.
 	 */
-	private void setEstEftData(){
+	private void setEstEftData(int time){
 		List<BaseTask> inputTaskList = new ArrayList<BaseTask>();
 		
 		// 1. Set the earliest finish time of head tasks.
 		for(BaseTask task : taskList){
 			if(task.getInputTaskList().size()==0){
-				task.setEft(task.getRemainingWorkAmount());
+				task.setEst(time);
+				task.setEft(time + task.getRemainingWorkAmount());
 				inputTaskList.add(task);
 			}
 		}
@@ -112,7 +113,7 @@ public class BaseWorkflow {
 							Double inputEst = inputTask.getEst();
 							Double est = Double.valueOf(inputEst) + inputTask.getRemainingWorkAmount();
 							Double eft = Double.valueOf(est) + task.getRemainingWorkAmount();
-							if(est >= preEst){
+							if(est > preEst){
 								task.setEst(est);
 								task.setEft(eft);
 								for (int l = 0; l < nextTaskList.size(); l++) {

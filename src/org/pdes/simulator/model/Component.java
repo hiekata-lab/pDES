@@ -49,6 +49,8 @@ public class Component extends BaseComponent {
 	private double estimatedCompletionTime;
 	private double estimatedTotalWorkAmount;
 	private double estimatedRequiredResource;
+	private int start;
+	private int finish;
 
 	/**
 	 * @param componentNode
@@ -57,6 +59,9 @@ public class Component extends BaseComponent {
 		super(componentNode);
 		this.sigma = componentNode.getSigma();
 		this.dueDate = componentNode.getDueDate(); 
+		
+		this.start = -1;
+		this.finish = -1;
 	}
 	
 	/**
@@ -132,5 +137,33 @@ public class Component extends BaseComponent {
 				.filter(t -> !t.isFinished())
 				.map(t -> (Task)t)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * @return the start
+	 */
+	public int getStartTime() {
+		return start;
+	}
+
+	/**
+	 * @param start the start to set
+	 */
+	public void setStartTime(int time) {
+		if(this.start == -1) this.start = time;
+	}
+
+	/**
+	 * @return the finish
+	 */
+	public int getFinishTime() {
+		return finish;
+	}
+
+	/**
+	 * @param finish the finish to set
+	 */
+	public void setFinishTime(int time) {
+		this.finish = time;
 	}	
 }

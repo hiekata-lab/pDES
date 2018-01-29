@@ -96,6 +96,9 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		
 		//Communication Matrix
 		//TO DO IMPLEMENT
+		//TO DO IMPLEMENT
+		//TO DO IMPLEMENT
+
 		
 		/**
 		 * 1.Initial Allocation
@@ -252,7 +255,11 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				/**
 				 * If project finishes, Release all resources.
 				 */
+				// Need to modify only one time execution all resource release.
 				if(c.getUnfinishedTaskList().size() == 0) {
+					//Project Finished.
+					c.setFinishTime(time);
+					
 					int projectIndex = projectList.indexOf(c);
 					for (Worker w : c.getWorkerList()) {
 						boolean updateFlag = false;
@@ -470,8 +477,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	 */
 	public void performAndUpdateAllWorkflow(int time, Component c){
 		workflowList.forEach(w -> ((Workflow)w).checkWorking(time, c));//READY -> WORKING
-		((Organization)organization).getWorkingWorkerList(c).stream().forEach(w -> w.addLaborCost());//pay labor cost
 		
+		((Organization)organization).getWorkingWorkerList(c).stream().forEach(w -> w.addLaborCost());//pay labor cost
 		//Update Task History Array
 		workflowList.forEach(wf -> {
 			((Organization)organization).getWorkingWorkerList().stream()
@@ -499,29 +506,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	 */
 	@Override
 	public void saveResultFileByCsv(String outputDirName, String resultFileName){
-		
-//		//TO IMPLEMENT Average Project Delay -> CSV Output
-//		this.getAllWorkerList().stream().forEach(w -> {
-//			System.out.println(w.getName()+" : AssignedProjectHistoryArray");
-//			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-//				System.out.print(w.getAssignedProjectHistoryArray()[time]+",");
-//			}
-//			System.out.println();
-//			
-//			System.out.println(w.getName()+" : AssignedTaskHistoryArray");
-//			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-//				System.out.print(w.getAssignedTaskHistoryArray()[time]+",");
-//			}
-//			System.out.println();
-//			
-//			System.out.println(w.getName()+" : AssignedProjectPlanArrayList");
-//			for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
-//				for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
-//					System.out.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 
-//				}
-//				System.out.println();
-//			}
-//		});
+	//TO IMPLEMENT Average Project Delay -> CSV Output
+
 				
 		File resultFile = new File(outputDirName, resultFileName);
 		String separator = ",";
@@ -534,27 +520,34 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
+			//summary
+			pw.println(String.join(separator, new String[]{
+					"Duration", String.valueOf(project.getDuration()+1), 
+					"Total Cost", String.valueOf(project.getTotalCost()),
+					"Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())
+					}));
+			
 			//time
-			pw.println(",time");
-			pw.print(" ,");//dummy
+			pw.println(separator +"time");
+			pw.print(" "+separator);//dummy
 			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-				pw.print(time+",");
+				pw.print(time+separator);
 			}
 			pw.println();
 			
 			pw.println("AssignedProjectHistoryArray");
 			this.getAllWorkerList().stream().forEach(w -> {
-				pw.print(w.getName()+",");
+				pw.print(w.getName()+separator);
 				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-					pw.print(w.getAssignedProjectHistoryArray()[time]+",");
+					pw.print(w.getAssignedProjectHistoryArray()[time]+separator);
 				}
 				pw.println();
 			});
 			pw.println("AssignedTaskHistoryArray");
 			this.getAllWorkerList().stream().forEach(w -> {
-				pw.print(w.getName()+",");
+				pw.print(w.getName()+separator);
 				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
-					pw.print(w.getAssignedTaskHistoryArray()[time]+",");
+					pw.print(w.getAssignedTaskHistoryArray()[time]+separator);
 				}
 				pw.println();
 			});
@@ -564,7 +557,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				pw.println(w.getName()+":");
 				for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
 					for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
-						pw.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 
+						pw.print(assignedProjectPlanArray[time]+separator);//at time, time(0~maxtime) 
 					}
 					pw.println();
 				}

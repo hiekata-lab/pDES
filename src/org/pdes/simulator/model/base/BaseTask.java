@@ -42,7 +42,7 @@ import org.pdes.rcp.model.TaskNode;
  */
 public class BaseTask {
 	
-	private enum TaskState {
+	protected enum TaskState {
 		/** Cannot start task (stateInt=0)*/
 		NONE,
 		/** Can start task but not start (stateInt=1)*/
@@ -529,13 +529,20 @@ public class BaseTask {
 	public double getActualWorkAmount() {
 		return actualWorkAmount;
 	}
-	
+
 	/**
 	 * Get the state of this task.
 	 * @return the stateInt
 	 */
 	public TaskState getState() {
 		return state;
+	}
+	/**
+	 * Set the state of this task.
+	 * @return
+	 */
+	public void setState(TaskState state) {
+		this.state = state;
 	}	
 
 	/**
@@ -544,6 +551,13 @@ public class BaseTask {
 	 */
 	public int getStateInt() {
 		return stateInt;
+	}
+	/**
+	 * Set the state(int) of this task.
+	 * @return the stateInt
+	 */
+	public void setStateInt(int stateInt) {
+		this.stateInt = stateInt;
 	}
 	
 	/**

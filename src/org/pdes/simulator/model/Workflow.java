@@ -126,7 +126,7 @@ public class Workflow extends BaseWorkflow {
 	public void checkWorking(int time, Component c)  {
 		super.getTaskList().stream()
 		.filter(t -> t.getTargetComponentList().contains(c)) //Project 
-		.forEach(t -> t.checkWorking(time));
+		.forEach(t -> ((Task)t).checkWorking(time,c));
 	}
 	
 	/**

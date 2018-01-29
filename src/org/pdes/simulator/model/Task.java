@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.TaskNode;
 import org.pdes.simulator.model.base.BaseTask;
-import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
@@ -89,6 +88,26 @@ public class Task extends BaseTask {
 			}
 			//Reduce work amount by produced work amount of workers.
 			super.setRemainingWorkAmount(super.getRemainingWorkAmount() - producedWorkAmount);
+		}
+	}
+	
+	/**
+	 * Check whether the state of this task has to be WORKING or not.<br>
+	 * If the state of this task is READY and this task is already allocated someone,
+	 * change the state of this task and allocated resources to WORKING, and add the information of start time to this task.
+	 * @param time
+	 */
+	public void checkWorking(int time, Component c) {
+		if (isReady() && super.getAllocatedWorkerList().size() > 0) {
+			super.setState(TaskState.WORKING);
+			super.setStateInt(2);
+			addStartTime(time);
+			c.setStartTime(time);//Project Start Time First Task.
+			for(BaseWorker allocatedWorker : super.getAllocatedWorkerList()) {
+				allocatedWorker.setStateWorking();
+				allocatedWorker.addStartTime(time);
+				allocatedWorker.addAssignedTask(this);
+			}
 		}
 	}
 

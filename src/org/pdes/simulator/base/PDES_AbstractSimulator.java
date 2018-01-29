@@ -328,7 +328,7 @@ public abstract class PDES_AbstractSimulator {
 	 * @param outputDirName
 	 * @param resultFileName
 	 */
-	private void saveResultFileByCsv(String outputDirName, String resultFileName){
+	public void saveResultFileByCsv(String outputDirName, String resultFileName){
 		File resultFile = new File(outputDirName, resultFileName);
 		String separator = ",";
 		try {

@@ -28,10 +28,17 @@
  */
 package org.pdes.simulator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.pdes.simulator.base.PDES_AbstractSimulator;
 import org.pdes.simulator.model.Component;
@@ -42,6 +49,7 @@ import org.pdes.simulator.model.Worker;
 import org.pdes.simulator.model.base.BaseFacility;
 import org.pdes.simulator.model.base.BaseProjectInfo;
 import org.pdes.simulator.model.base.BaseTask;
+import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
 /**
@@ -163,7 +171,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			/**
 			 * ToDo
-			 * - Request Class time_to_execute = N　 N-- (for each time step)
+			 * - Request Class time_to_execute = N縲� N-- (for each time step)
 			 * - Broker Interface
 			 */
 			
@@ -273,8 +281,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					/**
 					 * Release
 					 * ct' < dd
-					 * ⇔ time + WL'/|RA| < dd
-					 * ⇒ time < dd  ∵ WL'/|RA| > 0
+					 * 竍� time + WL'/|RA| < dd
+					 * 竍� time < dd  竏ｵ WL'/|RA| > 0
 					 */
 					//Work amount to be released
 					double estimatedReleasableWorkAmount = 0;
@@ -316,8 +324,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					/**
 					 * Supply Request
 					 * ct' > dd
-					 * ⇔ time + WL'/|RA| > dd
-					 * ⇒ (time < dd) or (time > dd)
+					 * 竍� time + WL'/|RA| > dd
+					 * 竍� (time < dd) or (time > dd)
 					 */
 					//Request Span and Work amount to supply request
 					//Initialize
@@ -477,15 +485,152 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public List<Worker> getAllWorkerList() {
 		return allWorkerList;
 	}
-	
-//	/**
-//	 * Save the simulation result to the given directory.
-//	 * @param outputDir
-//	 */
-//	@Override
-//	public void saveResultFilesInDirectory(String outputDir, String fileName){
+		
+	/**
+	 * Save result file including oida visualization by csv format.
+	 * @param outputDirName
+	 * @param resultFileName
+	 */
+	@Override
+	public void saveResultFileByCsv(String outputDirName, String resultFileName){
+		
 //		//TO IMPLEMENT Average Project Delay -> CSV Output
-//	}
-	
+//		this.getAllWorkerList().stream().forEach(w -> {
+//			System.out.println(w.getName()+" : AssignedProjectHistoryArray");
+//			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+//				System.out.print(w.getAssignedProjectHistoryArray()[time]+",");
+//			}
+//			System.out.println();
+//			
+//			System.out.println(w.getName()+" : AssignedTaskHistoryArray");
+//			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+//				System.out.print(w.getAssignedTaskHistoryArray()[time]+",");
+//			}
+//			System.out.println();
+//			
+//			System.out.println(w.getName()+" : AssignedProjectPlanArrayList");
+//			for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
+//				for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
+//					System.out.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 
+//				}
+//				System.out.println();
+//			}
+//		});
+				
+		File resultFile = new File(outputDirName, resultFileName);
+		String separator = ",";
+		try {
+			// BOM
+			FileOutputStream os = new FileOutputStream(resultFile);
+			os.write(0xef);
+			os.write(0xbb);
+			os.write(0xbf);
+			
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
+			
+			this.getAllWorkerList().stream().forEach(w -> {
+				pw.println(w.getName()+" : AssignedProjectHistoryArray");
+				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+					pw.print(w.getAssignedProjectHistoryArray()[time]+",");
+				}
+				pw.println();
+				
+				pw.println(w.getName()+" : AssignedTaskHistoryArray");
+				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+					pw.print(w.getAssignedTaskHistoryArray()[time]+",");
+				}
+				pw.println();
+				
+				pw.println(w.getName()+" : AssignedProjectPlanArrayList");
+				for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
+					for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
+						pw.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 
+					}
+					pw.println();
+				}
+			});
+			pw.println();
+			// header
+			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()+1), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
+			
+			// workflow
+			pw.println();
+			pw.println("Gantt chart of each Task");
+			pw.println(String.join(separator , new String[]{"Workflow", "Task", "Assigned Team", "Ready Time", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
+			this.workflowList.forEach(w -> {
+				String workflowName = "Workflow ("+w.getDueDate()+")";
+				w.getTaskList().forEach(t ->{
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(workflowName);
+					baseInfo.add(t.getName());
+					//baseInfo.add(t.getAllocatedTeam().getName());
+					baseInfo.add(t.getAllocatedTeamList().stream().map(BaseTeam::getName).collect(Collectors.joining("+")));
+					IntStream.range(0, t.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(t.getReadyTimeList().get(i)));
+						baseInfo.add(String.valueOf(t.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(t.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator ,baseInfo.stream().toArray(String[]::new)));
+				});
+			});
+			
+			// product
+			pw.println();
+			pw.println("Gantt chart of each Component");
+			pw.println(String.join(separator , new String[]{"Product", "Component", "Error/Error Torerance", "Start Time", "Finish Time", "Start Time", "Finish Time", "Start Time", "Finish Time"}));
+			this.productList.forEach(p -> {
+				String productName = "Product ("+p.getDueDate()+")";
+				p.getComponentList().forEach(c -> {
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(productName);
+					baseInfo.add(c.getName());
+					baseInfo.add(String.valueOf(c.getError())+"/"+String.valueOf(c.getErrorTolerance()));
+					IntStream.range(0, c.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(c.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(c.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator ,baseInfo.stream().toArray(String[]::new)));
+				});
+			});
+			// Organization
+			pw.println();
+			pw.println("Gantt chart of each Resource");
+			pw.println(String.join(separator , new String[]{"Team", "Type", "Name", "Start Time", "Finish Time"}));
+			this.organization.getTeamList().forEach(t -> {
+				String teamName = t.getName();
+				
+				//Workers
+				t.getWorkerList().forEach(w -> {;
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(teamName);
+					baseInfo.add("Worker");
+					baseInfo.add(w.getName());
+					IntStream.range(0, w.getAssignedTaskList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));
+				});
+				
+				//Facilities
+				t.getFacilityList().forEach(w -> {
+					List<String> baseInfo = new ArrayList<String>();
+					baseInfo.add(teamName);
+					baseInfo.add("Facility");
+					baseInfo.add(w.getName());
+					IntStream.range(0, w.getFinishTimeList().size()).forEach(i -> {
+						baseInfo.add(String.valueOf(w.getStartTimeList().get(i)));
+						baseInfo.add(String.valueOf(w.getFinishTimeList().get(i)));
+					});
+					pw.println(String.join(separator, baseInfo.stream().toArray(String[]::new)));
+				});
+			});
+			
+			pw.close();
+			os.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -36,6 +36,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -131,7 +132,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		//Update Assigned Project Plan
 		allWorkerList.stream().forEach(w -> 
 			w.setAssignedProjectPlanArray(
-					time, 
+					-1, //default setting time
 					0, //start
 					w.getCurrentAssignedProject().getDueDate(), //end (this value is excluded.)
 					projectList.indexOf(w.getCurrentAssignedProject()) //projectIndex
@@ -171,7 +172,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			/**
 			 * ToDo
-			 * - Request Class time_to_execute = N縲� N-- (for each time step)
+			 * - Request Class time_to_execute = N N-- (for each time step)
 			 * - Broker Interface
 			 */
 			
@@ -281,8 +282,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					/**
 					 * Release
 					 * ct' < dd
-					 * 竍� time + WL'/|RA| < dd
-					 * 竍� time < dd  竏ｵ WL'/|RA| > 0
+					 * <-> time + WL'/|RA| < dd
+					 * -> time < dd    *WL'/|RA| > 0
 					 */
 					//Work amount to be released
 					double estimatedReleasableWorkAmount = 0;
@@ -324,8 +325,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					/**
 					 * Supply Request
 					 * ct' > dd
-					 * 竍� time + WL'/|RA| > dd
-					 * 竍� (time < dd) or (time > dd)
+					 * <-> time + WL'/|RA| > dd
+					 * -> (time < dd) or (time > dd)
 					 */
 					//Request Span and Work amount to supply request
 					//Initialize
@@ -361,55 +362,69 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					
 					//Priority of Workers to be supplied. Which worker should be supplied? "Maximum" Matching Skill.
 					List<Worker> workerListToBeSupplied = allWorkerList.stream()
-						.sorted((w1,w2) -> w2.getExecutableUnfinishedTaskList(c).size() - w1.getExecutableUnfinishedTaskList(c).size())//How About Skill Point 
+						.filter(w -> w.getExecutableUnfinishedTaskList(c).size() > 0) //filter workers who has no-skill for unfinished tasks.
+						.sorted((w1,w2) -> w2.getExecutableUnfinishedTaskList(c).size() - w1.getExecutableUnfinishedTaskList(c).size())// Todo:How About Skill Point?
 						.collect(Collectors.toList());
-					
+										
 					if(time <= c.getDueDate()) {//time <= due date
-						//Select time slots to be supplied. Priority : 1.Worker -> 2.Time(Forward)
+						//Initialize
+						HashMap<Worker, Boolean> updateFlags = new HashMap<Worker,Boolean>();
+						workerListToBeSupplied.stream().forEach(w -> updateFlags.put(w, false));
+						
+						//(t+1 <= dd) Select time slots to be supplied. Priority : 1.Worker -> 2.Time(Forward)
 						double workAmountToBeSupplied = 0;
 						for (Worker w : workerListToBeSupplied) {
-							boolean updateFlag = false;
 							for(int t = time+1; t < c.getDueDate(); t++) {
 								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
 								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
 									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
 									workAmountToBeSupplied += 1;
-									updateFlag = true;
+									updateFlags.put(w, true);
 								}
-							}
-							//Update AssignedProjectPlanArray
-							if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
-						}
-						for(int t =  c.getDueDate(); t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
-							for (Worker w : workerListToBeSupplied) {
-								boolean updateFlag = false;
-								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
-								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
-									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
-									workAmountToBeSupplied += 1;
-									updateFlag = true;
-								}
-								//Update AssignedProjectPlanArray
-								if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
 							}
 						}
 						
-					}else {//time > due date
-						//Select time slots to be supplied. Priority : 1.Time(Forward) -> 2.Worker
-						double workAmountToBeSupplied = 0;
-						for(int t = time+1; t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
+						//(dd < t ) Select time slots to be supplied. Priority : 1.Time(Forward)　-> 2.Worker 
+						for(int t =  c.getDueDate(); t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
 							for (Worker w : workerListToBeSupplied) {
-								boolean updateFlag = false;
 								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
 								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
 									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
 									workAmountToBeSupplied += 1;
-									updateFlag = true;
+									updateFlags.put(w, true);
 								}
-								//Update AssignedProjectPlanArray
-								if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+
 							}
 						}
+						
+						//Update AssignedProjectPlanArray
+						workerListToBeSupplied.stream()
+							.filter(w -> updateFlags.get(w))
+							.forEach(w -> w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray()));
+						
+					}else {//time > due date
+						//Select time slots to be supplied. Priority : 1.Time(Forward) -> 2.Worker
+						//Initialize
+						double workAmountToBeSupplied = 0;
+						HashMap<Worker, Boolean> updateFlags = new HashMap<Worker,Boolean>();
+						workerListToBeSupplied.stream().forEach(w -> updateFlags.put(w, false));
+						
+						//Time -> Worker
+						for(int t = time+1; t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
+							for (Worker w : workerListToBeSupplied) {
+								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
+								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
+									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
+									workAmountToBeSupplied += 1;
+									updateFlags.put(w, true);
+								}
+							}
+						}
+						
+						//Update AssignedProjectPlanArray
+						workerListToBeSupplied.stream()
+							.filter(w -> updateFlags.get(w))
+							.forEach(w -> w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray()));
 					}	
 				}else {
 					//nothing
@@ -528,20 +543,34 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
+			//time
+			pw.println(",time");
+			pw.print(" ,");//dummy
+			for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
+				pw.print(time+",");
+			}
+			pw.println();
+			
+			pw.println("AssignedProjectHistoryArray");
 			this.getAllWorkerList().stream().forEach(w -> {
-				pw.println(w.getName()+" : AssignedProjectHistoryArray");
+				pw.print(w.getName()+",");
 				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
 					pw.print(w.getAssignedProjectHistoryArray()[time]+",");
 				}
 				pw.println();
-				
-				pw.println(w.getName()+" : AssignedTaskHistoryArray");
+			});
+			pw.println("AssignedTaskHistoryArray");
+			this.getAllWorkerList().stream().forEach(w -> {
+				pw.print(w.getName()+",");
 				for (int time = 0; time < PDES_OidaSimulator.maxTime; time++) {
 					pw.print(w.getAssignedTaskHistoryArray()[time]+",");
 				}
 				pw.println();
-				
-				pw.println(w.getName()+" : AssignedProjectPlanArrayList");
+			});
+			
+			pw.println("AssignedProjectPlanArrayList");
+			this.getAllWorkerList().stream().forEach(w -> {
+				pw.println(w.getName()+":");
 				for (Integer[] assignedProjectPlanArray : w.getAssignedProjectPlanArrayList()) {
 					for (int time = 0; time < PDES_OidaSimulator.maxTime + 1; time++) {
 						pw.print(assignedProjectPlanArray[time]+",");//at time, time(0~maxtime) 

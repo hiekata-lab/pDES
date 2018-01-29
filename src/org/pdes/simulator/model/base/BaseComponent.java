@@ -54,7 +54,7 @@ public class BaseComponent {
 	private final List<BaseTask> targetedTaskList = new ArrayList<>();
 	
 	// Changeable variable on simulation
-	private double error;
+	private double error = 0;
 	
 	//Other
 	private final Random random = new Random();

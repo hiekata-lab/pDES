@@ -28,25 +28,109 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.pdes.rcp.model.ComponentNode;
 import org.pdes.simulator.model.base.BaseComponent;
 
 /**
- * @author Takuya Goto <tgoto@s.h.k.u-tokyo.ac.jp>
+ * @author Yoshiaki Oida <yoida@s.h.k.u-tokyo.ac.jp>
  *
  */
 public class Component extends BaseComponent {
 	private final double sigma;
+	private final int dueDate;//[0,time = dueDate-1] or [0,dueDate)
+	private double actualTotalWorkAmount;
+
+	//Changeable variables
+	private List<Worker> workerList = new ArrayList<Worker>();
+	private double estimatedCompletionTime;
+	private double estimatedTotalWorkAmount;
+	private double estimatedRequiredResource;
 
 	/**
 	 * @param componentNode
 	 */
 	public Component(ComponentNode componentNode) {
 		super(componentNode);
-		this.sigma = 1.0;
+		this.sigma = componentNode.getSigma();
+		this.dueDate = componentNode.getDueDate(); 
+	}
+	
+	/**
+	 * Initialize
+	 */
+	@Override
+	public void initialize() {
+		this.actualTotalWorkAmount = this.getTargetedTaskList().stream()
+				.mapToDouble(t -> t.getActualWorkAmount()).sum();
+		
+		this.workerList.clear();
+		this.estimatedTotalWorkAmount = Double.POSITIVE_INFINITY;
+		this.estimatedCompletionTime = Double.POSITIVE_INFINITY;
+		this.estimatedRequiredResource = Double.POSITIVE_INFINITY;
 	}
 
 	public double getSigma() {
 		return sigma;
 	}
+	public int getDueDate() {
+		return dueDate;
+	}
+
+	public double getActualTotalWorkAmount() {
+		return this.actualTotalWorkAmount;
+	}
+	/**
+	 * Estimate Total Work Amount, Completion Time, Required Resources
+	 * @param time
+	 */
+	public void estimeate(int time) {
+		this.estimatedTotalWorkAmount = this.getTargetedTaskList().stream()
+				.mapToDouble(t -> t.getRemainingWorkAmount()).sum();
+		this.estimatedCompletionTime = time + this.getEstimatedTotalWorkAmount()/this.getWorkerList().size();	
+		this.estimatedRequiredResource = this.getEstimatedTotalWorkAmount()/(this.getDueDate() - time);
+	}
+
+	public double getEstimatedTotalWorkAmount() {
+		return this.estimatedTotalWorkAmount;
+	}
+
+	public double getEstimatedRequiredResource(int time) {
+		return this.estimatedRequiredResource;
+	}
+
+	public List<Worker> getWorkerList() {
+		return workerList;
+	}
+
+	public void setWorkerList(List<Worker> workerList) {
+		this.workerList = workerList;
+	}
+	
+	public double getEstimatedCompletionTime(int time) {
+		return this.estimatedCompletionTime;
+	}
+	
+
+	/**
+	 * Transfer to text data.
+	 */
+	@Override
+	public String toString() {
+		String assignedWorkerNames = String.join(",", workerList.stream().map(w -> w.getName()).collect(Collectors.toList()));
+		return String.format("[%s] DD=%d ECT=%f || ATWA=%f ETWA=%f || ERR=%f NoAW=%d AW=[%s]", 
+				this.getName(), this.getDueDate(), this.estimatedCompletionTime, //Time
+				this.actualTotalWorkAmount,this.estimatedTotalWorkAmount, //Work Amount
+				this.estimatedRequiredResource, workerList.size(), assignedWorkerNames); //Resource
+	}
+
+	public List<Task> getUnfinishedTaskList() {
+		return super.getTargetedTaskList().stream()
+				.filter(t -> !t.isFinished())
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
+	}	
 }

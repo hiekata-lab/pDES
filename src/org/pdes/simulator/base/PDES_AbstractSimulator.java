@@ -285,7 +285,7 @@ public abstract class PDES_AbstractSimulator {
 		workflowList.forEach(w -> w.perform(time, componentErrorRework));//update information of WORKING task in each workflow
 		workflowList.forEach(w -> w.checkFinished(time));// WORKING -> WORKING_ADDITIONALLY or FINISHED
 		workflowList.forEach(w -> w.checkReady(time));// NONE -> READY
-		workflowList.forEach(w -> w.updatePERTData());//Update PERT information
+		workflowList.forEach(w -> w.updatePERTData(time));//Update PERT information
 	}
 	
 	/**

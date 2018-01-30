@@ -158,8 +158,8 @@ public class Workflow extends BaseWorkflow {
 		
 		// 1. Set the earliest finish time of head tasks.
 		for(BaseTask task : superTaskList){
+			task.setEst(time); // for initializing
 			if(task.getInputTaskList().size()==0){
-				task.setEst(time);
 				task.setEft(time + task.getRemainingWorkAmount());
 				inputTaskList.add(task);
 			}
@@ -178,7 +178,8 @@ public class Workflow extends BaseWorkflow {
 							Double inputEst = inputTask.getEst();
 							Double est = Double.valueOf(inputEst) + inputTask.getRemainingWorkAmount();
 							Double eft = Double.valueOf(est) + task.getRemainingWorkAmount();
-							if(est > preEst){
+
+							if(est >= preEst){
 								task.setEst(est);
 								task.setEft(eft);
 								for (int l = 0; l < nextTaskList.size(); l++) {
@@ -238,7 +239,7 @@ public class Workflow extends BaseWorkflow {
 				if(task.getId().equals(lateTask.getId())){
 					task.setLft(getCriticalPathLength());
 					task.setLst(getCriticalPathLength() - task.getRemainingWorkAmount());
-					registerLsLf(task,c);
+					registerLsLf(task, c);
 				}
 			}
 		}
@@ -265,16 +266,145 @@ public class Workflow extends BaseWorkflow {
 		}
 		
 		for(BaseTask inputTask : inputTaskList){
-			if (inputTask.getLft() == 0
-					|| inputTask.getLft() > length) { 
+			
+			if (inputTask.getLft() <= length) { 
 				
 				inputTask.setLft(length);
-				inputTask.setLst(length - (inputTask.getRemainingWorkAmount()));
-				
+				inputTask.setLst(length - (inputTask.getRemainingWorkAmount()));	
 				registerLsLf(inputTask,c);
 			}
 		}
 	}
+	
+//	/**
+//	 * Calculate earliest start / finish time of all tasks by using only remaining work amount.
+//	 */
+//	private void setEstEftData(int time, Component c){
+//		List<BaseTask> superTaskList = super.getTaskList().stream()
+//		.filter(t -> t.getTargetComponentList().contains(c))
+//		.collect(Collectors.toList());
+//		
+//		List<BaseTask> inputTaskList = new ArrayList<BaseTask>();
+//		
+//		// 1. Set the earliest finish time of head tasks.
+//		for(BaseTask task : superTaskList){
+//			if(task.getInputTaskList().size()==0){
+//				task.setEst(time);
+//				task.setEft(time + task.getRemainingWorkAmount());
+//				inputTaskList.add(task);
+//			}
+//		}
+//		
+//		// 2. Calculate PERT information of all tasks
+//		while (true){
+//			if(inputTaskList.size() == 0) break;
+//			List<BaseTask> nextTaskList = new ArrayList<BaseTask>();
+//			for(BaseTask inputTask : inputTaskList){
+//				for(BaseTask task : superTaskList){
+//					List<BaseTask> _inputTaskList = task.getInputTaskList();
+//					for(BaseTask _inputTask : _inputTaskList){
+//						if(inputTask.equals(_inputTask)){
+//							Double preEst = task.getEst();
+//							Double inputEst = inputTask.getEst();
+//							Double est = Double.valueOf(inputEst) + inputTask.getRemainingWorkAmount();
+//							Double eft = Double.valueOf(est) + task.getRemainingWorkAmount();
+//							if(est > preEst){
+//								task.setEst(est);
+//								task.setEft(eft);
+//								for (int l = 0; l < nextTaskList.size(); l++) {
+//									if (nextTaskList.get(l).getId().equals(task.getId())) {
+//										nextTaskList.remove(l);
+//									}
+//								}
+//								nextTaskList.add(task);
+//							}
+//						}
+//					}
+//				}
+//			}
+//			inputTaskList = nextTaskList;
+//		}
+//	}
+//	
+//	/**
+//	 * Calculate latest start / finish time of all tasks by using only remaining work amount.
+//	 */
+//	private void setLstLftData(Component c){
+//		List<BaseTask> superTaskList = super.getTaskList().stream()
+//		.filter(t -> t.getTargetComponentList().contains(c))
+//		.collect(Collectors.toList());
+//		
+//		List<BaseTask> lateTaskList = new ArrayList<BaseTask>();
+//		
+//		//1. Extract the list of tail tasks.
+//		List<String> lastTaskIdList = superTaskList.stream().map(task -> task.getId()).collect(Collectors.toList());
+//		for(BaseTask task : superTaskList){
+//			for(BaseTask inputTask : task.getInputTaskList()){
+//				String inputTaskId = inputTask.getId();
+//				for(int k=0; k< lastTaskIdList.size(); k++){
+//					String id = lastTaskIdList.get(k);
+//					if(id.equals(inputTaskId)){
+//						lastTaskIdList.remove(k);
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		
+//		//2. Update the information of critical path of this workflow.
+//		for(String lastTaskId : lastTaskIdList){
+//			for(BaseTask task : superTaskList){
+//				if(lastTaskId.equals(task.getId())) {
+//					lateTaskList.add(task);
+//					if(getCriticalPathLength() < task.getEft()) setCriticalPathLength(task.getEft());
+//				}
+//			}
+//		}
+//		
+//		
+//		//3. Calculate the PERT information of all tasks.
+//		for(BaseTask task : superTaskList){
+//			for(BaseTask lateTask : lateTaskList){
+//				if(task.getId().equals(lateTask.getId())){
+//					task.setLft(getCriticalPathLength());
+//					task.setLst(getCriticalPathLength() - task.getRemainingWorkAmount());
+//					registerLsLf(task,c);
+//				}
+//			}
+//		}
+//		
+//	}
+//	
+//	/**
+//	 * Calculate latest start / finish time of all tasks by using only remaining work amount.
+//	 * @param task
+//	 */
+//	private void registerLsLf(BaseTask task, Component c) {
+//		List<BaseTask> superTaskList = super.getTaskList().stream()
+//		.filter(t -> t.getTargetComponentList().contains(c))
+//		.collect(Collectors.toList());
+//		
+//		double length = task.getLst();
+//		
+//		List<BaseTask> inputTaskList = new ArrayList<BaseTask>();
+//		for(BaseTask inputTask : superTaskList){
+//			for(BaseTask it : task.getInputTaskList()){
+//				String inputId = it.getId();
+//				if(inputTask.getId().equals(inputId)) inputTaskList.add(inputTask);
+//			}
+//		}
+//		
+//		for(BaseTask inputTask : inputTaskList){
+//			if (inputTask.getLft() == 0
+//					|| inputTask.getLft() > length) { 
+//				
+//				inputTask.setLft(length);
+//				inputTask.setLst(length - (inputTask.getRemainingWorkAmount()));
+//				
+//				registerLsLf(inputTask,c);
+//			}
+//		}
+//	}
 
 
 }

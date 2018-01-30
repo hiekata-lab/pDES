@@ -137,7 +137,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			w.setAssignedProjectPlanArray(
 					-1, //default setting time
 					0, //start
-					w.getCurrentAssignedProject().getDueDate(), //end (this value is excluded.)
+					w.getCurrentAssignedProject().getDueDate()+1, //end (this value is excluded.)
 					projectList.indexOf(w.getCurrentAssignedProject()) //projectIndex
 				)
 			);
@@ -284,7 +284,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					 */
 					//Work amount to be released
 					double estimatedReleasableWorkAmount = 0;
-					for (int t = time+1; t < c.getDueDate(); t++){//t+1 ~ dd
+					for (int t = time+1; t < c.getDueDate()+1; t++){//t+1 ~ dd
 						double numOfResourceAtTime = 0;
 						for (Worker w : allWorkerList) {
 							if(c.equals(w.getLatestAssignedProjectPlanArray()[t] != -1 
@@ -307,7 +307,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					double workAmountToBeReleased = 0;
 					for (Worker w : workerListToBeReleased) {
 						boolean updateFlag = false;
-						for(int t = c.getDueDate()-1; t > time; t--) {
+						for(int t = c.getDueDate(); time < t ; t--) {
 							if(estimatedReleasableWorkAmount <= workAmountToBeReleased) break;
 							if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
 								w.getLatestAssignedProjectPlanArray()[t] = -1; //Release
@@ -338,7 +338,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						
 						//Work Amount to be supply requested
 						estimatedLackOfWorkAmount = c.getEstimatedTotalWorkAmount();					
-						for (int t = time+1; t < c.getDueDate(); t++){//t+1 ~ dd
+						for (int t = time+1; t < c.getDueDate()+1; t++){//t+1 ~ dd
 							double numOfResourceAtTime = 0;
 							for (Worker w : allWorkerList) {
 								if(c.equals(w.getLatestAssignedProjectPlanArray()[t] != -1 
@@ -371,7 +371,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						//(t+1 <= dd) Select time slots to be supplied. Priority : 1.Worker -> 2.Time(Forward)
 						double workAmountToBeSupplied = 0;
 						for (Worker w : workerListToBeSupplied) {
-							for(int t = time+1; t < c.getDueDate(); t++) {
+							for(int t = time+1; t < c.getDueDate()+1; t++) {
 								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
 								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
 									w.getLatestAssignedProjectPlanArray()[t] = projectIndex; //Supplied
@@ -382,7 +382,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						}
 						
 						//(dd < t ) Select time slots to be supplied. Priority : 1.Time(Forward)　-> 2.Worker 
-						for(int t =  c.getDueDate(); t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
+						for(int t =  c.getDueDate()+1; t < Math.min(c.getEstimatedCompletionTime(time),PDES_OidaSimulator.maxTime); t++) {
 							for (Worker w : workerListToBeSupplied) {
 								if(estimatedLackOfWorkAmount <= workAmountToBeSupplied) break;
 								if(requestSpan[t] == projectIndex && w.getLatestAssignedProjectPlanArray()[t] == -1) {
@@ -508,18 +508,33 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
 			
+			//Projects
+			ArrayList<Component> projectList =this.productList.stream()
+					.flatMap(p -> p.getComponentList().stream())
+					.collect(
+							() -> new ArrayList<>(),
+							(l,c) -> l.add((Component)c),
+							(l1,l2) -> l1.addAll(l2)
+							);
 			//summary
-			pw.println(String.join(separator, new String[]{
-					"Duration", String.valueOf(project.getDuration()+1), 
-					
-					/**
-					 * 1/30 Average Project Delay 
-					 * 
-					 */
-					
-					"Total Cost", String.valueOf(project.getTotalCost()),
-					"Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())
-					}));
+			pw.print("Summary"+separator+"Portfolio"+separator);
+			projectList.stream().forEach(c -> pw.print(c.getName()+separator));
+			pw.println();
+			
+			pw.print("Total Work Amount"+separator+String.valueOf(project.getTotalActualWorkAmount())+separator);
+			projectList.stream().forEach(c -> pw.print(c.getActualTotalWorkAmount()+separator));
+			pw.println();
+			
+			pw.print("Duration"+separator+String.valueOf(project.getDuration()+1)+separator);
+			projectList.stream().forEach(c -> pw.print((c.getFinishTime()-c.getStartTime()+1)+separator));
+			pw.println();
+			
+			pw.print("Average Project Delay"+separator+ String.valueOf(projectList.stream().mapToDouble(c -> Math.max(0, c.getFinishTime()-c.getDueDate())).average().orElse(-1))+separator);
+			projectList.stream().forEach(c -> pw.print(Math.max(0, c.getFinishTime()-c.getDueDate())+separator));
+			pw.println();
+			
+			pw.println("Total Cost"+separator+ String.valueOf(project.getTotalCost())+separator);
+			pw.println();
 			
 			//time
 			pw.println(separator +"time");
@@ -557,6 +572,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				}
 			});
 			pw.println();
+			
 			// header
 			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()+1), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
 			

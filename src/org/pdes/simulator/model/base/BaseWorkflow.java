@@ -110,11 +110,11 @@ public class BaseWorkflow {
 					List<BaseTask> _inputTaskList = task.getInputTaskList();
 					for(BaseTask _inputTask : _inputTaskList){
 						if(inputTask.equals(_inputTask)){
-							//Double preEst = task.getEst();
+							Double preEst = task.getEst();
 							Double inputEst = inputTask.getEst();
 							Double est = Double.valueOf(inputEst) + inputTask.getRemainingWorkAmount();
 							Double eft = Double.valueOf(est) + task.getRemainingWorkAmount();
-							if(est > time){
+							if(est >= time && est >= preEst){
 								task.setEst(est);
 								task.setEft(eft);
 								for (int l = 0; l < nextTaskList.size(); l++) {
@@ -194,7 +194,7 @@ public class BaseWorkflow {
 		
 		for(BaseTask inputTask : inputTaskList){
 			
-			if (inputTask.getLft() < length) { 
+			if (inputTask.getLft() <= length) { 
 				
 				inputTask.setLft(length);
 				inputTask.setLst(length - (inputTask.getRemainingWorkAmount()));	

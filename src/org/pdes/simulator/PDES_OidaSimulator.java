@@ -44,6 +44,7 @@ import java.util.stream.IntStream;
 import org.pdes.simulator.base.PDES_AbstractSimulator;
 import org.pdes.simulator.model.Component;
 import org.pdes.simulator.model.Organization;
+import org.pdes.simulator.model.Request;
 import org.pdes.simulator.model.Task;
 import org.pdes.simulator.model.Workflow;
 import org.pdes.simulator.model.Worker;
@@ -63,7 +64,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	
 	//Additional
 	static public final int maxTime = 100;	
-	private List<Worker> allWorkerList;
+	static public List<Worker> allWorkerList;
+	static public ArrayList<Component> projectList;
 	
 	public PDES_OidaSimulator(BaseProjectInfo project) {
 		super(project);
@@ -76,9 +78,9 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		/**
 		 * Project Portfolio Initialize
 		 */
-		
-		//Projects
-		ArrayList<Component> projectList =this.productList.stream()
+
+		//All Projects
+		projectList =this.productList.stream()
 				.flatMap(p -> p.getComponentList().stream())
 				.collect(
 						() -> new ArrayList<>(),
@@ -86,19 +88,17 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						(l1,l2) -> l1.addAll(l2)
 						);
 				
-		int numOfProject = projectList.size();
-		
+		//All Workers
+		allWorkerList = this.organization.getWorkerList().stream()
+				.map(w -> (Worker)w)
+				.collect(Collectors.toList());
+				
 		System.out.println();
 		System.out.println("*** Project Portfolio Information ***");
-		System.out.println("Number of project : " + numOfProject);
+		System.out.println("Number of project : " + projectList.size());
 		System.out.println("Project portfolio : " + projectList);
 		projectList.stream().forEach(c -> System.out.println(c.getName() + " : " + c.getTargetedTaskList()));
 		
-		//Communication Matrix
-		//TO DO IMPLEMENT
-		//TO DO IMPLEMENT
-		//TO DO IMPLEMENT
-
 		
 		/**
 		 * 1.Initial Allocation
@@ -110,12 +110,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		 */
 		System.out.println();
 		System.out.println("*** Initial Allocation ***");
-		
-		//All Workers
-		this.allWorkerList = this.organization.getWorkerList().stream()
-				.map(w -> (Worker)w)
-				.collect(Collectors.toList());
-		
+				
 		//Just confirm worker's Executable Task
 		allWorkerList.stream().forEach(w -> 
 			projectList.stream().forEach(c -> 
@@ -243,10 +238,14 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			System.out.println();
 			System.out.println("t: " +time+ " *** Resource Re-allocation ***");
 			
+			//Show Communication Matrix
+			Request.showCommunicationMatrix();
+			
 			for(	Component c : projectList) {
 				/**
 				 * Release all resources when a project finishes,
 				 */
+				
 				//Just Show Unfinished Task List
 				System.out.println(c.getName() + "(Unfinished) : " + c.getUnfinishedTaskList());
 				//Check project finish or not.
@@ -271,40 +270,39 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				/**
 				 * Release and Request based on Estimation by Project Manager.
 				 */
-				//Estimate Total Remaining Work Amount, Completion Time, Required Resources
+				//(PM) Estimate Total Remaining Work Amount, Completion Time, Required Resources
 				c.estimeate(time);
 				System.out.println(c.toString());
+				
+				//Show Communication Matrix
+				Request.showCommunicationMatrix();
 				
 				//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
 				if(c.getEstimatedDelay() < 0) {
 					/**
-					 * Release
-					 * ct' < dd
-					 * <-> time + WL'/|RA| < dd
-					 * -> time < dd    *WL'/|RA| > 0
+					 * Release {ct' < dd} <-> {time + WL'/|RA| < dd} -> {time < dd}    *WL'/|RA| > 0
 					 */
-					//Work amount to be released
-					double estimatedReleasableWorkAmount = c.estimateReleasableWorkAmount(time, allWorkerList, projectList);
-//					double estimatedReleasableWorkAmount = 0;
-//					for (int t = time+1; t < c.getDueDate()+1; t++){//t+1 ~ dd
-//						double numOfResourceAtTime = 0;
-//						for (Worker w : allWorkerList) {
-//							if(c.equals(w.getLatestAssignedProjectPlanArray()[t] != -1 
-//									? projectList.get(w.getLatestAssignedProjectPlanArray()[t]) : null)) numOfResourceAtTime++;
-//						}
-//						estimatedReleasableWorkAmount += numOfResourceAtTime;
-//					}
-//					estimatedReleasableWorkAmount -= c.getEstimatedTotalWorkAmount();
-//					
-//					//No Release-able Resource -> next Project
-//					if(estimatedReleasableWorkAmount < 0) continue;
+					//(PM) Estimate Releasable Work Amount
+					double estimatedReleasableWorkAmount = c.estimateReleasableWorkAmount(time);
 					
-					//Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
+					/**
+					 * Add Example 
+					 * List<Request> releaseRequestList = new ArrayList<Request>(); PM->WR
+					 * List<Request> supplyRequestList = new ArrayList<Request>(); PM->BR
+					 * List<Request> assignRequestList = new ArrayList<Request>(); BR->WR
+					 * Request r = c.createRquest();
+					 * 
+					 * request list の時間がきたものから対処していく．
+					 * 時間関係など注意
+					 * 
+					 */
+					
+					//(PM) Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
 					List<Worker> workerListToBeReleased = allWorkerList.stream()
 						.sorted((w1,w2) -> w1.getExecutableUnfinishedTaskList(c).size() - w2.getExecutableUnfinishedTaskList(c).size())//How About Skill Point 
 						.collect(Collectors.toList());
 					
-					//Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
+					//(PM) Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
 					int projectIndex = projectList.indexOf(c);
 					double workAmountToBeReleased = 0;
 					for (Worker w : workerListToBeReleased) {

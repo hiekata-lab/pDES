@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.ComponentNode;
+import org.pdes.simulator.PDES_OidaSimulator;
 import org.pdes.simulator.model.base.BaseComponent;
 
 /**
@@ -101,12 +102,12 @@ public class Component extends BaseComponent {
 		this.estimatedDelay = this.estimatedCompletionTime - this.getDueDate();
 	}
 	
-	public double estimateReleasableWorkAmount(int time, List<Worker> allWorkerList, List<Component> projectList) {
+	public double estimateReleasableWorkAmount(int time) {
 		double estimatedReleasableWorkAmount = 0;
 		for (int t = time+1; t < this.getDueDate()+1; t++){//t+1 ~ dd
 			double numOfResourceAtTime = 0;
-			for (Worker w : allWorkerList) {
-				if(projectList.indexOf(this) == (w.getLatestAssignedProjectPlanArray()[t])) numOfResourceAtTime++;
+			for (Worker w : PDES_OidaSimulator.allWorkerList) {
+				if(PDES_OidaSimulator.projectList.indexOf(this) == (w.getLatestAssignedProjectPlanArray()[t])) numOfResourceAtTime++;
 			}
 			estimatedReleasableWorkAmount += numOfResourceAtTime;
 		}

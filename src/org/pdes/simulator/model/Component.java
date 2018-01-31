@@ -118,11 +118,15 @@ public class Component extends BaseComponent {
 		return estimatedReleasableWorkAmount;
 	}
 	
+	//PM->WR
 	public List<Request> sendRelease(int time) {
 		List<Request> releaseList  = new ArrayList<Request>();
 		
 		//(PM) Estimate Releasable Work Amount
 		double estimatedReleasableWorkAmount = this.estimateReleasableWorkAmount(time);
+		
+		//No Release-able Resource -> next Project
+		if(estimatedReleasableWorkAmount < 0) return releaseList;
 		
 		//(PM) Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
 		List<Worker> workerListToBeReleased = PDES_OidaSimulator.allWorkerList.stream()
@@ -153,17 +157,49 @@ public class Component extends BaseComponent {
 			}
 			
 			//Add request list
-			releaseList.add(new Request(time, Request.indexOf(this), Request.indexOf(w), targetTimeSlotArray, this.getUnfinishedTaskList()));
+			releaseList.add(new Request(time, Request.indexOf(this), Request.indexOf(w), targetTimeSlotArray));
 			
 //			//Update ReleaseProjectPlanArray
 //			if(updateFlags.get(w)) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
 		}
 		return releaseList;
 	}
-//	public List<Request> sendSupplyRequest(int time) {
-//		
-//		
-//	}
+	
+	public double estimateLackOfWorkAmount(int time) {
+		double estimatedLackOfWorkAmount = 0;
+		if(time <= this.getDueDate()) {//time <= due date
+
+			//Work Amount to be supply requested
+			estimatedLackOfWorkAmount = this.getEstimatedTotalWorkAmount();					
+			for (int t = time+1; t < this.getDueDate()+1; t++){//t+1 ~ dd
+				double numOfResourceAtTime = 0;
+				for (Worker w : PDES_OidaSimulator.allWorkerList) {
+					if(PDES_OidaSimulator.projectList.indexOf(this) == (w.getLatestAssignedProjectPlanArray()[t])) numOfResourceAtTime++;
+				}
+				estimatedLackOfWorkAmount -= numOfResourceAtTime;
+			}
+		}else {//time > due date			
+			//Work Amount as much as possible to be supply requested 
+			estimatedLackOfWorkAmount = this.getEstimatedTotalWorkAmount();											
+		}
+		return estimatedLackOfWorkAmount;
+	}
+	
+	//PM->BR
+	public List<Request> sendSupplyRequest(int time) {
+		List<Request> supplyRequestList  = new ArrayList<Request>();
+		
+		//(PM) Estimate work amount to supply request
+		double estimatedLackOfWorkAmount = estimateLackOfWorkAmount(time);
+		
+		//No lack of Resource -> next Project
+		if(estimatedLackOfWorkAmount < 0) return supplyRequestList;
+		
+		//Add request list
+		supplyRequestList.add(new Request(time, Request.indexOf(this), PDES_OidaSimulator.brokerId, this.getUnfinishedTaskList(), estimatedLackOfWorkAmount));
+		
+		return supplyRequestList;
+	}
 	
 	public double getEstimatedTotalWorkAmount() {
 		return this.estimatedTotalWorkAmount;

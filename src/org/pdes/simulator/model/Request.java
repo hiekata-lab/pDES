@@ -135,15 +135,43 @@ public class Request {
 		}
 	}	
 
-	private final Integer[] targetTimeSlotArray;
+	private Integer[] targetTimeSlotArray;
 	private List<Task> taskList;
+	private double workAmount;
 	private int remainingTime;
 	private int arrivalTime;
 	private final int departureTime;
 	private final int fromIndex;
 	private final int toIndex;
 	
-	//Supply Request, Confirm & Reply
+//	public Request(int time, int fromIndex, int toindex) {
+//		this.departureTime = time;
+//		this.fromIndex = fromIndex;
+//		this.toIndex = toindex;
+//	}
+	
+	//Release(PM->WR), Final Confirm & Reply (BR->WR)
+	public Request(int time, int fromIndex, int toindex, Integer[] targetTimeSlotArray) {
+		this.departureTime = time;
+		this.arrivalTime = -1;
+		this.targetTimeSlotArray = targetTimeSlotArray;
+		this.fromIndex = fromIndex;
+		this.toIndex = toindex;
+		this.remainingTime = calcDuration(fromIndex, toindex);
+	}
+	
+	//Supply Request PM->BR
+	public Request(int time, int fromIndex, int toindex, List<Task> taskList, double workAmount) {
+		this.departureTime = time;
+		this.arrivalTime = -1;
+		this.taskList = taskList;
+		this.workAmount = workAmount;
+		this.fromIndex = fromIndex;
+		this.toIndex = toindex;
+		this.remainingTime = calcDuration(fromIndex, toindex);
+	}
+	
+	//Confirm & Reply (BR->WR)
 	public Request(int time, int fromIndex, int toindex, Integer[] targetTimeSlotArray, List<Task> taskList) {
 		this.departureTime = time;
 		this.arrivalTime = -1;
@@ -151,25 +179,17 @@ public class Request {
 		this.targetTimeSlotArray = targetTimeSlotArray;
 		this.fromIndex = fromIndex;
 		this.toIndex = toindex;
-		this.remainingTime = calcTimeOfArrival(fromIndex, toindex);
-	}
-	
-	//Final Confirm & Reply, Release
-	public Request(int time, int fromIndex, int toindex, Integer[] targetTimeSlotArray) {
-		this.departureTime = time;
-		this.arrivalTime = -1;
-		this.targetTimeSlotArray = targetTimeSlotArray;
-		this.fromIndex = fromIndex;
-		this.toIndex = toindex;
-		this.remainingTime = calcTimeOfArrival(fromIndex, toindex);
+		this.remainingTime = calcDuration(fromIndex, toindex);
 	}
 
 	public void updateRemainlingTime() {
-		this.remainingTime-- ;
+		if(this.remainingTime > 0) {
+			this.remainingTime-- ;
+		}
 	}
 	
 	public boolean checkArrival(int time) {
-		if (this.remainingTime <= 0 && arrivalTime == -1){
+		if (this.remainingTime == 0 && arrivalTime == -1){
 			arrivalTime = time;
 			return true; //arrival
 		}else {
@@ -177,7 +197,7 @@ public class Request {
 		}
 	}
 	
-	private int calcTimeOfArrival(int fromIndex, int toindex) {
+	private int calcDuration(int fromIndex, int toindex) {
 		//return getCommunicationDistance(fromIndex, toindex);//0　
 		return 0;
 	}
@@ -200,5 +220,10 @@ public class Request {
 	public int getToIndex() {
 		return toIndex;
 	}
-
+	/**
+	 * @return the workAmount
+	 */
+	public double getWorkAmount() {
+		return workAmount;
+	}
 }

@@ -28,6 +28,7 @@
  */
 package org.pdes.simulator.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.pdes.simulator.PDES_OidaSimulator;
@@ -43,6 +44,18 @@ public class Request {
 	}
 	public static int indexOf(Component c) {
 		return 1 + PDES_OidaSimulator.projectList.indexOf(c); 
+	}
+	public static Object getObject(int index) {
+		if(index == 0) {
+			System.out.println("Portfolio Manager is selected.");
+			return null;
+		}
+		if(0 < index && index < 1+PDES_OidaSimulator.projectList.size()) {
+			return PDES_OidaSimulator.projectList.get(index);
+		}else{
+			return PDES_OidaSimulator.allWorkerList.get(index -(1+PDES_OidaSimulator.projectList.size()));
+		}
+		
 	}
 	public static void showCommunicationMatrix() {
 		//Communication Matrix
@@ -120,40 +133,72 @@ public class Request {
 				return 4; //Worker Assigned to other project
 			}
 		}
+	}	
+
+	private final Integer[] targetTimeSlotArray;
+	private List<Task> taskList;
+	private int remainingTime;
+	private int arrivalTime;
+	private final int departureTime;
+	private final int fromIndex;
+	private final int toIndex;
+	
+	//Supply Request, Confirm & Reply
+	public Request(int time, int fromIndex, int toindex, Integer[] targetTimeSlotArray, List<Task> taskList) {
+		this.departureTime = time;
+		this.arrivalTime = -1;
+		this.taskList = taskList;
+		this.targetTimeSlotArray = targetTimeSlotArray;
+		this.fromIndex = fromIndex;
+		this.toIndex = toindex;
+		this.remainingTime = calcTimeOfArrival(fromIndex, toindex);
 	}
 	
-	private final Worker targetWorker;
-	private final Integer[] targetTimeSpanArray;
-	private int timeOfArrival;
-	
-	public Request(Worker targetWorker, Integer[] targetTimeSpanArray, int fromIndex, int toindex) {
-		this.targetWorker = targetWorker;
-		this.targetTimeSpanArray = targetTimeSpanArray;
-		this.timeOfArrival = calcTimeOfArrival(fromIndex, toindex);
+	//Final Confirm & Reply, Release
+	public Request(int time, int fromIndex, int toindex, Integer[] targetTimeSlotArray) {
+		this.departureTime = time;
+		this.arrivalTime = -1;
+		this.targetTimeSlotArray = targetTimeSlotArray;
+		this.fromIndex = fromIndex;
+		this.toIndex = toindex;
+		this.remainingTime = calcTimeOfArrival(fromIndex, toindex);
 	}
 
-	public void updateTimeOfArrival() {
-		this.timeOfArrival-- ;
+	public void updateRemainlingTime() {
+		this.remainingTime-- ;
 	}
 	
-	public boolean checkArrival() {
-		return this.timeOfArrival <= 0;
+	public boolean checkArrival(int time) {
+		if (this.remainingTime <= 0 && arrivalTime == -1){
+			arrivalTime = time;
+			return true; //arrival
+		}else {
+			return false; //not yet
+		}
 	}
 	
 	private int calcTimeOfArrival(int fromIndex, int toindex) {
-		return getCommunicationDistance(fromIndex, toindex);//0　
+		//return getCommunicationDistance(fromIndex, toindex);//0　
+		return 0;
 	}
-	/**
-	 * @return the targetWorker
-	 */
-	public Worker getTargetWorker() {
-		return targetWorker;
-	}
+
 	/**
 	 * @return the targetTimeSpanArray
 	 */
-	public Integer[] getTargetTimeSpanArray() {
-		return targetTimeSpanArray;
+	public Integer[] getTargetTimeSlotArray() {
+		return targetTimeSlotArray;
+	}
+	/**
+	 * @return the fromIndex
+	 */
+	public int getFromIndex() {
+		return fromIndex;
+	}
+	/**
+	 * @return the toIndex
+	 */
+	public int getToIndex() {
+		return toIndex;
 	}
 
 }

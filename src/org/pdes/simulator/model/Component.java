@@ -29,6 +29,8 @@
 package org.pdes.simulator.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,7 @@ public class Component extends BaseComponent {
 	public double getActualTotalWorkAmount() {
 		return this.actualTotalWorkAmount;
 	}
+	
 	/**
 	 * Estimate Total Work Amount, Completion Time, Required Resources
 	 * @param time
@@ -114,6 +117,53 @@ public class Component extends BaseComponent {
 		estimatedReleasableWorkAmount -= this.getEstimatedTotalWorkAmount();	
 		return estimatedReleasableWorkAmount;
 	}
+	
+	public List<Request> sendRelease(int time) {
+		List<Request> releaseList  = new ArrayList<Request>();
+		
+		//(PM) Estimate Releasable Work Amount
+		double estimatedReleasableWorkAmount = this.estimateReleasableWorkAmount(time);
+		
+		//(PM) Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
+		List<Worker> workerListToBeReleased = PDES_OidaSimulator.allWorkerList.stream()
+			.sorted((w1,w2) -> w1.getExecutableUnfinishedTaskList(this).size() - w2.getExecutableUnfinishedTaskList(this).size())//How About Skill Point 
+			.collect(Collectors.toList());
+		
+		//(PM) Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
+//		//Initialize
+//		HashMap<Worker, Boolean> updateFlags = new HashMap<Worker,Boolean>();
+//		workerListToBeReleased.stream().forEach(w -> updateFlags.put(w, false));
+		
+		int projectIndex = PDES_OidaSimulator.projectList.indexOf(this);
+		double workAmountToBeReleased = 0;
+		for (Worker w : workerListToBeReleased) {
+			//Initialize
+			Integer[] targetTimeSlotArray = new Integer[PDES_OidaSimulator.maxTime];
+			System.arraycopy(w.getLatestAssignedProjectPlanArray(), 0,
+					targetTimeSlotArray, 0, w.getLatestAssignedProjectPlanArray().length);
+			
+			//Target Time Slots for Request
+			for(int t = this.getDueDate(); time < t ; t--) {
+				if(estimatedReleasableWorkAmount <= workAmountToBeReleased) break;
+				if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
+					targetTimeSlotArray[t] = -1; //Release
+					workAmountToBeReleased += 1;
+//					updateFlags.put(w, true);
+				}
+			}
+			
+			//Add request list
+			releaseList.add(new Request(time, Request.indexOf(this), Request.indexOf(w), targetTimeSlotArray, this.getUnfinishedTaskList()));
+			
+//			//Update ReleaseProjectPlanArray
+//			if(updateFlags.get(w)) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
+		}
+		return releaseList;
+	}
+//	public List<Request> sendSupplyRequest(int time) {
+//		
+//		
+//	}
 	
 	public double getEstimatedTotalWorkAmount() {
 		return this.estimatedTotalWorkAmount;

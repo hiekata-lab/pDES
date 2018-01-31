@@ -91,6 +91,19 @@ public class Worker extends BaseWorker {
 		setCurrentAssignedProject(null);
 	}
 	
+
+	/**
+	 * Get executable Task List
+	 * @param c
+	 * @return
+	 */
+	public List<Task> getExecutableTaskList(Workflow w) {
+		return w.getTaskList().stream()
+				.filter(t -> this.getWorkAmountSkillPoint(t) > 0)
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
+	}
+	
 	/**
 	 * Get executable unfinished Task List regarding each Project 
 	 * @param c
@@ -138,7 +151,8 @@ public class Worker extends BaseWorker {
 			Exception e = new Exception("Length of assignedProjectPlanArray is different.");
 			e.printStackTrace();
 		}
-		this.latestAssignedProjectPlanArray = assignedProjectPlanArray;
+		//this.latestAssignedProjectPlanArray = assignedProjectPlanArray;
+		System.arraycopy(assignedProjectPlanArray, time+1, this.latestAssignedProjectPlanArray, time+1, assignedProjectPlanArray.length - time -1);
 		
 		//update assigned plan history 
 		Integer[] timeOneArray = {time};

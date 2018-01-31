@@ -66,9 +66,17 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	static public final int maxTime = 100;	
 	static public List<Worker> allWorkerList;
 	static public ArrayList<Component> projectList;
+	public List<Request> releaseList;//release
+	public List<Request> supplyRequestList; //supply request
+	public List<Request> confirmList;//supply request
+	public List<Request> finalConfirmList;//supply request
 	
 	public PDES_OidaSimulator(BaseProjectInfo project) {
 		super(project);
+		releaseList = new ArrayList<>();
+		supplyRequestList = new ArrayList<>();
+		confirmList = new ArrayList<>();
+		finalConfirmList = new ArrayList<>();
 	}
 
 	@Override
@@ -168,12 +176,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				return;
 			}
 			
-			/**
-			 * ToDo
-			 * - Request Class time_to_execute = N N-- (for each time step)
-			 * - Broker Interface
-			 */
-			
 			//A. Confirm Assigned Project Members on the basis of Assigned Project Plan
 			System.out.println();
 			System.out.println("t: " +time+ " *** Update Current Assigned Project ***");
@@ -245,7 +247,6 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				/**
 				 * Release all resources when a project finishes,
 				 */
-				
 				//Just Show Unfinished Task List
 				System.out.println(c.getName() + "(Unfinished) : " + c.getUnfinishedTaskList());
 				//Check project finish or not.
@@ -268,22 +269,46 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				}
 				
 				/**
-				 * Release and Request based on Estimation by Project Manager.
+				 * Release and Supply Request based on Estimation by Project Manager.
 				 */
 				//(PM) Estimate Total Remaining Work Amount, Completion Time, Required Resources
 				c.estimeate(time);
 				System.out.println(c.toString());
 				
-				//Show Communication Matrix
+				//Just Show Communication Matrix
 				Request.showCommunicationMatrix();
+				
+				//(PM) 1.Release, Supply Request or nothing 
+				if(c.getEstimatedDelay() < 0) {
+					//New Release
+					releaseList.addAll(c.sendRelease(time));
+				}else if(c.getEstimatedDelay() > 0){
+					//New Request
+					//supplyRequestList.addAll(c.sendSupplyRequest(time));
+				}else {//PM do nothing!
+				}
+
+				//Release 
+				//(WR) 
+				releaseList.stream()
+				.filter(r -> r.checkArrival(time))
+				.forEach(r -> ((Worker)Request.getObject(r.getToIndex())).setAssignedProjectPlanArray(time, r.getTargetTimeSlotArray()));
+				
+				/**
+				 * update request status
+				 */
+				releaseList.stream().forEach(r -> r.updateRemainlingTime());
+				supplyRequestList.stream().forEach(r -> r.updateRemainlingTime());
+				confirmList.stream().forEach(r -> r.updateRemainlingTime());
+				finalConfirmList.stream().forEach(r -> r.updateRemainlingTime());
 				
 				//Necessity of Resources based on comparison between Estimated Completion Time and Project Due Date
 				if(c.getEstimatedDelay() < 0) {
 					/**
 					 * Release {ct' < dd} <-> {time + WL'/|RA| < dd} -> {time < dd}    *WL'/|RA| > 0
-					 */
-					//(PM) Estimate Releasable Work Amount
-					double estimatedReleasableWorkAmount = c.estimateReleasableWorkAmount(time);
+					 */					
+					
+					releaseList.addAll(c.sendRelease(time));
 					
 					/**
 					 * Add Example 
@@ -293,31 +318,14 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 					 * Request r = c.createRquest();
 					 * 
 					 * request list の時間がきたものから対処していく．
+					 * list のパイプラインとしてく
 					 * 時間関係など注意
 					 * 
 					 */
+
+
 					
-					//(PM) Priority of Workers to be released. Which worker should be released? "Minimum" Matching Skill.
-					List<Worker> workerListToBeReleased = allWorkerList.stream()
-						.sorted((w1,w2) -> w1.getExecutableUnfinishedTaskList(c).size() - w2.getExecutableUnfinishedTaskList(c).size())//How About Skill Point 
-						.collect(Collectors.toList());
-					
-					//(PM) Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
-					int projectIndex = projectList.indexOf(c);
-					double workAmountToBeReleased = 0;
-					for (Worker w : workerListToBeReleased) {
-						boolean updateFlag = false;
-						for(int t = c.getDueDate(); time < t ; t--) {
-							if(estimatedReleasableWorkAmount <= workAmountToBeReleased) break;
-							if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
-								w.getLatestAssignedProjectPlanArray()[t] = -1; //Release
-								workAmountToBeReleased += 1;
-								updateFlag = true;
-							}
-						}
-						//Update AssignedProjectPlanArray
-						if(updateFlag) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
-					}
+
 				}else if(c.getEstimatedDelay() > 0){
 					/**
 					 * Supply Request
@@ -341,8 +349,7 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 						for (int t = time+1; t < c.getDueDate()+1; t++){//t+1 ~ dd
 							double numOfResourceAtTime = 0;
 							for (Worker w : allWorkerList) {
-								if(c.equals(w.getLatestAssignedProjectPlanArray()[t] != -1 
-										? projectList.get(w.getLatestAssignedProjectPlanArray()[t]) : null)) numOfResourceAtTime++;
+								if(PDES_OidaSimulator.projectList.indexOf(c) == (w.getLatestAssignedProjectPlanArray()[t])) numOfResourceAtTime++;
 							}
 							estimatedLackOfWorkAmount -= numOfResourceAtTime;
 						}

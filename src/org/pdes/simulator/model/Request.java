@@ -199,7 +199,7 @@ public class Request {
 	
 	private int calcDuration(int fromIndex, int toindex) {
 		//return getCommunicationDistance(fromIndex, toindex);//0　
-		return 0;
+		return 1;
 	}
 
 	/**
@@ -225,5 +225,17 @@ public class Request {
 	 */
 	public double getWorkAmount() {
 		return workAmount;
+	}
+	/**
+	 * @return the departureTime
+	 */
+	public int getDepartureTime() {
+		return departureTime;
+	}
+	/**
+	 * @return the arrivalTime
+	 */
+	public int getArrivalTime() {
+		return arrivalTime;
 	}
 }

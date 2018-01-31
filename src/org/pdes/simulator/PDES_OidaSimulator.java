@@ -245,6 +245,16 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			//Show Communication Matrix
 			Request.showCommunicationMatrix();
 			
+			/**
+			 * このループがおかしい
+			 * これはEstimateの中で閉じるべき
+			 * 
+			 * SupplyRequestを行なった，
+			 * projectのIndexが登録されていないためおかしなことになっている．
+			 * ループ飲み直し．
+			 * 誰からのリクエストで誰にリソースを返すかもう一度確認
+			 * 
+			 */
 			for(	Component c : projectList) {
 				/**
 				 * Release all resources when a project finishes,
@@ -302,6 +312,8 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 				.filter(r -> r.checkArrival(time))
 				.forEach(r -> {
 					double estimatedLackOfWorkAmount = r.getWorkAmount();
+					
+					//だれからのリクエストか？
 					
 					//-----
 					//Now Confirmation has no delay.TODO add delay.
@@ -562,6 +574,10 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 	public List<Worker> getAllWorkerList() {
 		return allWorkerList;
 	}
+	
+	public List<Component> getProjectList() {
+		return projectList;
+	}
 		
 	/**
 	 * Save result file including oida visualization by csv format.
@@ -649,6 +665,49 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 			});
 			pw.println();
 			
+			pw.println("ReleaseList");
+			
+			for (int i = 0; i < this.getProjectList().size(); i++) {
+				pw.print(this.getProjectList().get(i).getName()+separator);
+				for(Request r : this.releaseList)
+					if(r.getFromIndex() == Request.indexOf(projectList.get(i))) {
+						pw.print(String.format("[DT]%03d [AT]%03d [W]%s,",
+								r.getDepartureTime(),
+								r.getArrivalTime(),
+								((Worker)Request.getObject(r.getToIndex())).getName()
+								));
+					}
+				pw.println();
+			}
+
+			pw.println("SupplyRequestList");
+			
+			for (int i = 0; i < this.getProjectList().size(); i++) {
+				pw.print(this.getProjectList().get(i).getName()+separator);
+				for(Request r : this.supplyRequestList)
+					if(r.getFromIndex() == Request.indexOf(projectList.get(i))) {
+						pw.print(String.format("[DT]%03d [AT]%03d [B]%d,",
+								r.getDepartureTime(),
+								r.getArrivalTime(),
+								PDES_OidaSimulator.brokerId
+								));
+					}
+				pw.println();
+			}
+
+			pw.println("FinalConfirmList");
+			pw.print("FinalConfirmList"+separator);
+			for(Request r : this.finalConfirmList)
+			{
+				pw.print(String.format("[DT]%03d [AT]%03d [B]%d [W]%s,",
+						r.getDepartureTime(),
+						r.getArrivalTime(),
+						PDES_OidaSimulator.brokerId,
+						((Worker)Request.getObject(r.getToIndex())).getName()
+						));
+			}
+			pw.println();
+
 			// header
 			pw.println(String.join(separator, new String[]{"Total Cost", String.valueOf(project.getTotalCost()), "Duration", String.valueOf(project.getDuration()+1), "Total Work Amount", String.valueOf(project.getTotalActualWorkAmount())}));
 			
@@ -730,6 +789,26 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		
 	}
+	
+//	private Integer[][] makePrintArrayOfRequestList(List<Request> requestList) {
+//		Integer[][] a = new Integer[this.getProjectList().size()][PDES_OidaSimulator.maxTime];
+//		for (int i = 0; i < a.length; i++) {
+//			for (int j = 0; j < a.length; j++) {
+//				a[i][j] = 0;
+//			}
+//		}
+//		for(Request r :requestList) {
+//			for (Component c: this.getProjectList()) {
+//				if(r.getFromIndex() == Request.indexOf(c)) {
+//					a[Request.indexOf(c)][r.getDepartureTime()] =  1;
+//					a[Request.indexOf(c)][r.getArrivalTime()]   = -1;
+//				}
+//			}
+//		}
+//		return a;
+//	}
 
 }

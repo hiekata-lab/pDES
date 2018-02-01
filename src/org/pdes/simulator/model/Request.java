@@ -198,8 +198,8 @@ public class Request {
 	}
 	
 	private int calcDuration(int fromIndex, int toindex) {
-		//return getCommunicationDistance(fromIndex, toindex);//0　
-		return 1;
+		return getCommunicationDistance(fromIndex, toindex);//0　
+		//return 5;
 	}
 
 	/**

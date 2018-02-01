@@ -29,8 +29,6 @@
 package org.pdes.simulator.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -134,10 +132,7 @@ public class Component extends BaseComponent {
 			.collect(Collectors.toList());
 		
 		//(PM) Select time slots to be released. Priority : 1.Worker -> 2.Time(Backward:from due date to current time).
-//		//Initialize
-//		HashMap<Worker, Boolean> updateFlags = new HashMap<Worker,Boolean>();
-//		workerListToBeReleased.stream().forEach(w -> updateFlags.put(w, false));
-		
+		//Initialize		
 		int projectIndex = PDES_OidaSimulator.projectList.indexOf(this);
 		double workAmountToBeReleased = 0;
 		for (Worker w : workerListToBeReleased) {
@@ -152,15 +147,11 @@ public class Component extends BaseComponent {
 				if(w.getLatestAssignedProjectPlanArray()[t] == projectIndex) {
 					targetTimeSlotArray[t] = -1; //Release
 					workAmountToBeReleased += 1;
-//					updateFlags.put(w, true);
 				}
 			}
 			
 			//Add request list
 			releaseList.add(new Request(time, Request.indexOf(this), Request.indexOf(w), targetTimeSlotArray));
-			
-//			//Update ReleaseProjectPlanArray
-//			if(updateFlags.get(w)) w.setAssignedProjectPlanArray(time, w.getLatestAssignedProjectPlanArray());
 		}
 		return releaseList;
 	}

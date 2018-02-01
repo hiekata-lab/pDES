@@ -116,6 +116,19 @@ public class Worker extends BaseWorker {
 				.map(t -> (Task)t)
 				.collect(Collectors.toList());
 	}
+	
+//	/**
+//	 * Get working Task List 
+//	 * @param c
+//	 * @return
+//	 */
+//	public List<Task> getWorkingTaskList() {
+//		return c.getTargetedTaskList().stream()
+//				.filter(t -> !t.isFinished())
+//				.filter(t -> this.getWorkAmountSkillPoint(t) > 0)
+//				.map(t -> (Task)t)
+//				.collect(Collectors.toList());
+//	}
 
 	public Component getCurrentAssignedProject() {
 		return currentAssignedProject;
@@ -151,6 +164,9 @@ public class Worker extends BaseWorker {
 			Exception e = new Exception("Length of assignedProjectPlanArray is different.");
 			e.printStackTrace();
 		}
+		//Current Task Check
+		//TODO
+		
 		//this.latestAssignedProjectPlanArray = assignedProjectPlanArray;
 		System.arraycopy(assignedProjectPlanArray, time+1, this.latestAssignedProjectPlanArray, time+1, assignedProjectPlanArray.length - time -1);
 		

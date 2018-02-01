@@ -51,9 +51,9 @@ public class Request {
 			return null;
 		}
 		if(0 < index && index < 1+PDES_OidaSimulator.projectList.size()) {
-			return PDES_OidaSimulator.projectList.get(index);
+			return PDES_OidaSimulator.projectList.get(index - 1);
 		}else{
-			return PDES_OidaSimulator.allWorkerList.get(index -(1+PDES_OidaSimulator.projectList.size()));
+			return PDES_OidaSimulator.allWorkerList.get(index - (1+PDES_OidaSimulator.projectList.size()));
 		}
 		
 	}

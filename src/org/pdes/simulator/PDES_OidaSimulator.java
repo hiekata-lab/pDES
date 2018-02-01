@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.eclipse.ui.internal.wizards.datatransfer.ProjectConfiguratorExtensionManager;
 import org.pdes.simulator.base.PDES_AbstractSimulator;
 import org.pdes.simulator.model.Component;
 import org.pdes.simulator.model.Organization;
@@ -672,23 +671,4 @@ public class PDES_OidaSimulator extends PDES_AbstractSimulator{
 		
 		
 	}
-	
-//	private Integer[][] makePrintArrayOfRequestList(List<Request> requestList) {
-//		Integer[][] a = new Integer[this.getProjectList().size()][PDES_OidaSimulator.maxTime];
-//		for (int i = 0; i < a.length; i++) {
-//			for (int j = 0; j < a.length; j++) {
-//				a[i][j] = 0;
-//			}
-//		}
-//		for(Request r :requestList) {
-//			for (Component c: this.getProjectList()) {
-//				if(r.getFromIndex() == Request.indexOf(c)) {
-//					a[Request.indexOf(c)][r.getDepartureTime()] =  1;
-//					a[Request.indexOf(c)][r.getArrivalTime()]   = -1;
-//				}
-//			}
-//		}
-//		return a;
-//	}
-
 }

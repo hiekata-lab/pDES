@@ -30,15 +30,11 @@ package org.pdes.simulator.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.pdes.rcp.model.WorkerElement;
 import org.pdes.simulator.PDES_OidaSimulator;
-import org.pdes.simulator.base.PDES_AbstractSimulator;
-import org.pdes.simulator.model.base.BaseComponent;
 import org.pdes.simulator.model.base.BaseTeam;
 import org.pdes.simulator.model.base.BaseWorker;
 
@@ -91,6 +87,19 @@ public class Worker extends BaseWorker {
 		setCurrentAssignedProject(null);
 	}
 	
+
+	/**
+	 * Get executable Task List
+	 * @param c
+	 * @return
+	 */
+	public List<Task> getExecutableTaskList(Workflow w) {
+		return w.getTaskList().stream()
+				.filter(t -> this.getWorkAmountSkillPoint(t) > 0)
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
+	}
+	
 	/**
 	 * Get executable unfinished Task List regarding each Project 
 	 * @param c
@@ -100,6 +109,18 @@ public class Worker extends BaseWorker {
 		return c.getTargetedTaskList().stream()
 				.filter(t -> !t.isFinished())
 				.filter(t -> this.getWorkAmountSkillPoint(t) > 0)
+				.map(t -> (Task)t)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Get working Task List regarding a project 
+	 * @param c
+	 * @return
+	 */
+	public List<Task> getWorkingTaskList(Component c) {
+		return c.getTargetedTaskList().stream()
+				.filter(t -> t.isWorking() && t.getAllocatedWorkerList().contains(this))
 				.map(t -> (Task)t)
 				.collect(Collectors.toList());
 	}
@@ -116,12 +137,8 @@ public class Worker extends BaseWorker {
 		return this.latestAssignedProjectPlanArray;
 	}
 	
-	public void setAssignedProjectPlanArray(int time, int start, int end, int projectIndex) {
-//		//update latest assigned plan new
-//		Integer[] newLatest = new Integer[PDES_OidaSimulator.maxTime];
-//		System.arraycopy(this.latestAssignedProjectPlanArray, 0, newLatest, 0, this.latestAssignedProjectPlanArray.length);
-//		this.latestAssignedProjectPlanArray = newLatest;
-		
+	//Initial Assignment
+	public void setAssignedProjectPlanArray(int time, int start, int end, int projectIndex) {		
 		//update latest assigned plan
 		Arrays.fill(this.latestAssignedProjectPlanArray, start, end, projectIndex);
 		
@@ -132,13 +149,30 @@ public class Worker extends BaseWorker {
 		System.arraycopy(this.latestAssignedProjectPlanArray, 0, tmp, timeOneArray.length, this.latestAssignedProjectPlanArray.length);
 		this.assignedProjectPlanArrayList.add(tmp);
 	}
+	
 	public void setAssignedProjectPlanArray(int time, Integer[] assignedProjectPlanArray) {
 		//update latest assigned plan
 		if(assignedProjectPlanArray.length != this.latestAssignedProjectPlanArray.length) {
 			Exception e = new Exception("Length of assignedProjectPlanArray is different.");
 			e.printStackTrace();
 		}
-		this.latestAssignedProjectPlanArray = assignedProjectPlanArray;
+		
+		//Need Overtime work
+		int timeShift = 0;//Current Work make assignment delayed.
+		boolean isDifferentProject = (this.latestAssignedProjectPlanArray[time] != assignedProjectPlanArray[time+1]);
+		List<Task> workingList = this.latestAssignedProjectPlanArray[time] != -1 ? 
+				this.getWorkingTaskList(PDES_OidaSimulator.projectList.get(this.latestAssignedProjectPlanArray[time])):new ArrayList<Task>() ;
+		boolean needOvertime = workingList.size() > 0 && isDifferentProject;
+		if(needOvertime) {
+			timeShift = (int)Math.ceil(workingList.stream().mapToDouble(w -> w.getRemainingWorkAmount()).sum());
+		}
+	
+		if(!needOvertime) {
+			System.arraycopy(assignedProjectPlanArray, time+1, this.latestAssignedProjectPlanArray, time+1, assignedProjectPlanArray.length - time -1);
+		}else {
+			Arrays.fill(this.latestAssignedProjectPlanArray, time+1, time+1 + timeShift, this.latestAssignedProjectPlanArray[time]);
+			System.arraycopy(assignedProjectPlanArray, time+1, this.latestAssignedProjectPlanArray, time+1 + timeShift, assignedProjectPlanArray.length - time -1 - timeShift);	
+		}
 		
 		//update assigned plan history 
 		Integer[] timeOneArray = {time};
